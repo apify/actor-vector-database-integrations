@@ -8,3 +8,5 @@ async def main() -> None:
 
         payload = await Actor.get_input()
         print(payload)
+
+        await Actor.set_status_message("Finished", is_terminal=True)
