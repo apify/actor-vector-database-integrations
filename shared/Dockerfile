@@ -1,11 +1,8 @@
 FROM apify/actor-python:3.12
 
-RUN rm -rf /usr/src/app/*
 WORKDIR /usr/src/app
 
-COPY pyproject.toml ./
-COPY poetry.toml ./
-COPY poetry.lock ./
+COPY code/pyproject.toml code/poetry.lock code/pyproject.toml ./
 
 RUN echo "Python version:" \
     && python --version \
@@ -20,6 +17,6 @@ RUN echo "Python version:" \
     && echo "All installed Python packages:" \
     && pip freeze
 
-COPY . ./
+COPY code ./
 
 CMD ["python3", "-m", "src"]

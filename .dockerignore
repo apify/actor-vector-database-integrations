@@ -1,0 +1,18 @@
+# Files and folders to ignore during Docker build
+.env/
+.env.example
+
+# Git
+.git
+.gitignore
+
+# Docker
+.docker
+
+# Python
+.pytest_cache
+.idea
+.mypy_cache
+
+# mono-repo
+code/.venv
