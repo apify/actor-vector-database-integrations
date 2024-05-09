@@ -1,0 +1,14 @@
+repos:
+  - repo: local
+    hooks:
+      - id: lint
+        name: Lint codebase
+        entry: make lint
+        language: system
+        pass_filenames: false
+
+      - id: type-check
+        name: Type-check codebase
+        entry: make type-check
+        language: system
+        pass_filenames: false

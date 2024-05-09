@@ -1,0 +1,92 @@
+{
+    "title": "Chroma-integration",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "chroma_collection_name": {
+            "title": "Chroma DB collection name",
+            "description": "Chroma DB collection name",
+            "type": "string",
+            "editor": "textfield",
+            "default": "chroma"
+        },
+        "chroma_client_host": {
+            "title": "ChromaDB host",
+            "description": "Host argument for ChromaDB HTTP Client",
+            "type": "string",
+            "editor": "textfield"
+        },
+        "chroma_client_port": {
+            "title": "ChromaDB port",
+            "description": "Port argument for ChromaDB HTTP Client",
+            "type": "integer",
+            "editor": "number",
+            "default": 8080
+        },
+        "chroma_client_ssl": {
+            "title": "ChromDB SSL",
+            "description": "Enable/Disable SSL",
+            "type": "boolean",
+            "default": false
+        },
+        "chroma_server_auth_credentials": {
+            "title": "ChromaDB server auth Static API token credentials",
+            "description": "ChromaDB server Auth Static API token.",
+            "type": "string",
+            "editor": "textfield",
+            "isSecret": true
+        },
+        "openai_token": {
+            "title": "OpenAI API KEY",
+            "description": "OpenAI API KEY",
+            "type": "string",
+            "editor": "textfield",
+            "isSecret": true
+        },
+        "fields": {
+            "title": "Fields",
+            "type": "array",
+            "description": "Specify Dataset fields for text extraction in this array, using dot notation. \n\nE.g., for a crawler's 'text' output field, simply add 'text' to the array.",
+            "editor": "stringList"
+        },
+        "metadata_fields": {
+            "title": "Metadata fields",
+            "type": "object",
+            "description": "Select metadata fields (supports dot notation)",
+            "editor": "json"
+        },
+        "metadata_values": {
+            "title": "Metadata values",
+            "type": "object",
+            "description": "Custom values saved to db for every Dataset item as metadata",
+            "editor": "json"
+        },
+        "perform_chunking": {
+            "title": "Perform chunking",
+            "description": "If set to true, the resulting text will be chunked according to the settings below",
+            "default": false,
+            "type": "boolean"
+        },
+        "chunk_size": {
+            "title": "Chunk size",
+            "type": "integer",
+            "description": "The maximum character length of each text chunk",
+            "default": 1000,
+            "minimum": 1
+        },
+        "chunk_overlap": {
+            "title": "Chunk overlap",
+            "type": "integer",
+            "description": "The character overlap between text chunks that are next to each other",
+            "default": 0,
+            "minimum": 0
+        },
+        "dataset_id": {
+            "title": "Dataset ID",
+            "type": "string",
+            "description": "Dataset ID (when running standalone without integration)",
+            "editor": "textfield"
+        }
+    },
+    "required": ["chroma_client_host", "openai_token", "fields"]
+}
