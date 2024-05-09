@@ -27,6 +27,18 @@ pytest-integration-mark = "^0.2.0"
 pytest-vcr = "^1.0.2"
 ruff = "^0.3.5"
 
+[tool.poetry.group.chromadb]
+optional = true
+
+[tool.poetry.group.chromadb.dependencies]
+chromadb = "^0.5.0"
+
+[tool.poetry.group.pinecone]
+optional = true
+
+[tool.poetry.group.pinecone.dependencies]
+pinecone = "^4.0.0"
+
 [tool.ruff]
 line-length = 120
 exclude = ["src/input_model.py"]

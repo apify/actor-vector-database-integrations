@@ -4,6 +4,16 @@ WORKDIR /usr/src/app
 
 COPY code/pyproject.toml code/poetry.lock code/pyproject.toml ./
 
+# echo environment variable VECTOR_DATABASE
+RUN echo "VECTOR_DATABASE: $VECTOR_DATABASE"
+RUN if [ -z "$VECTOR_DATABASE" ] ; then \
+        export POETRY_INSTALL="main"; \
+    else \
+        export POETRY_INSTALL="main,${VECTOR_DATABASE}"; \
+    fi \
+    && echo "VECTOR_DATABASE: $VECTOR_DATABASE" \
+    && echo "POETRY_INSTALL: $POETRY_INSTALL"
+
 RUN echo "Python version:" \
     && python --version \
     && echo "Pip version:" \
