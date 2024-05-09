@@ -4,14 +4,10 @@ WORKDIR /usr/src/app
 
 COPY code/pyproject.toml code/poetry.lock code/pyproject.toml ./
 
-# echo environment variable VECTOR_DATABASE
-RUN echo "VECTOR_DATABASE: $VECTOR_DATABASE"
-RUN if [ -z "$VECTOR_DATABASE" ] ; then \
-        export POETRY_INSTALL="main"; \
-    else \
-        export POETRY_INSTALL="main,${VECTOR_DATABASE}"; \
-    fi \
-    && echo "VECTOR_DATABASE: $VECTOR_DATABASE" \
+ARG VECTOR_DATABASE
+ENV POETRY_INSTALL="main${VECTOR_DATABASE:+,}${VECTOR_DATABASE}"
+
+RUN echo "VECTOR_DATABASE: $VECTOR_DATABASE" \
     && echo "POETRY_INSTALL: $POETRY_INSTALL"
 
 RUN echo "Python version:" \
@@ -22,11 +18,12 @@ RUN echo "Python version:" \
     && pip install --no-cache-dir poetry~=1.8 \
     && echo "Installing dependencies:" \
     && poetry config virtualenvs.create false \
-    && poetry install --only main --no-interaction --no-ansi \
+    && poetry install --only ${POETRY_INSTALL} --no-interaction --no-ansi \
     && rm -rf /tmp/.poetry-cache \
     && echo "All installed Python packages:" \
     && pip freeze
 
 COPY code ./
 
-CMD ["python3", "-m", "src"]
+#CMD ["python3", "-m", "src"]
+CMD ["/bin/bash"]
