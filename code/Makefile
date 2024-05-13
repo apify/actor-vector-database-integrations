@@ -1,6 +1,7 @@
 .PHONY: clean install-dev lint type-check check-code format
 
 DIRS_WITH_CODE = src
+DIRS_WITH_ACTORS = ../actors
 
 clean:
 	rm -rf .venv .mypy_cache .pytest_cache .ruff_cache __pycache__
@@ -23,5 +24,6 @@ format:
 	poetry run ruff format $(DIRS_WITH_CODE)
 
 pydantic-model:
-	datamodel-codegen --input .actor/input_schema.json --output $(DIRS_WITH_CODE)/input_model.py  --input-file-type jsonschema  --field-constraints
+	datamodel-codegen --input $(DIRS_WITH_ACTORS)/chroma/.actor/input_schema.json --output $(DIRS_WITH_CODE)/models/chroma_input_model.py  --input-file-type jsonschema  --field-constraints
+	datamodel-codegen --input $(DIRS_WITH_ACTORS)/pinecone/.actor/input_schema.json --output $(DIRS_WITH_CODE)/models/pinecone_input_model.py  --input-file-type jsonschema  --field-constraints
 
