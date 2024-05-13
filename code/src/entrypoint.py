@@ -45,3 +45,9 @@ async def main():
             status_message=f"This Actor was built incorrectly; an unknown Actor was selected to start ({actor_type}). "
             f"If you encounter this issue, please contact the Actor developer.",
         )
+
+
+if __name__ == "__main__":
+    import asyncio
+
+    asyncio.run(main())
