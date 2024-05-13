@@ -14,6 +14,7 @@ async def main():
     async with Actor:
 
         Actor.log.info("Starting the Actor")
+        print("Starting the Actor")
 
         if not (actor_input := await Actor.get_input() or {}):
             await Actor.fail(status_message="No input provided", exit_code=1)
@@ -49,5 +50,5 @@ async def main():
 
 if __name__ == "__main__":
     import asyncio
-
+    print("Running asyncio.run(main())")
     asyncio.run(main())
