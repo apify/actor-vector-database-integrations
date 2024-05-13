@@ -11,7 +11,7 @@ print("Imported entrypoint.py")
 
 
 async def main():
-    async with Actor():
+    async with Actor:
 
         Actor.log.info("Starting the Actor")
 
