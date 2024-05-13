@@ -25,5 +25,4 @@ RUN echo "Python version:" \
 
 COPY code ./
 
-#CMD ["python3", "-m", "src"]
-CMD ["/bin/bash"]
+CMD ["python3", "-m", "src.entrypoint"]
