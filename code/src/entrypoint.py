@@ -10,6 +10,9 @@ from .models.pinecone_input_model import PineconeIntegration
 
 async def main():
     async with Actor():
+
+        Actor.log.info("Starting the Actor")
+
         if not (actor_input := await Actor.get_input() or {}):
             await Actor.fail(status_message="No input provided", exit_code=1)
 
@@ -21,7 +24,7 @@ async def main():
                     "to start. If you encounter this issue, please contact the Actor developer.",
                 )
 
-            arg = f"actors/{SupportedVectorStoresEn.chroma.value}"
+            arg = f"actors/{SupportedVectorStoresEn.pinecone.value}"
             Actor.log.warning(
                 f"The environment variable ACTOR_PATH_IN_DOCKER_CONTEXT was not specified. "
                 f"Using default for local development: actors/{arg}"
