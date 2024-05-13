@@ -3,8 +3,8 @@ from functools import partial
 
 from apify import Actor
 
-from models.chroma_input_model import ChromaIntegration
-from models.pinecone_input_model import PineconeIntegration
+from .models.chroma_input_model import ChromaIntegration
+from .models.pinecone_input_model import PineconeIntegration
 
 TypeDb = ChromaIntegration | PineconeIntegration
 

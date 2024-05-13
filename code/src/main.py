@@ -6,7 +6,7 @@ from langchain_community.document_loaders import ApifyDatasetLoader
 from langchain_openai.embeddings import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from .base import TypeDb, get_database
+from .vcs import TypeDb, get_database
 from .models.chroma_input_model import ChromaIntegration  # type: ignore
 from .models.pinecone_input_model import PineconeIntegration  # type: ignore
 

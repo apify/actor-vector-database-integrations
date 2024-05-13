@@ -1,40 +1,40 @@
-# ChromaDB integration
+# Chroma integration
 
-The Apify ChromaDB integration seamlessly transfers selected data from Apify Actors to a ChromaDB.
+The Apify Chroma database integration seamlessly transfers selected data from Apify Actors to a Chroma database.
 
 Is there anything you find unclear or missing? Please don't hesitate to inform us by creating an issue.
 
 ⚠️ **Note**: This Actor is meant to be used together with other Actors' integration section.
 For instance, if you are using the [Website Content Crawler](https://apify.com/apify/website-content-crawler),
-you can enable ChromaDB integration to store vectors in ChromaDB.
+you can enable Chroma database integration to store vectors in Chroma.
 
-Apify ChromaDB integration computes OpenAI embeddings and store them in ChromaDB. It uses [LangChain](https://www.langchain.com/)
-to interact with [OpenAI embeddings](https://platform.openai.com/docs/guides/embeddings) and [ChromaDB](https://www.trychroma.com/).
+Apify Chroma integration computes OpenAI embeddings and store them in Chroma. It uses [LangChain](https://www.langchain.com/)
+to interact with [OpenAI embeddings](https://platform.openai.com/docs/guides/embeddings) and [Chroma](https://www.trychroma.com/).
 
 For more information how to leverage vector stores in Apify platform, see a similar [Pinecone
 integration](https://github.com/HonzaTuron/pinecone) and detailed blog post [what Pinecone is and why you should use it with your LLMs](https://blog.apify.com/what-is-pinecone-why-use-it-with-llms/).
 
 ## Description
 
-The ChromaDB-integration is designed to compute and store vectors from other Actors' data. It uses langchain
-to interact with `OpenAI` and `ChromaDB`.
+The Chroma-integration is designed to compute and store vectors from other Actors' data. It uses langchain
+to interact with `OpenAI` and `Chroma`.
 
 1. Get `dataset_id` from an `Apify Actor` output (passed automatically via integration).
 2. Get dataset using `Apify Python SDK`.
 3. [Optional] Split text data into chunks using `langchain`'s `RecursiveCharacterTextSplitter`
 (enable/disable using `perform_chunking` and specify `chunk_size`, `chunk_overlap`)
 4. Compute embeddings using `OpenAI`
-5. Save data into `ChromaDB`
+5. Save data into `Chroma`
 
 ## Before you start
 
 To utilize this integration, ensure you have:
 
 - An OpenAI account and an OpenAI API token. Create a free account at [OpenAI](https://beta.openai.com/).
-- `ChromaDB` operational on a server or localhost.
+- `Chroma` operational on a server or localhost.
 
-For quick ChromaDB setup, refer to [ChromaDB deployment](https://docs.trychroma.com/deployment#docker).
-ChromaDB can be run in a Docker container with the following commands:
+For quick Chroma setup, refer to [Chroma deployment](https://docs.trychroma.com/deployment#docker).
+Chroma can be run in a Docker container with the following commands:
 
 ### Docker
 
@@ -59,9 +59,9 @@ Then run Docker with:
 docker run --env-file ./.env -p 8000:8000 chromadb/chroma
 ```
 
-### If you are running ChromaDB locally, you can expose the localhost using Ngrok
+### If you are running Chroma locally, you can expose the localhost using Ngrok
 
-[Install ngrok](https://ngrok.com/download) (you can use it for free or create an account). Expose ChromaDB using
+[Install ngrok](https://ngrok.com/download) (you can use it for free or create an account). Expose Chroma using
 
 ```shell
 ngrok http http://localhost:8080
@@ -82,15 +82,15 @@ Note that your specific URL will vary.
 
 For details refer to [input schema](.actor/input_schema.json).
 
-- `chroma_collection_name`: ChromaDB collection name (default: `chroma`)
-- `chroma_client_host`: ChromaDB client host
-- `chroma_client_port`: ChromaDB client port (default: `8080`)
+- `chroma_collection_name`: Chroma collection name (default: `chroma`)
+- `chroma_client_host`: Chroma client host
+- `chroma_client_port`: Chroma client port (default: `8080`)
 - `chroma_client_ssl`: Enable/disable SSL (default: `false`)
-- `chroma_auth_credentials`: ChromaDB server auth Static API token credentials
+- `chroma_auth_credentials`: Chroma server auth Static API token credentials
 - `fields` - Array of fields you want to save. For example, if you want to push `name` and `user.description` fields, you should set this field to `["name", "user.description"]`.
-- `metadata_values` - Object of metadata values you want to save. For example, if you want to push `url` and `createdAt` values to ChromaDB, you should set this field to `{"url": "https://www.apify.com", "createdAt": "2021-09-01"}`.
+- `metadata_values` - Object of metadata values you want to save. For example, if you want to push `url` and `createdAt` values to Chroma, you should set this field to `{"url": "https://www.apify.com", "createdAt": "2021-09-01"}`.
 - `metadata_fields` - Object of metadata fields you want to save. For example, if you want to push `url` and `createdAt` fields, you should set this field to `{"url": "url", "createdAt": "createdAt"}`. If it has the same key as `metadata_values`, it's replaced.
-- `openai_token` - OpenAI API token.
+- `openai_api_key` - OpenAI API KEY.
 - `perform_chunking` - Whether to compute text chunks
 - `chunk_size` - The maximum character length of each text chunk
 - `chunk_overlap` - The character overlap between text chunks that are next to each other
@@ -99,7 +99,7 @@ Fields `fields`, `metadata_values`, and `metadata_fields` supports dot notation.
 
 ## Outputs
 
-This integration will save the selected fields from your Actor to your a ChromaDB.
+This integration will save the selected fields from your Actor to your a Chroma.
 
 ## Want to talk to other devs or get help?
 
