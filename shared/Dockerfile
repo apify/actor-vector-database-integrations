@@ -28,4 +28,4 @@ COPY code ./
 ARG ACTOR_PATH_IN_DOCKER_CONTEXT
 ENV ACTOR_PATH_IN_DOCKER_CONTEXT="${ACTOR_PATH_IN_DOCKER_CONTEXT}"
 
-CMD ["python3", "-m", "src.entrypoint"]
+CMD ["python3", "-m", "src"]
