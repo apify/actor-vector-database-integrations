@@ -7,6 +7,9 @@ from .main import main as main_f
 from .models.chroma_input_model import ChromaIntegration
 from .models.pinecone_input_model import PineconeIntegration
 
+print("Imported entrypoint.py")
+
+
 async def main():
     async with Actor():
 
