@@ -19,6 +19,8 @@ async def main():
         if not (actor_input := await Actor.get_input() or {}):
             await Actor.fail(status_message="No input provided", exit_code=1)
 
+        print("Actor path in the docker context: ", os.getenv("ACTOR_PATH_IN_DOCKER_CONTEXT"))
+
         if not (arg := os.getenv("ACTOR_PATH_IN_DOCKER_CONTEXT")):
             if Actor.is_at_home():
                 await Actor.exit(
