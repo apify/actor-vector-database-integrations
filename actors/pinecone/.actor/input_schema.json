@@ -1,0 +1,77 @@
+{
+  "title": "Pinecone-integration",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "pinecone_index_name": {
+      "title": "Pinecone index name",
+      "type": "string",
+      "description": "Pinecone index name.",
+      "editor": "textfield"
+    },
+    "pinecone_api_key": {
+      "title": "Pinecone API KEY",
+      "description": "Pinecone API KEY",
+      "type": "string",
+      "editor": "textfield",
+      "isSecret": true
+    },
+    "openai_api_key": {
+      "title": "OpenAI API KEY",
+      "description": "OpenAI API KEY",
+      "type": "string",
+      "editor": "textfield",
+      "isSecret": true
+    },
+    "fields": {
+      "title": "Fields",
+      "type": "array",
+      "description": "Select Dataset fields pushed to Pinecone (supports dot notation)",
+      "editor": "stringList"
+    },
+    "metadata_fields": {
+      "title": "Metadata fields",
+      "type": "object",
+      "description": "Select fields pushed to Pinecone as metadata (supports dot notation)",
+      "editor": "json"
+    },
+    "metadata_values": {
+      "title": "Metadata values",
+      "type": "object",
+      "description": "Custom values pushed to Pinecone for every Dataset item as metadata",
+      "editor": "json"
+    },
+    "perform_chunking": {
+      "title": "Perform chunking",
+      "description": "If set to true, the resulting text will be chunked according to the settings below",
+      "default": false,
+      "type": "boolean"
+    },
+    "chunk_size": {
+      "title": "Chunk size",
+      "type": "integer",
+      "description": "The maximum character length of each text chunk",
+      "default": 1000,
+      "minimum": 1
+    },
+    "chunk_overlap": {
+      "title": "Chunk overlap",
+      "type": "integer",
+      "description": "The character overlap between text chunks that are next to each other",
+      "default": 0,
+      "minimum": 0
+    },
+    "dataset_id": {
+      "title": "Dataset ID",
+      "type": "string",
+      "description": "Dataset ID (when running standalone without integration)",
+      "editor": "textfield"
+    }
+  },
+  "required": [
+    "pinecone_index_name",
+    "pinecone_api_key",
+    "openai_api_key",
+    "fields"
+  ]
+}

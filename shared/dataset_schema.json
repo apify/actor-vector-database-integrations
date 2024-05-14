@@ -1,0 +1,32 @@
+{
+    "actorSpecification": 1,
+    "views": {
+        "overview": {
+            "title": "Overview",
+            "transformation": {
+                "fields": [
+                    "url",
+                    "answer",
+                    "jsonAnswer"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "url": {
+                        "label": "URL",
+                        "format": "link"
+                    },
+                    "answer": {
+                        "label": "Answer",
+                        "format": "text"
+                    },
+                    "jsonAnswer": {
+                        "label": "JSON answer (if any)",
+                        "format": "object"
+                    }
+                }
+            }
+        }
+    }
+}

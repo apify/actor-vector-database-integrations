@@ -1,0 +1,18 @@
+# IDE configurations
+.idea
+.vscode
+
+# crawlee and apify storage folders
+apify_storage
+crawlee_storage
+storage
+
+# python related
+__pycache__
+.mypy_cache
+.pytest_cache
+.coverage
+.venv
+
+# git folder
+.git
