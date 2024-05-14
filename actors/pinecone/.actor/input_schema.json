@@ -24,21 +24,30 @@
       "isSecret": true
     },
     "fields": {
-      "title": "Fields",
+      "title": "A list of fields which should be selected from the items",
       "type": "array",
-      "description": "Select Dataset fields pushed to Pinecone (supports dot notation)",
+      "description": "A list of fields which should be selected from the items, only these fields will remain in the resulting record objects.\n\n For example, when using the website content crawler, you might select fields such as `text` and `url`, and `metadata.title` among others, to be included in the vector store file.",
+      "default": [
+        "url",
+        "text"
+      ],
+      "prefill": [
+        "url",
+        "text",
+        "metadata.title"
+      ],
       "editor": "stringList"
     },
     "metadata_fields": {
       "title": "Metadata fields",
       "type": "object",
-      "description": "Select fields pushed to Pinecone as metadata (supports dot notation)",
+      "description": "A list of fields which should be selected from the items and stored as metadata. \n\n For example, when using the website content crawler, you might want to store `url` in metadata. In this case, use `metadata_fields parameter as follows {\"page_url\": \"url\"}`",
       "editor": "json"
     },
     "metadata_values": {
       "title": "Metadata values",
       "type": "object",
-      "description": "Custom values pushed to Pinecone for every Dataset item as metadata",
+      "description": "Custom values to be stored for every Dataset item as metadata.\n\n For example, you might want to store `domain` in metadata, hence use `metadata_values as {\"domain\": \"apify.com\"}`",
       "editor": "json"
     },
     "perform_chunking": {
