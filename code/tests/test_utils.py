@@ -1,7 +1,8 @@
 from unittest.mock import patch
 
-from src.utils import get_nested_value, stringify_dict, ApifyDatasetLoader, load_dataset
 from langchain.docstore.document import Document
+
+from utils import get_nested_value, load_dataset, stringify_dict
 
 
 def test_get_nested_value_with_nested_keys():
