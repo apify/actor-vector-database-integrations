@@ -31,7 +31,7 @@ async def main():
             )
 
     actor_type = arg.split("/")[-1]
-    Actor.log.debug("Received start argument: %s", actor_type)
+    Actor.log.info("Received start argument: %s", actor_type)
 
     if actor_type == SupportedVectorStoresEn.chroma.value:
         return main_f(ChromaIntegration(**actor_input), actor_input)
