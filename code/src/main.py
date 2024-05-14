@@ -55,7 +55,7 @@ async def main(actor_input: TypeDb, payload: dict):
         loader = ApifyDatasetLoader(
             str(dataset_id),
             dataset_mapping_function=lambda dataset_item: Document(
-                page_content=get_nested_value(dataset_item, field),
+                page_content=get_nested_value(dataset_item, field) or "",
                 metadata={
                     **meta_values,
                     **{key: get_nested_value(dataset_item, value) for key, value in meta_fields.items()},
