@@ -28,19 +28,17 @@ pytest-integration-mark = "^0.2.0"
 pytest-vcr = "^1.0.2"
 ruff = "^0.3.5"
 
-[tool.poetry.group.chroma]
-optional = true
-
-[tool.poetry.group.chroma.dependencies]
-langchain-chroma = "^0.1.0"
-
 [tool.poetry.group.pinecone]
 optional = true
 
 [tool.poetry.group.pinecone.dependencies]
 langchain-pinecone = "^0.1.0"
-pinecone = "^4.0.0"
 
+[tool.poetry.group.chroma]
+optional = true
+
+[tool.poetry.group.chroma.dependencies]
+langchain-chroma = "^0.1.0"
 
 [tool.ruff]
 line-length = 120

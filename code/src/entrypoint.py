@@ -3,23 +3,18 @@ import os
 from apify import Actor
 
 from .constants import SupportedVectorStoresEn
-from .core import main as main_f
+from .main import main as main_f
 from .models.chroma_input_model import ChromaIntegration
 from .models.pinecone_input_model import PineconeIntegration
-
-print("Imported entrypoint.py")
 
 
 async def main():
     async with Actor:
 
         Actor.log.info("Starting the Actor")
-        print("Starting the Actor")
 
         if not (actor_input := await Actor.get_input() or {}):
             await Actor.fail(status_message="No input provided", exit_code=1)
-
-        print("Actor path in the docker context: ", os.getenv("ACTOR_PATH_IN_DOCKER_CONTEXT"))
 
         if not (arg := os.getenv("ACTOR_PATH_IN_DOCKER_CONTEXT")):
             if Actor.is_at_home():

@@ -2733,26 +2733,6 @@ files = [
 ptyprocess = ">=0.5"
 
 [[package]]
-name = "pinecone"
-version = "4.0.0"
-description = "Pinecone client and SDK"
-optional = false
-python-versions = "<4.0,>=3.8"
-files = [
-    {file = "pinecone-4.0.0-py3-none-any.whl", hash = "sha256:63c441c4ddab70c2acc7436d7f7e78e33d7d47b894093c3a9016b46b4173c47f"},
-    {file = "pinecone-4.0.0.tar.gz", hash = "sha256:47e3e7b8f4a0da9a8339fa63f3d4f9a260b03d2cc53f2ad83d17f3fee947861e"},
-]
-
-[package.dependencies]
-certifi = ">=2019.11.17"
-tqdm = ">=4.64.1"
-typing-extensions = ">=3.7.4"
-urllib3 = {version = ">=1.26.5", markers = "python_version >= \"3.12\" and python_version < \"4.0\""}
-
-[package.extras]
-grpc = ["googleapis-common-protos (>=1.53.0)", "grpcio (>=1.44.0)", "grpcio (>=1.59.0)", "lz4 (>=3.1.3)", "protobuf (>=4.25,<5.0)", "protoc-gen-openapiv2 (>=0.0.1,<0.0.2)"]
-
-[[package]]
 name = "pinecone-client"
 version = "3.2.2"
 description = "Pinecone client and SDK"
@@ -4630,4 +4610,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.12,<3.13"
-content-hash = "36f390c139b42a7f70e4e5e2364751f96fb5fa9944d74245d06c275543b16ba8"
+content-hash = "42f9314d8ce02548a01f87e7f0fe3e75b1168c147087ab091bcba1f4df9e3a77"
