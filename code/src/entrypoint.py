@@ -43,17 +43,17 @@ async def main():
                 f"Using default for local development: actors/{arg}"
             )
 
-    Actor.log.info("Actor path: %s", arg)
-    actor_type = arg.split("/")[-1]
-    Actor.log.info("Received start argument: %s", actor_type)
+        Actor.log.info("Actor path: %s", arg)
+        actor_type = arg.split("/")[-1]
+        Actor.log.info("Received start argument: %s", actor_type)
 
-    if actor_type == SupportedVectorStoresEn.chroma.value:
-        return main_f(ChromaIntegration(**actor_input), actor_input)
-    elif actor_type == SupportedVectorStoresEn.pinecone.value:
-        return main_f(PineconeIntegration(**actor_input), actor_input)
-    else:
-        await Actor.exit(
-            exit_code=10,
-            status_message=f"This Actor was built incorrectly; an unknown Actor was selected to start ({actor_type}). "
-            f"If you encounter this issue, please contact the Actor developer.",
-        )
+        if actor_type == SupportedVectorStoresEn.chroma.value:
+            return main_f(ChromaIntegration(**actor_input), actor_input)
+        elif actor_type == SupportedVectorStoresEn.pinecone.value:
+            return main_f(PineconeIntegration(**actor_input), actor_input)
+        else:
+            await Actor.exit(
+                exit_code=10,
+                status_message=f"This Actor was built incorrectly; an unknown Actor was selected to start ({actor_type}). "
+                f"If you encounter this issue, please contact the Actor developer.",
+            )
