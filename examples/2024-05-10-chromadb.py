@@ -8,14 +8,20 @@ from langchain_core.documents import Document
 from langchain_openai.embeddings import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pathlib import Path
+from apify_client import ApifyClient
 
 # docker pull chromadb/chroma
 # docker run -p 8000:8000 chromadb/chroma
 
 COLLECTION_NAME = "chroma"
+DATASET_ID = "J13oTZVY5wJWQdbzn"
+
+
 load_dotenv(Path.cwd() / ".." / "code" / ".env")
 
 embeddings = OpenAIEmbeddings()
+
+client = ApifyClient()
 
 chroma_client = chromadb.HttpClient(
     "localhost",
@@ -32,6 +38,30 @@ print(chroma_client.get_version())
 print(chroma_client.count_collections())
 
 
+def get_nested_value(d: dict, keys: str) -> str:
+    """
+    Extract nested value from dict.
+
+    Example:
+      >>> get_nested_value({"a": "v1", "c1": {"c2": "v2"}}, "c1.c2")
+      'v2'
+    """
+
+    keys_list = keys.split(".")
+    result = d
+
+    for key in keys_list:
+        if key in result:
+            result = result[key]
+        else:
+            # If any of the keys are not found, return None
+            return ""
+
+    return result  # type: ignore
+
+
+
+
 def load_dataset(dataset_id: str) -> ApifyDatasetLoader:
     """Load dataset by dataset_id using ApifyDatasetLoader."""
 
@@ -43,12 +73,15 @@ def load_dataset(dataset_id: str) -> ApifyDatasetLoader:
             ),
         )
     except ApifyApiError as e:
-        raise ApifyApiError(e) from None
+        raise ApifyApiError(e)
 
+dataset = client.dataset(DATASET_ID).list_items(clean=True)
+data: list = dataset.items
+data = [{key: get_nested_value(d, key) for key in aid.fields} for d in data]
+data = [d for d in data if d]
 
-loader: ApifyDatasetLoader = load_dataset("J13oTZVY5wJWQdbzn")
-data = loader.load()
-
+# loader: ApifyDatasetLoader = load_dataset(DATASET_ID)
+# data = loader.load()
 
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
 data = text_splitter.split_documents(data)
