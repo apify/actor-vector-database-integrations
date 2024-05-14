@@ -24,19 +24,23 @@ async def main():
         )
 
         if not (arg := os.getenv("ACTOR_PATH_IN_DOCKER_CONTEXT")):
+            Actor.log.info("No environment variable ACTOR_PATH_IN_DOCKER_CONTEXT found")
             if Actor.is_at_home():
+                Actor.log.info("Running in local development mode")
                 await Actor.exit(
                     exit_code=100,
                     status_message="This Actor was built incorrectly; no environment variable specifies which Actor "
                     "to start. If you encounter this issue, please contact the Actor developer.",
                 )
 
+            Actor.log.info("Running in Apify cloud")
             arg = f"actors/{SupportedVectorStoresEn.pinecone.value}"
             Actor.log.warning(
                 f"The environment variable ACTOR_PATH_IN_DOCKER_CONTEXT was not specified. "
                 f"Using default for local development: actors/{arg}"
             )
 
+    Actor.log.info("Actor path: %s", arg)
     actor_type = arg.split("/")[-1]
     Actor.log.info("Received start argument: %s", actor_type)
 
