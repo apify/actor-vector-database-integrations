@@ -22,7 +22,7 @@
       "type": "string",
       "editor": "select",
       "enum": ["OpenAIEmbeddings", "HuggingFaceEmbeddings, CohereEmbeddings"],
-      "prefill": ["OpenAiEmbeddings"]
+      "default": "OpenAIEmbeddings"
     },
     "embeddings_config": {
       "title": "Embeddings provider configuration",
@@ -94,6 +94,7 @@
   "required": [
     "pinecone_index_name",
     "pinecone_api_key",
+    "embeddings",
     "fields"
   ]
 }

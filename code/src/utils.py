@@ -19,7 +19,7 @@ def get_nested_value(d: dict, keys: str) -> str:
             d = d[key]
         else:
             return ""
-    return d  # type ignore
+    return str(d)
 
 
 def stringify_dict(d: dict, keys: list[str]) -> str:

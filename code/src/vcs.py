@@ -22,7 +22,7 @@ async def get_vector_store(aid: InputsDb, embeddings: Embeddings) -> VectorStore
         return await _get_pinecone(aid, embeddings)
 
     await Actor.fail(status_message=f"Failed to get database with config: {aid}")
-    raise
+    raise ValueError("Failed to get database")
 
 
 async def _get_chroma(aid: ChromaIntegration, embeddings: Embeddings) -> VectorStore:

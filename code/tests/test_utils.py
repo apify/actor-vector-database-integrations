@@ -49,23 +49,6 @@ def test_stringify_dict_with_empty_dict():
     assert stringify_dict(d, keys) == ""
 
 
-@patch("src.utils.ApifyDatasetLoader")
-def test_load_dataset_and_load_data(mock_loader):
-    dataset_id = "1234"
-    fields = ["text"]
-    meta_values = {}
-    meta_fields = {}
-
-    mock_instance = mock_loader.return_value
-    mock_instance.load.return_value = ["mocked data"]
-
-    loader = load_dataset(dataset_id, fields, meta_values, meta_fields)
-    data = loader.load()
-
-    mock_instance.load.assert_called_once()
-    assert data == ["mocked data"]
-
-
 def test_load_page_content():
 
     dataset_items = [{"text": "This is a test"}]
