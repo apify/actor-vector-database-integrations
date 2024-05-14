@@ -1,23 +1,17 @@
 import os
-from functools import partial
 from pathlib import Path
 
-import chromadb
-from chromadb.config import Settings
 from dotenv import load_dotenv
-from langchain_community.vectorstores import Chroma
 from langchain_core.documents import Document
 from langchain_openai.embeddings import OpenAIEmbeddings
-from langchain_pinecone import PineconeVectorStore
-
 
 load_dotenv(Path.cwd() / ".." / "code" / ".env")
 COLLECTION_NAME = "chroma"
 
 embeddings = OpenAIEmbeddings()
 
-CHROMADB = False
-PINECONE = True
+CHROMADB = True
+PINECONE = False
 
 
 docs = [
@@ -30,6 +24,11 @@ docs = [
 
 # CHROMA --------------------
 if CHROMADB:
+
+    import chromadb
+    from chromadb.config import Settings
+    from langchain_chroma import Chroma
+
     chroma_client = chromadb.HttpClient(
         "localhost",
         port=8000,
@@ -44,24 +43,19 @@ if CHROMADB:
     print(chroma_client.get_version())
     print(chroma_client.count_collections())
 
-    db = Chroma.from_documents(
-        documents=docs, client=chroma_client, embedding=embeddings, collection_name=COLLECTION_NAME
-    )
-    print(db)
-
-    for v in db.similarity_search("apify", k=1):
+    vcs_ = Chroma(client=chroma_client, collection_name=COLLECTION_NAME, embedding_function=embeddings)
+    vcs_.add_documents(documents=docs)
+    for v in vcs_.similarity_search("apify", k=1):
         print(v)
-
-    # define partial function for Chroma.from_documents
-    vs_from_documents = partial(Chroma.from_documents, client=chroma_client, collection_name=COLLECTION_NAME)
-    vs_from_documents(documents=docs, embedding=embeddings)
 
 # PINECONE --------------------
 if PINECONE:
-    # expects that PINECONE_API_KEY is set as the environment variable
-    # db_p = PineconeVectorStore(embedding=embeddings)
-    # client = PineconeClient(api_key=_pinecone_api_key, source_tag="langchain")
-    # self._index = client.Index(_index_name)
-    db_p = PineconeVectorStore.from_documents(
-        documents=docs, embedding=embeddings, index_name=os.getenv("PINECONE_INDEX_NAME")
-    )
+    from langchain_pinecone import PineconeVectorStore  # type: ignore
+    from pinecone import Pinecone as PineconeClient  # type: ignore
+
+    client = PineconeClient(api_key=os.getenv("PINECONE_API_KEY"), source_tag="apify")
+    vs_ = PineconeVectorStore(index=client.Index(os.getenv("PINECONE_INDEX_NAME")), embedding=embeddings)
+    vs_.add_documents(documents=docs)
+
+    for v in vs_.similarity_search("apify", k=1):
+        print(v)
