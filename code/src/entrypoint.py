@@ -11,10 +11,12 @@ from .models.pinecone_input_model import PineconeIntegration
 async def main():
     async with Actor:
 
-        Actor.log.info("Starting the Actor")
+        Actor.log.info("Starting the Vector Store Actor")
 
         if not (actor_input := await Actor.get_input() or {}):
             await Actor.fail(status_message="No input provided", exit_code=1)
+
+        Actor.log.info("Received input: %s", actor_input)
 
         if not (arg := os.getenv("ACTOR_PATH_IN_DOCKER_CONTEXT")):
             if Actor.is_at_home():
