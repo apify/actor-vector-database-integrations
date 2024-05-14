@@ -22,8 +22,11 @@ async def main():
             "Checking for the environment variable ACTOR_PATH_IN_DOCKER_CONTEXT: %s",
             os.getenv("ACTOR_PATH_IN_DOCKER_CONTEXT"),
         )
+        arg = os.getenv("ACTOR_PATH_IN_DOCKER_CONTEXT")
 
-        if not (arg := os.getenv("ACTOR_PATH_IN_DOCKER_CONTEXT")):
+        Actor.log.info("arg: %s", arg)
+
+        if not arg:
             Actor.log.info("No environment variable ACTOR_PATH_IN_DOCKER_CONTEXT found")
             if Actor.is_at_home():
                 Actor.log.info("Running in local development mode")
