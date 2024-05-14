@@ -48,9 +48,9 @@ async def main():
         Actor.log.info("Received start argument: %s", actor_type)
 
         if actor_type == SupportedVectorStoresEn.chroma.value:
-            return main_f(ChromaIntegration(**actor_input), actor_input)
+            return await main_f(ChromaIntegration(**actor_input), actor_input)
         elif actor_type == SupportedVectorStoresEn.pinecone.value:
-            return main_f(PineconeIntegration(**actor_input), actor_input)
+            return await main_f(PineconeIntegration(**actor_input), actor_input)
         else:
             await Actor.exit(
                 exit_code=10,
