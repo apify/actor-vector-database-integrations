@@ -82,20 +82,20 @@ Note that your specific URL will vary.
 
 For details refer to [input schema](.actor/input_schema.json).
 
-- `chroma_collection_name`: Chroma collection name (default: `chroma`)
-- `chroma_client_host`: Chroma client host
-- `chroma_client_port`: Chroma client port (default: `8080`)
-- `chroma_client_ssl`: Enable/disable SSL (default: `false`)
-- `chroma_auth_credentials`: Chroma server auth Static API token credentials
+- `chromaCollectionName`: Chroma collection name (default: `chroma`)
+- `chromaClientHost`: Chroma client host
+- `chromaClientPort`: Chroma client port (default: `8080`)
+- `chromaClientSsl`: Enable/disable SSL (default: `false`)
+- `chromaAuthCredentials`: Chroma server auth Static API token credentials
 - `fields` - Array of fields you want to save. For example, if you want to push `name` and `user.description` fields, you should set this field to `["name", "user.description"]`.
-- `metadata_values` - Object of metadata values you want to save. For example, if you want to push `url` and `createdAt` values to Chroma, you should set this field to `{"url": "https://www.apify.com", "createdAt": "2021-09-01"}`.
-- `metadata_fields` - Object of metadata fields you want to save. For example, if you want to push `url` and `createdAt` fields, you should set this field to `{"url": "url", "createdAt": "createdAt"}`. If it has the same key as `metadata_values`, it's replaced.
-- `openai_api_key` - OpenAI API KEY.
-- `perform_chunking` - Whether to compute text chunks
-- `chunk_size` - The maximum character length of each text chunk
-- `chunk_overlap` - The character overlap between text chunks that are next to each other
+- `metadataValues` - Object of metadata values you want to save. For example, if you want to push `url` and `createdAt` values to Chroma, you should set this field to `{"url": "https://www.apify.com", "createdAt": "2021-09-01"}`.
+- `metadataFields` - Object of metadata fields you want to save. For example, if you want to push `url` and `createdAt` fields, you should set this field to `{"url": "url", "createdAt": "createdAt"}`. If it has the same key as `metadata_values`, it's replaced.
+- `openaiApiKey` - OpenAI API KEY.
+- `performChunking` - Whether to compute text chunks
+- `chunkSize` - The maximum character length of each text chunk
+- `chunkOverlap` - The character overlap between text chunks that are next to each other
 
-Fields `fields`, `metadata_values`, and `metadata_fields` supports dot notation. For example, if you want to push `name` field from `user` object, you should set `fields` to `["user.name"]`.
+Fields `fields`, `metadataValues`, and `metadataFields` supports dot notation. For example, if you want to push `name` field from `user` object, you should set `fields` to `["user.name"]`.
 
 ## Outputs
 

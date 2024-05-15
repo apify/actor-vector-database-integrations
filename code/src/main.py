@@ -1,36 +1,41 @@
+from typing import TYPE_CHECKING
+
 from apify import Actor
-from langchain.vectorstores import VectorStore
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from .emb import get_embeddings
 from .utils import load_dataset
 from .vcs import InputsDb, get_vector_store
 
+if TYPE_CHECKING:
+    from langchain.vectorstores import VectorStore
 
-async def main(aid: InputsDb, payload: dict):
 
+async def main(aid: InputsDb, payload: dict) -> None:
     resource = payload.get("payload", {}).get("resource", {})
-    if not (dataset_id := resource.get("defaultDatasetId") or aid.dataset_id):
+    if not (dataset_id := resource.get("defaultDatasetId") or aid.datasetId):
         msg = "No Dataset ID provided. It should be provided either in payload or in actor_input"
         await Actor.fail(status_message=msg)
 
     try:
-        Actor.log.info("Getting embeddings: %s", aid.embeddings.value)  # type: ignore
+        Actor.log.info("Getting embeddings: %s", aid.embeddings.value)  # type: ignore[union-attr]
         embeddings = await get_embeddings(
-            aid.embeddings.value, aid.embeddings_api_key, aid.embeddings_config  # type: ignore
+            aid.embeddings.value, # type: ignore[union-attr]
+            aid.embeddingsApiKey,
+            aid.embeddingsConfig,
         )
     except Exception as e:
-        msg = f"Failed to get embeddings: {str(e)}"
+        msg = f"Failed to get embeddings: {e}"
         await Actor.fail(status_message=msg)
         return
 
     Actor.log.info("Load Dataset ID %s and extract fields %s", dataset_id, aid.fields)
     try:
         loader_ = load_dataset(
-            str(aid.dataset_id),
+            str(aid.datasetId),
             fields=aid.fields,
-            meta_values=aid.metadata_values or {},
-            meta_fields=aid.metadata_fields or {},
+            meta_values=aid.metadataValues or {},
+            meta_fields=aid.metadataFields or {},
         )
         documents = loader_.load()
         documents = [doc for doc in documents if doc.page_content]
@@ -39,8 +44,8 @@ async def main(aid: InputsDb, payload: dict):
         await Actor.fail(status_message=f"Failed to load datasets: {e}")
         return
 
-    if aid.perform_chunking:
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=aid.chunk_size, chunk_overlap=aid.chunk_overlap)
+    if aid.performChunking:
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=aid.chunkSize, chunk_overlap=aid.chunkOverlap)
         documents = text_splitter.split_documents(documents)
         Actor.log.info("Documents chunked to %s chunks", len(documents))
     try:
@@ -48,6 +53,6 @@ async def main(aid: InputsDb, payload: dict):
         vcs_.add_documents(documents)
         Actor.log.info("Documents inserted into database successfully")
     except Exception as e:
-        msg = f"Document insertion failed: {str(e)}"
+        msg = f"Document insertion failed: {e}"
         await Actor.set_status_message(msg)
         await Actor.fail()

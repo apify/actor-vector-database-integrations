@@ -19,10 +19,10 @@ integration](https://github.com/HonzaTuron/pinecone) and detailed blog post [wha
 The Pinecone-integration is designed to compute and store vectors from other Actors' data. It uses langchain
 to interact with `OpenAI` and `Pinecone`.
 
-1. Get `dataset_id` from an `Apify Actor` output (passed automatically via integration).
+1. Get `datasetId` from an `Apify Actor` output (passed automatically via integration).
 2. Get dataset using `Apify Python SDK`.
 3. [Optional] Split text data into chunks using `langchain`'s `RecursiveCharacterTextSplitter`
-(enable/disable using `perform_chunking` and specify `chunk_size`, `chunk_overlap`)
+(enable/disable using `performChunking` and specify `chunkSize`, `chunkOverlap`)
 4. Compute embeddings using `OpenAI`
 5. Save data into `Pinecone`
 
@@ -37,17 +37,17 @@ To utilize this integration, ensure you have:
 
 For details refer to [input schema](.actor/input_schema.json).
 
-- `pinecone_index_name`: Pinecone index name
-- `pinecone_api_key`: Pinecone API key
+- `pineconeIndexName`: Pinecone index name
+- `pineconeApiKey`: Pinecone API key
 - `fields` - Array of fields you want to save. For example, if you want to push `name` and `user.description` fields, you should set this field to `["name", "user.description"]`.
-- `metadata_values` - Object of metadata values you want to save. For example, if you want to push `url` and `createdAt` values to Pinecone, you should set this field to `{"url": "https://www.apify.com", "createdAt": "2021-09-01"}`.
+- `metadataValues` - Object of metadata values you want to save. For example, if you want to push `url` and `createdAt` values to Pinecone, you should set this field to `{"url": "https://www.apify.com", "createdAt": "2021-09-01"}`.
 - `metadata_fields` - Object of metadata fields you want to save. For example, if you want to push `url` and `createdAt` fields, you should set this field to `{"url": "url", "createdAt": "createdAt"}`. If it has the same key as `metadata_values`, it's replaced.
-- `openai_token` - OpenAI API token.
-- `perform_chunking` - Whether to compute text chunks
-- `chunk_size` - The maximum character length of each text chunk
-- `chunk_overlap` - The character overlap between text chunks that are next to each other
+- `openaiToken` - OpenAI API token.
+- `performChunking` - Whether to compute text chunks
+- `chunkSize` - The maximum character length of each text chunk
+- `chunkOverlap` - The character overlap between text chunks that are next to each other
 
-Fields `fields`, `metadata_values`, and `metadata_fields` supports dot notation. For example, if you want to push `name` field from `user` object, you should set `fields` to `["user.name"]`.
+Fields `fields`, `metadataValues`, and `metadataFields` supports dot notation. For example, if you want to push `name` field from `user` object, you should set `fields` to `["user.name"]`.
 
 ## Outputs
 

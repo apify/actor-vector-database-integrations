@@ -43,7 +43,7 @@ langchain-chroma = "^0.1.0"
 
 [tool.ruff]
 line-length = 120
-exclude = ["src/input_model.py"]
+exclude = ["src/models/**"]
 
 [tool.ruff.lint]
 select = ["ALL"]

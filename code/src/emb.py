@@ -1,9 +1,14 @@
+from __future__ import annotations
+
 import os
+from typing import TYPE_CHECKING
 
 from apify import Actor
-from langchain_core.embeddings import Embeddings
 
 from .constants import SupportedEmbeddingsEn
+
+if TYPE_CHECKING:
+    from langchain_core.embeddings import Embeddings
 
 
 async def get_embeddings(embeddings_class: str, api_key: str | None = None, config: dict | None = None) -> Embeddings:

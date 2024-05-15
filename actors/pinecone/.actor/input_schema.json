@@ -3,13 +3,13 @@
   "type": "object",
   "schemaVersion": 1,
   "properties": {
-    "pinecone_index_name": {
+    "pineconeIndexName": {
       "title": "Pinecone index name",
       "type": "string",
       "description": "Pinecone index name.",
       "editor": "textfield"
     },
-    "pinecone_api_key": {
+    "pineconeApiKey": {
       "title": "Pinecone API KEY",
       "description": "Pinecone API KEY",
       "type": "string",
@@ -24,13 +24,13 @@
       "enum": ["OpenAIEmbeddings", "HuggingFaceEmbeddings, CohereEmbeddings"],
       "default": "OpenAIEmbeddings"
     },
-    "embeddings_config": {
+    "embeddingsConfig": {
       "title": "Embeddings provider configuration",
       "description": "Specific configuration for the embeddings. For example, for OpenAI, you can the model name as ({\"model\": \"text-embedding-ada-002\"}), for HuggingFace ({\"model_name\": \"sentence-transformers/paraphrase-MiniLM-L6-v2\"})",
       "type": "object",
       "editor": "json"
     },
-    "embeddings_api_key": {
+    "embeddingsApiKey": {
       "title": "Embeddings API KEY (whenever applicable, depends on provider)",
       "description": "Value of the API KEY for the embeddings provider (if required).\n\n For example for OpenAI it is OPENAI_API_KEY, for Cohere it is COHERE_API_KEY)",
       "type": "string",
@@ -52,39 +52,39 @@
       ],
       "editor": "stringList"
     },
-    "metadata_fields": {
+    "metadataFields": {
       "title": "Metadata fields",
       "type": "object",
       "description": "A list of fields which should be selected from the items and stored as metadata. \n\n For example, when using the website content crawler, you might want to store `url` in metadata. In this case, use `metadata_fields parameter as follows {\"page_url\": \"url\"}`",
       "editor": "json"
     },
-    "metadata_values": {
+    "metadataValues": {
       "title": "Metadata values",
       "type": "object",
       "description": "Custom values to be stored for every Dataset item as metadata.\n\n For example, you might want to store `domain` in metadata, hence use `metadata_values as {\"domain\": \"apify.com\"}`",
       "editor": "json"
     },
-    "perform_chunking": {
+    "performChunking": {
       "title": "Perform chunking",
       "description": "If set to true, the resulting text will be chunked according to the settings below",
       "default": false,
       "type": "boolean"
     },
-    "chunk_size": {
+    "chunkSize": {
       "title": "Chunk size",
       "type": "integer",
       "description": "The maximum character length of each text chunk",
       "default": 1000,
       "minimum": 1
     },
-    "chunk_overlap": {
+    "chunkOverlap": {
       "title": "Chunk overlap",
       "type": "integer",
       "description": "The character overlap between text chunks that are next to each other",
       "default": 0,
       "minimum": 0
     },
-    "dataset_id": {
+    "datasetId": {
       "title": "Dataset ID",
       "type": "string",
       "description": "Dataset ID (when running standalone without integration)",
@@ -92,8 +92,8 @@
     }
   },
   "required": [
-    "pinecone_index_name",
-    "pinecone_api_key",
+    "pineconeIndexName",
+    "pineconeApiKey",
     "embeddings",
     "fields"
   ]
