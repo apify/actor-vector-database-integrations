@@ -5,7 +5,7 @@ The Actors are designed to be used with other Apify Actors as an integration.
 
 ## Features
 - Fetch data from other Apify Actors
-- Chunk data into smaller pieces
+- Chunk data into smaller pieces (use tokens not characters)
 - Compute embeddings (OpenAI, HuggingFace, Cohere) with different models
 - Store vectors in vector databases (Pinecone, Chroma)
 
