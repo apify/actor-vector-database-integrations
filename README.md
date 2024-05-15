@@ -19,6 +19,7 @@ The Actors are designed to be used with other Apify Actors as an integration.
 - Change snake_case to camelCase in all the Actors
 - Test all the Actors
 - Test all the embeddings
+- How to handle large sentence-transformers models? Save them to KV store to have them handy?
 
 ## Code
 Contains the core functionality for all the vector databases and integrations.
