@@ -1,86 +1,53 @@
-import os
-
 from apify import Actor
-from langchain.docstore.document import Document
-from langchain_community.document_loaders import ApifyDatasetLoader
-from langchain_openai.embeddings import OpenAIEmbeddings
+from langchain.vectorstores import VectorStore
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from .vcs import TypeDb, get_database
-from .models.chroma_input_model import ChromaIntegration  # type: ignore
-from .models.pinecone_input_model import PineconeIntegration  # type: ignore
+from .emb import get_embeddings
+from .utils import load_dataset
+from .vcs import InputsDb, get_vector_store
 
 
-def get_nested_value(data: dict, keys: str) -> str:
-    """
-    Extract nested value from dict.
-
-    Example:
-      >>> get_nested_value({"a": "v1", "c1": {"c2": "v2"}}, "c1.c2")
-      'v2'
-    """
-
-    keys_list = keys.split(".")
-    result = data
-
-    for key in keys_list:
-        if key in result:
-            result = result[key]
-        else:
-            # If any of the keys are not found, return None
-            return ""
-
-    return result  # type: ignore
-
-
-async def main(actor_input: TypeDb, payload: dict):
-
-    os.environ["OPENAI_API_KEY"] = actor_input.openai_api_key
+async def main(aid: InputsDb, payload: dict):
 
     resource = payload.get("payload", {}).get("resource", {})
-    if not (dataset_id := resource.get("defaultDatasetId") or actor_input.dataset_id):
+    if not (dataset_id := resource.get("defaultDatasetId") or aid.dataset_id):
         msg = "No Dataset ID provided. It should be provided either in payload or in actor_input"
         await Actor.fail(status_message=msg)
 
-    Actor.log.debug("Load Dataset ID %s and extract fields %s", dataset_id, actor_input.fields)
-
-    embeddings = OpenAIEmbeddings()
-
-    meta_values = actor_input.metadata_values or {}
-    meta_fields = actor_input.metadata_fields or {}
-
-    # Function from Honza Turon to load dataset.
-    # Do we really want to create a new chunk for every field?
-    for field in actor_input.fields:
-        loader = ApifyDatasetLoader(
-            str(dataset_id),
-            dataset_mapping_function=lambda dataset_item: Document(
-                page_content=get_nested_value(dataset_item, field) or "",
-                metadata={
-                    **meta_values,
-                    **{key: get_nested_value(dataset_item, value) for key, value in meta_fields.items()},
-                },
-            ),
+    try:
+        Actor.log.info("Getting embeddings: %s", aid.embeddings.value)  # type: ignore
+        embeddings = await get_embeddings(
+            aid.embeddings.value, aid.embeddings_api_key, aid.embeddings_config  # type: ignore
         )
+    except Exception as e:
+        msg = f"Failed to get embeddings: {str(e)}"
+        await Actor.fail(status_message=msg)
+        return
 
-        try:
-            documents = loader.load()
-            Actor.log.debug("Document loaded")
-        except Exception as e:
-            await Actor.fail(status_message=f"Failed to load documents for field {field}: {e}")
-        #
-        # if actor_input.perform_chunking:
-        #     text_splitter = RecursiveCharacterTextSplitter(
-        #         chunk_size=actor_input.chunk_size, chunk_overlap=actor_input.chunk_overlap
-        #     )
-        #     documents = text_splitter.split_documents(documents)
-        #     Actor.log.debug("Documents chunked to %s chunks", len(documents))
-        #
-        # try:
-        #     pf_from_documents = await get_database(actor_input)
-        #     pf_from_documents(documents=documents, embedding=embeddings)
-        #     Actor.log.debug("Documents inserted into database successfully")
-        # except Exception as e:
-        #     msg = f"Document insertion failed: {str(e)}"
-        #     await Actor.set_status_message(msg)
-        #     await Actor.fail()
+    Actor.log.info("Load Dataset ID %s and extract fields %s", dataset_id, aid.fields)
+    try:
+        loader_ = load_dataset(
+            str(aid.dataset_id),
+            fields=aid.fields,
+            meta_values=aid.metadata_values or {},
+            meta_fields=aid.metadata_fields or {},
+        )
+        documents = loader_.load()
+        documents = [doc for doc in documents if doc.page_content]
+        Actor.log.info("Dataset loaded, number of documents: %s", len(documents))
+    except Exception as e:
+        await Actor.fail(status_message=f"Failed to load datasets: {e}")
+        return
+
+    if aid.perform_chunking:
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=aid.chunk_size, chunk_overlap=aid.chunk_overlap)
+        documents = text_splitter.split_documents(documents)
+        Actor.log.info("Documents chunked to %s chunks", len(documents))
+    try:
+        vcs_: VectorStore = await get_vector_store(aid, embeddings)
+        vcs_.add_documents(documents)
+        Actor.log.info("Documents inserted into database successfully")
+    except Exception as e:
+        msg = f"Document insertion failed: {str(e)}"
+        await Actor.set_status_message(msg)
+        await Actor.fail()
