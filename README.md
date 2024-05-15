@@ -11,6 +11,7 @@ The Actors are designed to be used with other Apify Actors as an integration.
 
 ## Features - Roadmap
 - Add other state-of-the-art embeddings (e.g., HuggingFace BGE, HuggingFace inference endpoint)
+- Embeddings - use tokens for chunking (not characters)
 - Add option to drop all existing vectors in a database (not supported by LangChain, custom implementation needed)
 - Add option to replace vectors with a filter (e.g., replace only vectors with a specific tag, URL, etc.). Not supported by LangChain, custom implementation needed.
 - Add PGVector, Weaviate
