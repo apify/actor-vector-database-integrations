@@ -47,6 +47,7 @@ async def _get_chroma(aid: ChromaIntegration, embeddings: Embeddings) -> VectorS
 
     if TYPE_CHECKING:
         from chromadb.api import ClientAPI
+
     async def check_chroma_connection(client: ClientAPI) -> None:
         if client.heartbeat() <= 1:
             raise FailedToConnectToDatabaseError("ChromaDB is not reachable")
@@ -76,7 +77,6 @@ async def _get_chroma(aid: ChromaIntegration, embeddings: Embeddings) -> VectorS
 
 
 async def _get_pinecone(aid: PineconeIntegration, embeddings: Embeddings) -> VectorStore:
-
     from langchain_pinecone import PineconeVectorStore
     from pinecone import Pinecone as PineconeClient  # type: ignore[import-untyped]
 

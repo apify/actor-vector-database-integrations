@@ -20,7 +20,7 @@ async def main(aid: InputsDb, payload: dict) -> None:
     try:
         Actor.log.info("Getting embeddings: %s", aid.embeddings.value)  # type: ignore[union-attr]
         embeddings = await get_embeddings(
-            aid.embeddings.value, # type: ignore[union-attr]
+            aid.embeddings.value,  # type: ignore[union-attr]
             aid.embeddingsApiKey,
             aid.embeddingsConfig,
         )
