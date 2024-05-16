@@ -8,7 +8,7 @@ clean:
 	rm -rf .venv .mypy_cache .pytest_cache .ruff_cache __pycache__
 
 install-dev:
-	cd $(DIRS_WITH_CODE) && python3 -m pip install --upgrade pip poetry && poetry install && poetry run pre-commit install && cd ..
+	cd $(DIRS_WITH_CODE) && python3 -m pip install --upgrade pip poetry && poetry install --with main,dev,pinecone,chroma && poetry run pre-commit install && cd ..
 
 lint:
 	poetry run -C $(DIRS_WITH_CODE) ruff check code/src

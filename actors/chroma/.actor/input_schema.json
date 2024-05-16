@@ -41,7 +41,7 @@
       "description": "Choose the embeddings provider to use for generating embeddings",
       "type": "string",
       "editor": "select",
-      "enum": ["OpenAIEmbeddings", "HuggingFaceEmbeddings, CohereEmbeddings"],
+      "enum": ["OpenAIEmbeddings", "HuggingFaceEmbeddings", "CohereEmbeddings"],
       "default": "OpenAIEmbeddings"
     },
     "embeddingsConfig": {
