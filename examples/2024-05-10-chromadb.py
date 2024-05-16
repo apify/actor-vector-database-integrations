@@ -28,11 +28,11 @@ embeddings = OpenAIEmbeddings()
 client = ApifyClient()
 
 chroma_client = chromadb.HttpClient(
-    host="https://cf26-89-29-46-196.ngrok-free.app/",
+    host="https://0e36-82-208-25-82.ngrok-free.app",
     port=8000,
     ssl=True,
     settings=Settings(
-        chroma_client_auth_provider="chromadb.auth.token.TokenAuthClientProvider",
+        chroma_client_auth_provider="chromadb.auth.token_authn.TokenAuthClientProvider",
         chroma_client_auth_credentials="test-token",
     ),
 )
