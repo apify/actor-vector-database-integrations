@@ -18,7 +18,7 @@ async def main(aid: InputsDb, payload: dict) -> None:
         await Actor.fail(status_message=msg)
 
     try:
-        Actor.log.info("Getting embeddings: %s", aid.embeddings.value)  # type: ignore[union-attr]
+        Actor.log.info("Get embeddings class: %s", aid.embeddings.value)  # type: ignore[union-attr]
         embeddings = await get_embeddings(
             aid.embeddings.value,  # type: ignore[union-attr]
             aid.embeddingsApiKey,
@@ -52,6 +52,9 @@ async def main(aid: InputsDb, payload: dict) -> None:
         vcs_: VectorStore = await get_vector_store(aid, embeddings)
         vcs_.add_documents(documents)
         Actor.log.info("Documents inserted into database successfully")
+
+        Actor.log.info("Push chunked data to the unnamed output dataset")
+        await Actor.push_data([doc.dict() for doc in documents])
     except Exception as e:
         msg = f"Document insertion failed: {e}"
         await Actor.set_status_message(msg)

@@ -51,7 +51,7 @@ async def _get_chroma(aid: ChromaIntegration, embeddings: Embeddings) -> VectorS
     async def check_chroma_connection(client: ClientAPI) -> None:
         if client.heartbeat() <= 1:
             raise FailedToConnectToDatabaseError("ChromaDB is not reachable")
-        Actor.log.debug("Connected to chroma database")
+        Actor.log.info("Connected to chroma database")
 
     settings = None
     if auth := aid.chromaServerAuthCredentials:

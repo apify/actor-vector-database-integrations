@@ -2,7 +2,7 @@
 	"actorSpecification": 1,
 	"name": "chroma-integration",
 	"title": "Chroma Integration",
-	"description": "Upload a dataset to chroma",
+	"description": "Upload a dataset to Chroma",
 	"version": "0.0",
 	"input": "./input_schema.json",
 	"dockerfile": "../../../shared/Dockerfile",

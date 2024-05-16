@@ -40,6 +40,7 @@ optional = true
 
 [tool.poetry.group.chroma.dependencies]
 langchain-chroma = "^0.1.0"
+pysqlite3-binary = "^0.5.2.post3"
 
 [tool.ruff]
 line-length = 120
