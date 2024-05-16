@@ -12,11 +12,11 @@
             "display": {
                 "component": "table",
                 "properties": {
-                    "pageContent": {
+                    "page_content": {
                         "label": "Page content (chunk)",
                         "format": "text"
                     },
-                    "metaData": {
+                    "metadata": {
                         "label": "Metadata (if any)",
                         "format": "object"
                     }
