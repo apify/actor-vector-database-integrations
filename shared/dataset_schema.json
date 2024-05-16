@@ -5,8 +5,8 @@
             "title": "Overview",
             "transformation": {
                 "fields": [
-                    "Page_content",
-                    "Metadata"
+                    "page_content",
+                    "metadata"
                 ]
             },
             "display": {
