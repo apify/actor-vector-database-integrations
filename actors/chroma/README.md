@@ -127,6 +127,14 @@ The configuration consists of three parts: Data, Chroma, and OpenAI embeddings t
 {
   "embeddingsApiKey": "YOUR-OPENAI-API-KEY",
   "embeddings": "OpenAIEmbeddings",
-  "embeddingsConfig": {"model":  "text-embedding-3-small"}
+  "embeddingsConfig": {"model":  "text-embedding-3-large"}
+}
+```
+#### Cohere embeddings
+```json 
+{
+  "embeddingsApiKey": "YOUR-COHERE-API-KEY",
+  "embeddings": "CohereEmbeddings",
+  "embeddingsConfig": {"model":  "embed-multilingual-v3.0"}
 }
 ```

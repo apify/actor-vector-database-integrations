@@ -82,3 +82,11 @@ The configuration consists of three parts: Data, Pinecone, and OpenAI embeddings
   "embeddingsConfig": {"model":  "text-embedding-3-large"}
 }
 ```
+#### Cohere embeddings
+```json 
+{
+  "embeddingsApiKey": "YOUR-COHERE-API-KEY",
+  "embeddings": "CohereEmbeddings",
+  "embeddingsConfig": {"model":  "embed-multilingual-v3.0"}
+}
+```

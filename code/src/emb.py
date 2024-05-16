@@ -20,15 +20,17 @@ async def get_embeddings(embeddings_class: str, api_key: str | None = None, conf
         os.environ["OPENAI_API_KEY"] = api_key or ""
         return config and OpenAIEmbeddings(**config) or OpenAIEmbeddings()
 
-    if embeddings_class == SupportedEmbeddingsEn.cohere_embeddings and config:
+    if embeddings_class == SupportedEmbeddingsEn.cohere_embeddings:
         from langchain_cohere import CohereEmbeddings
 
+        config = config or {}
         config["cohere_api_key"] = api_key
         return CohereEmbeddings(**config)
 
     if embeddings_class == SupportedEmbeddingsEn.hugging_face_embeddings and config:
         from langchain_community.embeddings import HuggingFaceEmbeddings
 
+        config = config or {}
         return HuggingFaceEmbeddings(**config)
 
     await Actor.fail(
