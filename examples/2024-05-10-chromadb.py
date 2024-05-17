@@ -18,7 +18,7 @@ from utils import get_nested_value, load_dataset, stringify_dict  # type: ignore
 # docker run -p 8000:8000 chromadb/chroma
 
 COLLECTION_NAME = "chroma"
-DATASET_ID = "J13oTZVY5wJWQdbzn"
+DATASET_ID = "syDy52Bwz2T7JTsF9"
 
 
 load_dotenv(Path.cwd() / ".." / "code" / ".env")
@@ -28,14 +28,15 @@ embeddings = OpenAIEmbeddings()
 client = ApifyClient()
 
 chroma_client = chromadb.HttpClient(
-    "localhost",
+    host="https://7058-89-29-46-196.ngrok-free.app/",
     port=8000,
-    ssl=False,
+    ssl=True,
     settings=Settings(
         chroma_client_auth_provider="chromadb.auth.token_authn.TokenAuthClientProvider",
         chroma_client_auth_credentials="test-token",
     ),
 )
+
 
 print(chroma_client.heartbeat())
 print(chroma_client.get_version())
@@ -47,7 +48,8 @@ data = loader.load()
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
 data = text_splitter.split_documents(data)
 
-db = Chroma.from_documents(documents=data, client=chroma_client, embedding=embeddings, collection_name=COLLECTION_NAME)
+db = Chroma(client=chroma_client, collection_name=COLLECTION_NAME, embedding_function=embeddings)
+# db = Chroma.from_documents(documents=data, client=chroma_client, embedding=embeddings, collection_name=COLLECTION_NAME)
 
 for v in db.similarity_search("apify", k=5):
     print(v)

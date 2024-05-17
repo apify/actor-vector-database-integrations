@@ -1,37 +1,29 @@
 # Chroma integration
 
-The Apify Chroma database integration seamlessly transfers selected data from Apify Actors to a Chroma database.
+The Apify Chroma integration seamlessly transfers selected data from Apify Actors to a Chroma database.
 
-Is there anything you find unclear or missing? Please don't hesitate to inform us by creating an issue.
+💡 **Note**: This Actor is meant to be used together with other Actors' integration sections.
+For instance, if you are using the [Website Content Crawler](https://apify.com/apify/website-content-crawler), you can activate Chroma integration to save web data as vectors to Chroma.
 
-⚠️ **Note**: This Actor is meant to be used together with other Actors' integration section.
-For instance, if you are using the [Website Content Crawler](https://apify.com/apify/website-content-crawler),
-you can enable Chroma database integration to store vectors in Chroma.
-
-Apify Chroma integration computes OpenAI embeddings and store them in Chroma. It uses [LangChain](https://www.langchain.com/)
-to interact with [OpenAI embeddings](https://platform.openai.com/docs/guides/embeddings) and [Chroma](https://www.trychroma.com/).
-
-For more information how to leverage vector stores in Apify platform, see a similar [Pinecone
-integration](https://github.com/HonzaTuron/pinecone) and detailed blog post [what Pinecone is and why you should use it with your LLMs](https://blog.apify.com/what-is-pinecone-why-use-it-with-llms/).
+For more information how to leverage vector stores in Apify platform, see [Pinecone integration](https://github.com/HonzaTuron/pinecone) and detailed blog post [what Pinecone is and why you should use it with your LLMs](https://blog.apify.com/what-is-pinecone-why-use-it-with-llms/).
 
 ## Description
 
-The Chroma-integration is designed to compute and store vectors from other Actors' data. It uses langchain
-to interact with `OpenAI` and `Chroma`.
+Apify Chroma integration computes embeddings and store them in Chroma. It uses [LangChain](https://www.langchain.com/) to compute embeddings and interact with [Chroma](https://www.trychroma.io/).
 
-1. Get `dataset_id` from an `Apify Actor` output (passed automatically via integration).
+1. Get `datasetId` from an `Apify Actor` output (passed automatically via integration).
 2. Get dataset using `Apify Python SDK`.
 3. [Optional] Split text data into chunks using `langchain`'s `RecursiveCharacterTextSplitter`
-(enable/disable using `perform_chunking` and specify `chunk_size`, `chunk_overlap`)
-4. Compute embeddings using `OpenAI`
+(enable/disable using `performChunking` and specify `chunkSize`, `chunkOverlap`)
+4. Compute embeddings
 5. Save data into `Chroma`
 
 ## Before you start
 
 To utilize this integration, ensure you have:
 
-- An OpenAI account and an OpenAI API token. Create a free account at [OpenAI](https://beta.openai.com/).
 - `Chroma` operational on a server or localhost.
+- An account to compute embeddings using one of the providers (e.g., OpenAI or Cohere), or you can use free Huggingface models.
 
 For quick Chroma setup, refer to [Chroma deployment](https://docs.trychroma.com/deployment#docker).
 Chroma can be run in a Docker container with the following commands:
@@ -48,9 +40,8 @@ docker run -p 8000:8000 chromadb/chroma
 To enable static API Token authentication, create a .env file with:
 
 ```dotenv
-CHROMA_SERVER_AUTH_CREDENTIALS=test-token
-CHROMA_SERVER_AUTH_CREDENTIALS_PROVIDER=chromadb.auth.token.TokenConfigServerAuthCredentialsProvider
-CHROMA_SERVER_AUTH_PROVIDER=chromadb.auth.token.TokenAuthServerProvider
+CHROMA_SERVER_AUTHN_CREDENTIALS=test-token
+CHROMA_SERVER_AUTHN_PROVIDER=chromadb.auth.token_authn.TokenAuthenticationServerProvider
 ```
 
 Then run Docker with:
@@ -74,7 +65,7 @@ Account                       a@a.ai (Plan: Free)
 Forwarding                    https://fdfe-82-208-25-82.ngrok-free.app -> http://localhost:8000
 ```
 
-The URL (`https://fdfe-82-208-25-82.ngrok-free.app`) can be used in the as an input variable for `chroma_client_host`.
+The URL (`https://fdfe-82-208-25-82.ngrok-free.app`) can be used in the as an input variable for `chromaClientHost=https://fdfe-82-208-25-82.ngrok-free.app`.
 Note that your specific URL will vary.
 
 
@@ -82,31 +73,69 @@ Note that your specific URL will vary.
 
 For details refer to [input schema](.actor/input_schema.json).
 
-- `chroma_collection_name`: Chroma collection name (default: `chroma`)
-- `chroma_client_host`: Chroma client host
-- `chroma_client_port`: Chroma client port (default: `8080`)
-- `chroma_client_ssl`: Enable/disable SSL (default: `false`)
-- `chroma_auth_credentials`: Chroma server auth Static API token credentials
+- `chromaCollectionName`: Chroma collection name (default: `chroma`)
+- `chromaClientHost`: Chroma client host
+- `chromaClientPort`: Chroma client port (default: `8080`)
+- `chromaClientSsl`: Enable/disable SSL (default: `false`)
+- `chromaAuthCredentials`: Chroma server auth Static API token credentials
+- `chromaClientAuthProvider`: Chroma client auth provider (default: `chromadb.auth.token_authn.TokenAuthClientProvider`)
 - `fields` - Array of fields you want to save. For example, if you want to push `name` and `user.description` fields, you should set this field to `["name", "user.description"]`.
-- `metadata_values` - Object of metadata values you want to save. For example, if you want to push `url` and `createdAt` values to Chroma, you should set this field to `{"url": "https://www.apify.com", "createdAt": "2021-09-01"}`.
-- `metadata_fields` - Object of metadata fields you want to save. For example, if you want to push `url` and `createdAt` fields, you should set this field to `{"url": "url", "createdAt": "createdAt"}`. If it has the same key as `metadata_values`, it's replaced.
-- `openai_api_key` - OpenAI API KEY.
-- `perform_chunking` - Whether to compute text chunks
-- `chunk_size` - The maximum character length of each text chunk
-- `chunk_overlap` - The character overlap between text chunks that are next to each other
+- `metadataValues` - Object of metadata values you want to save. For example, if you want to push `url` and `createdAt` values to Chroma, you should set this field to `{"url": "https://www.apify.com", "createdAt": "2021-09-01"}`.
+- `metadataFields` - Object of metadata fields you want to save. For example, if you want to push `url` and `createdAt` fields, you should set this field to `{"url": "url", "createdAt": "createdAt"}`. If it has the same key as `metadataValues`, it's replaced.
+- `openaiApiKey` - OpenAI API KEY.
+- `performChunking` - Whether to compute text chunks
+- `chunkSize` - The maximum character length of each text chunk
+- `chunkOverlap` - The character overlap between text chunks that are next to each other
+- `embeddings` - Embeddings provider to use for computing vectors. For example, `OpenAIEmbeddings` or `CohereEmbeddings`.
+- `embeddingsConfig` - Configuration for the embeddings' provider. For example, `{"model": "text-embedding-ada-002"}`.
+- `embeddingsApiKey` - API key for the embeddings provider (whenever needed)
 
-Fields `fields`, `metadata_values`, and `metadata_fields` supports dot notation. For example, if you want to push `name` field from `user` object, you should set `fields` to `["user.name"]`.
+Fields `fields`, `metadataValues`, and `metadataFields` supports dot notation. For example, if you want to push `name` field from `user` object, you should set `fields` to `["user.name"]`.
 
 ## Outputs
 
-This integration will save the selected fields from your Actor to your a Chroma.
+This integration will save the selected fields from your Actor to Chroma.
 
-## Want to talk to other devs or get help?
+## Examples
 
-Join our [developer community on Discord](https://discord.com/invite/jyEM2PRvMU) to connect with other users and discuss this and other integrations.
+### Example input configuration (Chroma with OpenAI embeddings)
 
-## Need data for your LLMs?
+The configuration consists of three parts: Data, Chroma, and OpenAI embeddings that are typically combined, but we show them separately here for clarity.
 
-You can also use the Apify platform to [gather data for your large language models](https://apify.com/data-for-generative-ai). We have Actors to ingest entire websites automatically.
-Gather customer documentation, knowledge bases, help centers, forums, blog posts, and other sources of information to train or prompt your LLMs.
-Integrate Apify into your product and let your customers upload their content in minutes.
+#### Data
+
+```json
+{
+  "fields": ["text"],
+  "metadataValues": {"domain": "apify.com"},
+  "metadataFields": {"title": "metadata.title", "loadedTime":  "crawl.loadedTime"},
+  "performChunking": true,
+  "chunkSize": 1000,
+  "chunkOverlap": 0
+}
+```
+#### Chroma
+```json
+{
+  "chromaClientHost": "https://fdfe-82-208-25-82.ngrok-free.app",
+  "chromaCollectionName": "chroma",
+  "chromaServerAuthCredentials": "test-token"
+}
+```
+
+#### OpenAI embeddings
+```json 
+{
+  "embeddingsApiKey": "YOUR-OPENAI-API-KEY",
+  "embeddings": "OpenAIEmbeddings",
+  "embeddingsConfig": {"model":  "text-embedding-3-large"}
+}
+```
+#### Cohere embeddings
+```json 
+{
+  "embeddingsApiKey": "YOUR-COHERE-API-KEY",
+  "embeddings": "CohereEmbeddings",
+  "embeddingsConfig": {"model":  "embed-multilingual-v3.0"}
+}
+```

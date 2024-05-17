@@ -1,4 +1,5 @@
-FROM apify/actor-python:3.12
+FROM apify/actor-python:3.11
+
 
 WORKDIR /usr/src/app
 

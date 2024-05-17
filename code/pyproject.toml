@@ -11,7 +11,7 @@ package-mode = false
 apify = "^1.7.0"
 apify-client = "^1.6.4"
 openai = "^1.17.0"
-python = ">=3.12,<3.13"
+python = ">=3.11,<3.13"
 python-dotenv = "^1.0.1"
 langchain = "^0.1.19"
 langchain-openai = "^0.1.6"
@@ -40,10 +40,12 @@ optional = true
 
 [tool.poetry.group.chroma.dependencies]
 langchain-chroma = "^0.1.0"
+pysqlite3-binary = "^0.5.2"
+chromadb = "^0.5.0"
 
 [tool.ruff]
 line-length = 120
-exclude = ["src/input_model.py"]
+exclude = ["src/models/**"]
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -120,7 +122,7 @@ asyncio_mode = "auto"
 timeout = 1200
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.11"
 files = ["scripts", "src", "tests"]
 check_untyped_defs = true
 disallow_incomplete_defs = true

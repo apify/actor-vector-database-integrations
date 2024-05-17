@@ -5,24 +5,19 @@
             "title": "Overview",
             "transformation": {
                 "fields": [
-                    "url",
-                    "answer",
-                    "jsonAnswer"
+                    "page_content",
+                    "metadata"
                 ]
             },
             "display": {
                 "component": "table",
                 "properties": {
-                    "url": {
-                        "label": "URL",
-                        "format": "link"
-                    },
-                    "answer": {
-                        "label": "Answer",
+                    "page_content": {
+                        "label": "Page content (chunk)",
                         "format": "text"
                     },
-                    "jsonAnswer": {
-                        "label": "JSON answer (if any)",
+                    "metadata": {
+                        "label": "Metadata (if any)",
                         "format": "object"
                     }
                 }

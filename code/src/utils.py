@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import copy
 
 from langchain_community.document_loaders import ApifyDatasetLoader
@@ -31,11 +33,7 @@ def stringify_dict(d: dict, keys: list[str]) -> str:
         a.text: Apify is cool
         description: Apify platform
     """
-    result = []
-    for key in keys:
-        if value := get_nested_value(d, key):
-            result.append(f"{key}: {value}")
-    return "\n".join(result)
+    return "\n".join([f"{key}: {value}" for key in keys if (value := get_nested_value(d, key))])
 
 
 def load_dataset(dataset_id: str, fields: list[str], meta_values: dict, meta_fields: dict) -> ApifyDatasetLoader:
@@ -45,7 +43,7 @@ def load_dataset(dataset_id: str, fields: list[str], meta_values: dict, meta_fie
     Stringify dict using the fields.
     """
 
-    loader_ = ApifyDatasetLoader(
+    return ApifyDatasetLoader(
         str(dataset_id),
         dataset_mapping_function=lambda dataset_item: Document(
             page_content=stringify_dict(dataset_item, fields) or "",
@@ -55,4 +53,3 @@ def load_dataset(dataset_id: str, fields: list[str], meta_values: dict, meta_fie
             },
         ),
     )
-    return loader_

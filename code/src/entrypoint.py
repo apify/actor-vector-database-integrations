@@ -2,15 +2,14 @@ import os
 
 from apify import Actor
 
-from .constants import SupportedVectorStoresEn  # type: ignore
-from .main import main as main_f  # type: ignore
-from .models.chroma_input_model import ChromaIntegration  # type: ignore
-from .models.pinecone_input_model import PineconeIntegration  # type: ignore
+from .constants import SupportedVectorStoresEn
+from .main import main as main_f
+from .models.chroma_input_model import ChromaIntegration
+from .models.pinecone_input_model import PineconeIntegration
 
 
-async def main():
+async def main() -> None:
     async with Actor:
-
         Actor.log.info("Starting the Vector Store Actor")
 
         if not (actor_input := await Actor.get_input() or {}):
@@ -34,12 +33,12 @@ async def main():
         Actor.log.info("Received start argument (vector database name): %s", actor_type)
 
         if actor_type == SupportedVectorStoresEn.chroma.value:
-            return await main_f(ChromaIntegration(**actor_input), actor_input)
+            await main_f(ChromaIntegration(**actor_input), actor_input)
         elif actor_type == SupportedVectorStoresEn.pinecone.value:
-            return await main_f(PineconeIntegration(**actor_input), actor_input)
+            await main_f(PineconeIntegration(**actor_input), actor_input)
         else:
             await Actor.exit(
                 exit_code=10,
-                status_message=f"This Actor was built incorrectly; an unknown Actor was selected to start ({actor_type}). "
-                f"If you encounter this issue, please contact the Actor developer.",
+                status_message=f"This Actor was built incorrectly; an unknown Actor was selected "
+                f"to start ({actor_type}). If you encounter this issue, please contact the Actor developer.",
             )
