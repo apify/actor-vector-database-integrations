@@ -28,7 +28,7 @@ embeddings = OpenAIEmbeddings()
 client = ApifyClient()
 
 chroma_client = chromadb.HttpClient(
-    host="https://0e36-82-208-25-82.ngrok-free.app",
+    host="https://7058-89-29-46-196.ngrok-free.app/",
     port=8000,
     ssl=True,
     settings=Settings(
