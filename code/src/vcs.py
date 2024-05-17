@@ -57,7 +57,7 @@ async def _get_chroma(aid: ChromaIntegration, embeddings: Embeddings) -> VectorS
     if auth := aid.chromaServerAuthCredentials:
         settings = chromadb.config.Settings(
             chroma_client_auth_credentials=auth,
-            chroma_client_auth_provider="chromadb.auth.token.TokenAuthClientProvider",
+            chroma_client_auth_provider=aid.chromaClientAuthProvider,
         )
     try:
         chroma_client = chromadb.HttpClient(

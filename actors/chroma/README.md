@@ -78,6 +78,7 @@ For details refer to [input schema](.actor/input_schema.json).
 - `chromaClientPort`: Chroma client port (default: `8080`)
 - `chromaClientSsl`: Enable/disable SSL (default: `false`)
 - `chromaAuthCredentials`: Chroma server auth Static API token credentials
+- `chromaClientAuthProvider`: Chroma client auth provider (default: `chromadb.auth.token_authn.TokenAuthClientProvider`)
 - `fields` - Array of fields you want to save. For example, if you want to push `name` and `user.description` fields, you should set this field to `["name", "user.description"]`.
 - `metadataValues` - Object of metadata values you want to save. For example, if you want to push `url` and `createdAt` values to Chroma, you should set this field to `{"url": "https://www.apify.com", "createdAt": "2021-09-01"}`.
 - `metadataFields` - Object of metadata fields you want to save. For example, if you want to push `url` and `createdAt` fields, you should set this field to `{"url": "url", "createdAt": "createdAt"}`. If it has the same key as `metadataValues`, it's replaced.

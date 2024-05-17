@@ -4,37 +4,45 @@
   "schemaVersion": 1,
   "properties": {
     "chromaCollectionName": {
-      "title": "Chroma DB collection name",
-      "description": "Chroma DB collection name",
+      "title": "Chroma collection name",
+      "description": "Chroma collection name",
       "type": "string",
       "editor": "textfield",
       "default": "chroma"
     },
     "chromaClientHost": {
-      "title": "ChromaDB host",
-      "description": "Host argument for ChromaDB HTTP Client",
+      "title": "Chroma host",
+      "description": "Host argument for Chroma HTTP Client",
       "type": "string",
       "editor": "textfield"
     },
     "chromaClientPort": {
-      "title": "ChromaDB port",
-      "description": "Port argument for ChromaDB HTTP Client",
+      "title": "Chroma port",
+      "description": "Port argument for Chroma HTTP Client",
       "type": "integer",
       "editor": "number",
       "default": 8080
     },
     "chromaClientSsl": {
-      "title": "ChromDB SSL",
+      "title": "Chroma SSL enabled",
       "description": "Enable/Disable SSL",
       "type": "boolean",
       "default": false
     },
     "chromaServerAuthCredentials": {
-      "title": "ChromaDB server auth Static API token credentials",
-      "description": "ChromaDB server Auth Static API token.",
+      "title": "Chroma server auth Static API token credentials",
+      "description": "Chroma server Auth Static API token.",
       "type": "string",
       "editor": "textfield",
       "isSecret": true
+    },
+    "chromaClientAuthProvider": {
+      "title": "Chroma client auth provider",
+      "description": "Chroma client auth provider",
+      "type": "string",
+      "editor": "textfield",
+      "prefill": "chromadb.auth.token_authn.TokenAuthClientProvider",
+      "default": "chromadb.auth.token_authn.TokenAuthClientProvider"
     },
     "embeddings": {
       "title": "Embeddings provider (as defined in the langchain API)",
