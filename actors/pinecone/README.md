@@ -23,7 +23,7 @@ Apify Pinecone integration computes embeddings and store them in Pinecone. It us
 To utilize this integration, ensure you have:
 
 - Created or existing `Pinecone` database. You need to know `indexName` and `apiKey`.
-- An account to compute embeddings using one of the providers (e.g., OpenAI or Cohere), or you can use free Huggingface models.
+- An account to compute embeddings using one of the providers, e.g., OpenAI or Cohere.
 
 ## Inputs
 

@@ -21,12 +21,12 @@
       "description": "Choose the embeddings provider to use for generating embeddings",
       "type": "string",
       "editor": "select",
-      "enum": ["OpenAIEmbeddings", "HuggingFaceEmbeddings", "CohereEmbeddings"],
+      "enum": ["OpenAIEmbeddings", "CohereEmbeddings"],
       "default": "OpenAIEmbeddings"
     },
     "embeddingsConfig": {
       "title": "Embeddings provider configuration",
-      "description": "Specific configuration for the embeddings. For example, for OpenAI, you can the model name as ({\"model\": \"text-embedding-ada-002\"}), for HuggingFace ({\"model_name\": \"sentence-transformers/paraphrase-MiniLM-L6-v2\"})",
+      "description": "Specific configuration for the embeddings. For example, for OpenAI, you can the model name as {\"model\": \"text-embedding-ada-002\"})",
       "type": "object",
       "editor": "json"
     },

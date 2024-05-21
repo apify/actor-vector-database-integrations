@@ -1,8 +1,6 @@
-from unittest.mock import patch
-
 from langchain.docstore.document import Document
 
-from utils import get_nested_value, load_dataset, stringify_dict
+from utils import get_dataset_loader, get_nested_value, stringify_dict
 
 
 def test_get_nested_value_with_nested_keys():
@@ -53,7 +51,7 @@ def test_load_page_content():
 
     dataset_items = [{"text": "This is a test"}]
 
-    loader = load_dataset("1234", ["text"], {}, {})
+    loader = get_dataset_loader("1234", ["text"], {}, {})
     result = list(map(loader.dataset_mapping_function, dataset_items))
 
     assert result == [Document(**{"page_content": "text: This is a test"})]
@@ -69,7 +67,7 @@ def test_load_page_content_with_metadata():
     meta_values = {"source": "test source"}
     meta_fields = {"page_url": "url", "page_title": "metadata.title"}
 
-    loader = load_dataset("1234", ["text", "url"], meta_values, meta_fields)
+    loader = get_dataset_loader("1234", ["text", "url"], meta_values, meta_fields)
     result = list(map(loader.dataset_mapping_function, dataset_items))
 
     expected_result = [

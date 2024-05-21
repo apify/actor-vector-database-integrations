@@ -23,7 +23,7 @@ Apify Chroma integration computes embeddings and store them in Chroma. It uses [
 To utilize this integration, ensure you have:
 
 - `Chroma` operational on a server or localhost.
-- An account to compute embeddings using one of the providers (e.g., OpenAI or Cohere), or you can use free Huggingface models.
+- An account to compute embeddings using one of the providers, e.g., OpenAI or Cohere.
 
 For quick Chroma setup, refer to [Chroma deployment](https://docs.trychroma.com/deployment#docker).
 Chroma can be run in a Docker container with the following commands:

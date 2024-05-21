@@ -14,23 +14,23 @@ if TYPE_CHECKING:
     from langchain.vectorstores import VectorStore
     from langchain_core.embeddings import Embeddings
 
-InputsDb: TypeAlias = ChromaIntegration | PineconeIntegration
+ActorInputsDb: TypeAlias = ChromaIntegration | PineconeIntegration
 
 
-async def get_vector_store(aid: InputsDb | None, embeddings: Embeddings) -> VectorStore:
+async def get_vector_store(actor_input: ActorInputsDb | None, embeddings: Embeddings) -> VectorStore:
     """Get database based on the integration type."""
 
-    if isinstance(aid, ChromaIntegration):
-        return await _get_chroma(aid, embeddings)
+    if isinstance(actor_input, ChromaIntegration):
+        return await _get_chroma(actor_input, embeddings)
 
-    if isinstance(aid, PineconeIntegration):
-        return await _get_pinecone(aid, embeddings)
+    if isinstance(actor_input, PineconeIntegration):
+        return await _get_pinecone(actor_input, embeddings)
 
-    await Actor.fail(status_message=f"Failed to get database with config: {aid}")
+    await Actor.fail(status_message=f"Failed to get database with config: {actor_input}")
     raise ValueError("Failed to get database")
 
 
-async def _get_chroma(aid: ChromaIntegration, embeddings: Embeddings) -> VectorStore:
+async def _get_chroma(actor_input: ChromaIntegration, embeddings: Embeddings) -> VectorStore:
     # Apify dockerfile is using Debian slim-buster image, which has an unsupported version of sqlite3.
     # FIx for RuntimeError: Your system has an unsupported version of sqlite3. Chroma requires sqlite3 >= 3.35.0.
     # References:
@@ -54,21 +54,23 @@ async def _get_chroma(aid: ChromaIntegration, embeddings: Embeddings) -> VectorS
         Actor.log.info("Connected to chroma database")
 
     settings = None
-    if auth := aid.chromaServerAuthCredentials:
+    if auth := actor_input.chromaServerAuthCredentials:
         settings = chromadb.config.Settings(
             chroma_client_auth_credentials=auth,
-            chroma_client_auth_provider=aid.chromaClientAuthProvider,
+            chroma_client_auth_provider=actor_input.chromaClientAuthProvider,
         )
     try:
         chroma_client = chromadb.HttpClient(
-            host=aid.chromaClientHost,
-            port=aid.chromaClientPort or 8000,
-            ssl=aid.chromaClientSsl or False,
+            host=actor_input.chromaClientHost,
+            port=actor_input.chromaClientPort or 8000,
+            ssl=actor_input.chromaClientSsl or False,
             settings=settings,
         )
         await check_chroma_connection(chroma_client)
         return Chroma(
-            client=chroma_client, collection_name=aid.chromaCollectionName or "chroma", embedding_function=embeddings
+            client=chroma_client,
+            collection_name=actor_input.chromaCollectionName or "chroma",
+            embedding_function=embeddings,
         )
 
     except Exception as e:
@@ -76,13 +78,13 @@ async def _get_chroma(aid: ChromaIntegration, embeddings: Embeddings) -> VectorS
         raise FailedToConnectToDatabaseError("Failed to connect to chroma") from e
 
 
-async def _get_pinecone(aid: PineconeIntegration, embeddings: Embeddings) -> VectorStore:
+async def _get_pinecone(actor_input: PineconeIntegration, embeddings: Embeddings) -> VectorStore:
     from langchain_pinecone import PineconeVectorStore
     from pinecone import Pinecone as PineconeClient  # type: ignore[import-untyped]
 
     try:
-        client = PineconeClient(api_key=aid.pineconeApiKey, source_tag=PINECONE_SOURCE_TAG)
-        return PineconeVectorStore(index=client.Index(aid.pineconeIndexName), embedding=embeddings)
+        client = PineconeClient(api_key=actor_input.pineconeApiKey, source_tag=PINECONE_SOURCE_TAG)
+        return PineconeVectorStore(index=client.Index(actor_input.pineconeIndexName), embedding=embeddings)
     except Exception as e:
         await Actor.fail(status_message=f"Failed to initialize pinecone: {e}")
         raise FailedToConnectToDatabaseError("Failed to connect to chroma") from e

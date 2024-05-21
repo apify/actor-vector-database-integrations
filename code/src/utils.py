@@ -36,7 +36,7 @@ def stringify_dict(d: dict, keys: list[str]) -> str:
     return "\n".join([f"{key}: {value}" for key in keys if (value := get_nested_value(d, key))])
 
 
-def load_dataset(dataset_id: str, fields: list[str], meta_values: dict, meta_fields: dict) -> ApifyDatasetLoader:
+def get_dataset_loader(dataset_id: str, fields: list[str], meta_values: dict, meta_fields: dict) -> ApifyDatasetLoader:
     """Load dataset by dataset_id using ApifyDatasetLoader.
 
     The dataset_mapping_function is used to map the dataset item to a Document object.
