@@ -8,7 +8,7 @@ from .utils import get_dataset_loader
 from .vcs import ActorInputsDb, get_vector_store
 
 if TYPE_CHECKING:
-    from langchain.vectorstores import VectorStore
+    from langchain_core.vectorstores import VectorStore
 
 
 async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
