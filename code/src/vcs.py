@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import sys
 from typing import TYPE_CHECKING, TypeAlias
 
 from apify import Actor
@@ -31,16 +30,6 @@ async def get_vector_store(actor_input: ActorInputsDb | None, embeddings: Embedd
 
 
 async def _get_chroma(actor_input: ChromaIntegration, embeddings: Embeddings) -> VectorStore:
-    # Apify dockerfile is using Debian slim-buster image, which has an unsupported version of sqlite3.
-    # FIx for RuntimeError: Your system has an unsupported version of sqlite3. Chroma requires sqlite3 >= 3.35.0.
-    # References:
-    #  https://docs.trychroma.com/troubleshooting#sqlite
-    #  https://gist.github.com/defulmere/8b9695e415a44271061cc8e272f3c300
-    #
-    # pip install pysqlite3
-    # swap the stdlib sqlite3 lib with the pysqlite3 package, before importing chromadb
-    __import__("pysqlite3")
-    sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
 
     import chromadb
     from langchain_chroma import Chroma

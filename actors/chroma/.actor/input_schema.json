@@ -21,7 +21,7 @@
       "description": "Port argument for Chroma HTTP Client",
       "type": "integer",
       "editor": "number",
-      "default": 8080
+      "default": 8000
     },
     "chromaClientSsl": {
       "title": "Chroma SSL enabled",

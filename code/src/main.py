@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 
 
 async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
+
     resource = payload.get("payload", {}).get("resource", {})
     if not (dataset_id := resource.get("defaultDatasetId") or actor_input.datasetId):
         msg = "No Dataset ID provided. It should be provided either in payload or in actor_input"
