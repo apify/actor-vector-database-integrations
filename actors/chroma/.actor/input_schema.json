@@ -1,0 +1,127 @@
+{
+  "title": "Chroma-integration",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "chromaCollectionName": {
+      "title": "Chroma collection name",
+      "description": "Chroma collection name",
+      "type": "string",
+      "editor": "textfield",
+      "default": "chroma"
+    },
+    "chromaClientHost": {
+      "title": "Chroma host",
+      "description": "Host argument for Chroma HTTP Client",
+      "type": "string",
+      "editor": "textfield"
+    },
+    "chromaClientPort": {
+      "title": "Chroma port",
+      "description": "Port argument for Chroma HTTP Client",
+      "type": "integer",
+      "editor": "number",
+      "default": 8000
+    },
+    "chromaClientSsl": {
+      "title": "Chroma SSL enabled",
+      "description": "Enable/Disable SSL",
+      "type": "boolean",
+      "default": false
+    },
+    "chromaServerAuthCredentials": {
+      "title": "Chroma server auth Static API token credentials",
+      "description": "Chroma server Auth Static API token.",
+      "type": "string",
+      "editor": "textfield",
+      "isSecret": true
+    },
+    "chromaClientAuthProvider": {
+      "title": "Chroma client auth provider",
+      "description": "Chroma client auth provider",
+      "type": "string",
+      "editor": "textfield",
+      "prefill": "chromadb.auth.token_authn.TokenAuthClientProvider",
+      "default": "chromadb.auth.token_authn.TokenAuthClientProvider"
+    },
+    "embeddings": {
+      "title": "Embeddings provider (as defined in the langchain API)",
+      "description": "Choose the embeddings provider to use for generating embeddings",
+      "type": "string",
+      "editor": "select",
+      "enum": ["OpenAIEmbeddings", "CohereEmbeddings"],
+      "default": "OpenAIEmbeddings"
+    },
+    "embeddingsConfig": {
+      "title": "Embeddings provider configuration",
+      "description": "Specific configuration for the embeddings. For example, for OpenAI, you can the model name as {\"model\": \"text-embedding-ada-002\"})",
+      "type": "object",
+      "editor": "json"
+    },
+    "embeddingsApiKey": {
+      "title": "Embeddings API KEY (whenever applicable, depends on provider)",
+      "description": "Value of the API KEY for the embeddings provider (if required).\n\n For example for OpenAI it is OPENAI_API_KEY, for Cohere it is COHERE_API_KEY)",
+      "type": "string",
+      "editor": "textfield",
+      "isSecret": true
+    },
+    "fields": {
+      "title": "A list of fields which should be selected from the items",
+      "type": "array",
+      "description": "A list of fields which should be selected from the items, only these fields will remain in the resulting record objects.\n\n For example, when using the website content crawler, you might select fields such as `text` and `url`, and `metadata.title` among others, to be included in the vector store file.",
+      "default": [
+        "url",
+        "text"
+      ],
+      "prefill": [
+        "url",
+        "text",
+        "metadata.title"
+      ],
+      "editor": "stringList"
+    },
+    "metadataFields": {
+      "title": "Metadata fields",
+      "type": "object",
+      "description": "A list of fields which should be selected from the items and stored as metadata. \n\n For example, when using the website content crawler, you might want to store `url` in metadata. In this case, use `metadata_fields parameter as follows {\"page_url\": \"url\"}`",
+      "editor": "json"
+    },
+    "metadataValues": {
+      "title": "Metadata values",
+      "type": "object",
+      "description": "Custom values to be stored for every Dataset item as metadata.\n\n For example, you might want to store `domain` in metadata, hence use `metadata_values as {\"domain\": \"apify.com\"}`",
+      "editor": "json"
+    },
+    "performChunking": {
+      "title": "Perform chunking",
+      "description": "If set to true, the resulting text will be chunked according to the settings below",
+      "default": false,
+      "type": "boolean"
+    },
+    "chunkSize": {
+      "title": "Chunk size",
+      "type": "integer",
+      "description": "The maximum character length of each text chunk",
+      "default": 1000,
+      "minimum": 1
+    },
+    "chunkOverlap": {
+      "title": "Chunk overlap",
+      "type": "integer",
+      "description": "The character overlap between text chunks that are next to each other",
+      "default": 0,
+      "minimum": 0
+    },
+    "datasetId": {
+      "title": "Dataset ID",
+      "type": "string",
+      "description": "Dataset ID (when running standalone without integration)",
+      "editor": "textfield"
+    }
+  },
+  "required": [
+    "chromaClientHost",
+    "embeddings",
+    "fields"
+  ]
+}

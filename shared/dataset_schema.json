@@ -1,0 +1,27 @@
+{
+    "actorSpecification": 1,
+    "views": {
+        "overview": {
+            "title": "Overview",
+            "transformation": {
+                "fields": [
+                    "page_content",
+                    "metadata"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "page_content": {
+                        "label": "Page content (chunk)",
+                        "format": "text"
+                    },
+                    "metadata": {
+                        "label": "Metadata (if any)",
+                        "format": "object"
+                    }
+                }
+            }
+        }
+    }
+}
