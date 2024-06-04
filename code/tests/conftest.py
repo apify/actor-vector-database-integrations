@@ -6,12 +6,12 @@ from dotenv import load_dotenv
 from langchain_core.documents import Document
 from langchain_openai.embeddings import OpenAIEmbeddings
 
-from store_vector_db.constants import VCR_HEADERS_EXCLUDE
-from store_vector_db.models.chroma_input_model import ChromaIntegration
-from store_vector_db.models.pinecone_input_model import EmbeddingsProvider, PineconeIntegration
-from store_vector_db.utils import add_item_checksum
-from store_vector_db.vector_stores.chroma import ChromaDatabase
-from store_vector_db.vector_stores.pinecone import PineconeDatabase
+from constants import VCR_HEADERS_EXCLUDE
+from models.chroma_input_model import ChromaIntegration
+from models.pinecone_input_model import EmbeddingsProvider, PineconeIntegration
+from utils import add_item_checksum
+from vector_stores.chroma import ChromaDatabase
+from vector_stores.pinecone import PineconeDatabase
 
 load_dotenv()
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")

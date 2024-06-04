@@ -66,9 +66,7 @@ def compute_hash(text: str) -> str:
     return hashlib.md5(text.encode()).hexdigest()  # noqa: S324
 
 
-def get_chunks_to_delete(
-    chunks_prev: list[Document], chunks_current: list[Document], expired_days: float
-) -> tuple[list[Document], list[Document]]:
+def get_chunks_to_delete(chunks_prev: list[Document], chunks_current: list[Document], expired_days: float) -> tuple[list[Document], list[Document]]:
     """
     Identifies chunks to be deleted based on their last seen timestamp and presence in the current run.
 

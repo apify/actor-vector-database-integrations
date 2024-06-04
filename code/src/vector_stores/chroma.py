@@ -5,19 +5,17 @@ from typing import TYPE_CHECKING
 import chromadb
 from langchain_chroma import Chroma
 
-from store_vector_db.exceptions import FailedToConnectToDatabaseError
-from store_vector_db.vector_stores.base import VectorDbBase
+from .base import FailedToConnectToDatabaseError, VectorDbBase
 
 if TYPE_CHECKING:
     from langchain_core.documents import Document
     from langchain_core.embeddings import Embeddings
 
-    from store_vector_db.models.chroma_input_model import ChromaIntegration
+    from ..models.chroma_input_model import ChromaIntegration
 
 
 class ChromaDatabase(Chroma, VectorDbBase):
     def __init__(self, actor_input: ChromaIntegration, embeddings: Embeddings) -> None:
-
         settings = None
         if auth := actor_input.chromaServerAuthCredentials:
             settings = chromadb.config.Settings(

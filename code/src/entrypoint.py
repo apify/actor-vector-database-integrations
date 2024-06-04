@@ -2,10 +2,10 @@ import os
 
 from apify import Actor
 
-from store_vector_db.constants import SupportedVectorStores
-from store_vector_db.main import run_actor
-from store_vector_db.models.chroma_input_model import ChromaIntegration
-from store_vector_db.models.pinecone_input_model import PineconeIntegration
+from .constants import SupportedVectorStores
+from .main import run_actor
+from .models.chroma_input_model import ChromaIntegration
+from .models.pinecone_input_model import PineconeIntegration
 
 
 async def main() -> None:
@@ -25,8 +25,7 @@ async def main() -> None:
 
             arg = f"actors/{SupportedVectorStores.pinecone.value}"
             Actor.log.warning(
-                f"The environment variable ACTOR_PATH_IN_DOCKER_CONTEXT was not specified. "
-                f"Using default for local development: {arg}"
+                f"The environment variable ACTOR_PATH_IN_DOCKER_CONTEXT was not specified. " f"Using default for local development: {arg}"
             )
 
         actor_type = arg.split("/")[-1]

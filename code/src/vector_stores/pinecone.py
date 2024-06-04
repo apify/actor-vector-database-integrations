@@ -5,20 +5,20 @@ from typing import TYPE_CHECKING
 from langchain_pinecone import PineconeVectorStore
 from pinecone import Pinecone as PineconeClient  # type: ignore[import-untyped]
 
-from store_vector_db.constants import PINECONE_SOURCE_TAG
-from store_vector_db.exceptions import FailedToConnectToDatabaseError
-from store_vector_db.vector_stores.base import VectorDbBase
+from .base import FailedToConnectToDatabaseError, VectorDbBase
 
 if TYPE_CHECKING:
     from langchain_core.documents import Document
     from langchain_core.embeddings import Embeddings
 
-    from store_vector_db.models.pinecone_input_model import PineconeIntegration
+    from ..models.pinecone_input_model import PineconeIntegration
+
+# Pinecone API attribution tag
+PINECONE_SOURCE_TAG = "apify"
 
 
 class PineconeDatabase(PineconeVectorStore, VectorDbBase):
     def __init__(self, actor_input: PineconeIntegration, embeddings: Embeddings) -> None:
-
         try:
             self.client = PineconeClient(api_key=actor_input.pineconeApiKey, source_tag=PINECONE_SOURCE_TAG)
             super().__init__(index=self.client.Index(actor_input.pineconeIndexName), embedding=embeddings)

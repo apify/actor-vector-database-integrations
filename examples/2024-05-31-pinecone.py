@@ -8,9 +8,9 @@ from langchain_pinecone import PineconeVectorStore  # type: ignore
 from pinecone import Pinecone as PineconeClient  # type: ignore
 
 from data_examples import crawl_1, crawl_2, expected_results
-from store_vector_db.models.pinecone_input_model import EmbeddingsProvider, PineconeIntegration
-from store_vector_db.vcs import compare_crawled_data_with_db
-from store_vector_db.vector_stores.pinecone import PineconeDatabase
+from models.pinecone_input_model import EmbeddingsProvider, PineconeIntegration
+from vcs import compare_crawled_data_with_db
+from vector_stores.pinecone import PineconeDatabase
 
 load_dotenv(Path.cwd() / ".." / "code" / ".env")
 PINECONE_INDEX_NAME = "apify-unit-test"

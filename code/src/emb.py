@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from apify import Actor
 
-from store_vector_db.constants import SupportedEmbeddings
+from .constants import SupportedEmbeddings
 
 if TYPE_CHECKING:
     from langchain_core.embeddings import Embeddings
@@ -27,7 +27,5 @@ async def get_embeddings(embeddings_class_name: str, api_key: str | None = None,
         config["cohere_api_key"] = api_key
         return CohereEmbeddings(**config)
 
-    await Actor.fail(
-        status_message=f"Failed to get embeddings for embedding class: {embeddings_class_name} and config: {config}"
-    )
+    await Actor.fail(status_message=f"Failed to get embeddings for embedding class: {embeddings_class_name} and config: {config}")
     raise ValueError("Failed to get embeddings")

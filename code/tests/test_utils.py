@@ -2,7 +2,7 @@ import copy
 
 from langchain_core.documents import Document
 
-from store_vector_db.utils import (
+from src.utils import (
     add_item_checksum,
     compute_hash,
     get_chunks_to_delete,

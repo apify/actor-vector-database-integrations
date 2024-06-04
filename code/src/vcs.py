@@ -6,18 +6,17 @@ from apify import Actor
 from langchain_core.documents import Document
 from langchain_core.vectorstores import VectorStore
 
-from store_vector_db.constants import CACHE_KV_STORE_NAME
-from store_vector_db.models.chroma_input_model import ChromaIntegration
-from store_vector_db.models.pinecone_input_model import PineconeIntegration
-from store_vector_db.utils import get_chunks_to_delete, get_chunks_to_update
+from .constants import CACHE_KV_STORE_NAME
+from .models.chroma_input_model import ChromaIntegration
+from .models.pinecone_input_model import PineconeIntegration
+from .utils import get_chunks_to_delete, get_chunks_to_update
 
 if TYPE_CHECKING:
-
     from langchain.vectorstores import VectorStore
     from langchain_core.embeddings import Embeddings
 
-    from store_vector_db.vector_stores.chroma import ChromaDatabase
-    from store_vector_db.vector_stores.pinecone import PineconeDatabase
+    from .vector_stores.chroma import ChromaDatabase
+    from .vector_stores.pinecone import PineconeDatabase
 
     ActorInputsDb: TypeAlias = ChromaIntegration | PineconeIntegration
     DB: TypeAlias = ChromaDatabase | PineconeDatabase

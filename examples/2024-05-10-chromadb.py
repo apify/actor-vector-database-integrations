@@ -12,7 +12,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "code" / "src"))
 
-from store_vector_db.utils import get_nested_value, get_dataset_loader, stringify_dict  # type: ignore
+from utils import get_nested_value, get_dataset_loader, stringify_dict  # type: ignore
 
 # docker pull chromadb/chroma
 # docker run -p 8000:8000 chromadb/chroma

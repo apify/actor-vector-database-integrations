@@ -6,12 +6,12 @@ from typing import TYPE_CHECKING
 from apify import Actor
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from store_vector_db.emb import get_embeddings
-from store_vector_db.utils import DAY_IN_SECONDS, add_chunk_id, add_item_checksum, get_dataset_loader
-from store_vector_db.vcs import ActorInputsDb, get_vector_store, update_db_with_crawled_data
+from .emb import get_embeddings
+from .utils import DAY_IN_SECONDS, add_chunk_id, add_item_checksum, get_dataset_loader
+from .vcs import get_vector_store, update_db_with_crawled_data
 
 if TYPE_CHECKING:
-    from store_vector_db.vcs import DB
+    from .vcs import DB, ActorInputsDb
 
 
 async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:

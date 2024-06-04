@@ -7,6 +7,10 @@ if TYPE_CHECKING:
     from langchain_core.documents import Document
 
 
+class FailedToConnectToDatabaseError(Exception):
+    """Failed to connect to a vector database."""
+
+
 class VectorDbBase(ABC):
     @abstractmethod
     def update_last_seen_at(self, data: list[Document]) -> None:

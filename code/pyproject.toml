@@ -5,12 +5,7 @@ description = ""
 name = "store-vector-db"
 readme = "README.md"
 version = "0.0.1"
-packages = [{include = "store_vector_db", from="src"}]
-
-[tool.poetry-dynamic-versioning.substitution]
-folders = [
-  { path = "src" }
-]
+package-mode = false
 
 [tool.poetry.dependencies]
 apify = "^1.7.0"
@@ -51,7 +46,7 @@ chromadb = "^0.5.0"
 
 [tool.ruff]
 line-length = 150
-exclude = ["src/store_vector_db/models/**"]
+exclude = ["src/models/**"]
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -83,6 +78,7 @@ ignore = [
     "S303",    # Use of insecure MD2, MD4, MD5, or SHA1 hash function
     "S311",    # Standard pseudo-random generators are not suitable for cryptographic purposes
     "TD002",   # Missing author in TODO; try: `# TODO(<author_name>): ...` or `# TODO @<author_name>: ...
+    "TID252",  # Prefer absolute imports over relative imports from parent modules
     "TRY003",  # Avoid specifying long messages outside the exception class
     #
     "D",

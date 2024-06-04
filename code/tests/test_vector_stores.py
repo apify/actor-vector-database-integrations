@@ -1,8 +1,8 @@
 import pytest
 import time
 
-from store_vector_db.constants import VCR_HEADERS_EXCLUDE
-from store_vector_db.vcs import compare_crawled_data_with_db, update_db_with_crawled_data
+from src.constants import VCR_HEADERS_EXCLUDE
+from src.vcs import compare_crawled_data_with_db, update_db_with_crawled_data
 
 
 # Database fixtures to test. Fill here the name of the fixtures you want to test
@@ -11,7 +11,7 @@ DATABASE_FIXTURES = ["db_pinecone", "db_chroma"]
 
 def wait_for_db(sec=3):
     # Wait for the database to update (Pinecone)
-    # Data freshness -  Pinecone is eventually consistent, so there can be a slight delay before new or changed records are visible to queries.
+    # Data freshness - Pinecone is eventually consistent, so there can be a slight delay before new or changed records are visible to queries.
     time.sleep(sec)
 
 
