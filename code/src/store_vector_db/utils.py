@@ -1,0 +1,141 @@
+from __future__ import annotations
+
+import copy
+import hashlib
+from collections import defaultdict
+from datetime import datetime, timezone
+from uuid import uuid4
+
+from langchain_community.document_loaders import ApifyDatasetLoader
+from langchain_core.documents import Document
+
+EXCLUDE_KEYS_FROM_CHECKSUM = {"metadata": {"id", "checksum", "updated_at", "item_id"}}
+DAY_IN_SECONDS = 24 * 3600
+
+
+def get_nested_value(d: dict, keys: str) -> str:
+    """
+    Extract nested value from dict.
+
+    Example:
+      >>> get_nested_value({"a": "v1", "c1": {"c2": "v2"}}, "c1.c2")
+      'v2'
+    """
+
+    d = copy.deepcopy(d)
+    for key in keys.split("."):
+        if d and isinstance(d, dict) and d.get(key):
+            d = d[key]
+        else:
+            return ""
+    return str(d)
+
+
+def stringify_dict(d: dict, keys: list[str]) -> str:
+    """Stringify all values in a dictionary.
+
+    Example:
+        >>> d_ = {"a": {"text": "Apify is cool"}, "description": "Apify platform"}
+        >>> stringify_dict(d_, ["a.text", "description"])
+        'a.text: Apify is cool\\ndescription: Apify platform'
+    """
+    return "\n".join([f"{key}: {value}" for key in keys if (value := get_nested_value(d, key))])
+
+
+def get_dataset_loader(dataset_id: str, fields: list[str], meta_values: dict, meta_fields: dict) -> ApifyDatasetLoader:
+    """Load dataset by dataset_id using ApifyDatasetLoader.
+
+    The dataset_mapping_function is used to map the dataset item to a Document object.
+    Stringify dict using the fields.
+    """
+
+    return ApifyDatasetLoader(
+        dataset_id,
+        dataset_mapping_function=lambda dataset_item: Document(
+            page_content=stringify_dict(dataset_item, fields) or "",
+            metadata={
+                **meta_values,
+                **{key: get_nested_value(dataset_item, value) for key, value in meta_fields.items()},
+            },
+        ),
+    )
+
+
+def compute_hash(text: str) -> str:
+    """Compute hash of the text."""
+    return hashlib.md5(text.encode()).hexdigest()  # noqa: S324
+
+
+def get_chunks_to_delete(
+    chunks_prev: list[Document], chunks_current: list[Document], orphaned_days: float
+) -> tuple[list[Document], list[Document]]:
+    """
+    Identifies chunks to be deleted based on their last update timestamp and presence in the current run.
+
+    Compare the chunks from the previous and current runs and identify chunks that are not present
+    in the current run and have not been updated within the specified 'orphaned_days'. These chunks are considered
+    'orphaned' and are marked for deletion.
+    """
+    ids_current = {d.metadata["item_id"] for d in chunks_current}
+
+    ts_orphaned = int(datetime.now(timezone.utc).timestamp() - orphaned_days * DAY_IN_SECONDS)
+    chunks_orphaned_delete, chunks_old_keep = [], []
+
+    # chunks that have been crawled in the current run and are older than orphaned days => to delete
+    for d in chunks_prev:
+        if d.metadata["item_id"] not in ids_current:
+            if d.metadata["updated_at"] < ts_orphaned:
+                chunks_orphaned_delete.append(d)
+            else:
+                chunks_old_keep.append(d)
+
+    return chunks_orphaned_delete, chunks_old_keep
+
+
+def get_chunks_to_update(chunks_prev: list[Document], chunks_current: list[Document]) -> tuple[list[Document], list[Document]]:
+    """
+    Identifies chunks that need to be updated or added based on their unique identifiers and checksums.
+
+    Compare the chunks from the previous and current runs and identify chunks that are new or have
+    undergone content changes by comparing their checksums. These chunks are marked for addition. chunks that are
+    present in both runs but have not undergone content changes are marked for metadata update.
+    """
+
+    prev_id_checksum = defaultdict(list)
+    for chunk in chunks_prev:
+        prev_id_checksum[chunk.metadata["item_id"]].append(chunk.metadata["checksum"])
+
+    chunks_add = []
+    chunks_update_metadata = []
+    for chunk in chunks_current:
+        if chunk.metadata["item_id"] in prev_id_checksum:
+            if chunk.metadata["checksum"] in prev_id_checksum[chunk.metadata["item_id"]]:
+                chunks_update_metadata.append(chunk)
+            else:
+                chunks_add.append(chunk)
+        else:
+            chunks_add.append(chunk)
+
+    return chunks_add, chunks_update_metadata
+
+
+def add_item_checksum(items: list[Document], dataset_keys_to_item_id: list[str]) -> list[Document]:
+    """
+    Adds a checksum and unique item_id to the metadata of each dataset item.
+
+    This function computes a checksum for each item based on its content and metadata, excluding certain keys.
+    The checksum is then added to the document's metadata. Additionally, a unique item ID is generated based on
+    specified keys in the document's metadata and added to the metadata as well.
+    """
+    for item in items:
+        item.metadata["checksum"] = compute_hash(item.json(exclude=EXCLUDE_KEYS_FROM_CHECKSUM))  # type: ignore[arg-type]
+        item.metadata["updated_at"] = int(datetime.now(timezone.utc).timestamp())
+        item.metadata["item_id"] = compute_hash("".join([item.metadata.get(key, "") for key in dataset_keys_to_item_id]))
+    return items
+
+
+def add_chunk_id(chunks: list[Document]) -> list[Document]:
+    """For every chunk (document stored in vector db) add id to metadata."""
+    for d in chunks:
+        d.metadata["id"] = d.metadata.get("id", uuid4().hex)
+    return chunks

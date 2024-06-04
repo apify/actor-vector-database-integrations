@@ -23,4 +23,4 @@ RUN echo "Python version:" \
 
 COPY code ./
 
-CMD ["python3", "-m", "src"]
+CMD ["python3", "-m", "src.store_vector_db"]

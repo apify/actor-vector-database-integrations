@@ -3,6 +3,8 @@ import enum
 # Pinecone API attribution tag
 PINECONE_SOURCE_TAG = "apify"
 
+CACHE_KV_STORE_NAME = "cache"
+
 
 class SupportedVectorStores(str, enum.Enum):
     pinecone = "pinecone"

@@ -5,7 +5,7 @@
   "properties": {
     "chromaCollectionName": {
       "title": "Chroma collection name",
-      "description": "Chroma collection name",
+      "description": "Name of the chroma collection where the data will be stored",
       "type": "string",
       "editor": "textfield",
       "default": "chroma"
@@ -30,7 +30,7 @@
       "default": false
     },
     "chromaServerAuthCredentials": {
-      "title": "Chroma server auth Static API token credentials",
+      "title": "Chroma server Auth Static API token credentials",
       "description": "Chroma server Auth Static API token.",
       "type": "string",
       "editor": "textfield",
@@ -44,31 +44,34 @@
       "prefill": "chromadb.auth.token_authn.TokenAuthClientProvider",
       "default": "chromadb.auth.token_authn.TokenAuthClientProvider"
     },
-    "embeddings": {
+    "embeddingsProvider": {
       "title": "Embeddings provider (as defined in the langchain API)",
-      "description": "Choose the embeddings provider to use for generating embeddings",
+      "description": "Select the provider for generating embeddings. This should be one of the providers defined in the langchain API.",
       "type": "string",
       "editor": "select",
-      "enum": ["OpenAIEmbeddings", "CohereEmbeddings"],
+      "enum": [
+        "OpenAIEmbeddings",
+        "CohereEmbeddings"
+      ],
       "default": "OpenAIEmbeddings"
     },
     "embeddingsConfig": {
       "title": "Embeddings provider configuration",
-      "description": "Specific configuration for the embeddings. For example, for OpenAI, you can the model name as {\"model\": \"text-embedding-ada-002\"})",
+      "description": "Provide specific configuration parameters for the selected embeddings provider. For instance, for OpenAI, you can specify the model name like this: {\"model\": \"text-embedding-ada-002\"}.",
       "type": "object",
       "editor": "json"
     },
     "embeddingsApiKey": {
-      "title": "Embeddings API KEY (whenever applicable, depends on provider)",
-      "description": "Value of the API KEY for the embeddings provider (if required).\n\n For example for OpenAI it is OPENAI_API_KEY, for Cohere it is COHERE_API_KEY)",
+      "title": "Embeddings API Key (whenever applicable, depends on provider)",
+      "description": "Enter the API key for the selected embeddings provider, if required. For example, for OpenAI, use the OPENAI_API_KEY, and for Cohere, use the COHERE_API_KEY.",
       "type": "string",
       "editor": "textfield",
       "isSecret": true
     },
-    "fields": {
-      "title": "A list of fields which should be selected from the items",
+    "datasetFields": {
+      "title": "A list of dataset fields which should be selected from the dataset results",
       "type": "array",
-      "description": "A list of fields which should be selected from the items, only these fields will remain in the resulting record objects.\n\n For example, when using the website content crawler, you might select fields such as `text` and `url`, and `metadata.title` among others, to be included in the vector store file.",
+      "description": "This array specifies the dataset fields to be selected and stored in the vector store. Only the fields listed here will be included in the vector store. For instance, when using the Website Content Crawler, you might choose to include fields such as `text`, `url`, and `metadata.title` in the vector store.",
       "default": [
         "url",
         "text"
@@ -80,16 +83,16 @@
       ],
       "editor": "stringList"
     },
-    "metadataFields": {
-      "title": "Metadata fields",
+    "metadataDatasetFields": {
+      "title": "A list of dataset fields to be selected from the dataset and stored as metadata in the database",
       "type": "object",
-      "description": "A list of fields which should be selected from the items and stored as metadata. \n\n For example, when using the website content crawler, you might want to store `url` in metadata. In this case, use `metadata_fields parameter as follows {\"page_url\": \"url\"}`",
+      "description": "A list of dataset fields which should be selected from the dataset and stored as metadata in the vector stores. \n\n For example, when using the Website Content Crawler, you might want to store `url` in metadata. In this case, use `metadataDatasetFields parameter as follows {\"page_url\": \"url\"}`",
       "editor": "json"
     },
-    "metadataValues": {
-      "title": "Metadata values",
+    "metadataObject": {
+      "title": "Custom object to be stored as metadata in the vector store database",
       "type": "object",
-      "description": "Custom values to be stored for every Dataset item as metadata.\n\n For example, you might want to store `domain` in metadata, hence use `metadata_values as {\"domain\": \"apify.com\"}`",
+      "description": "This object allows you to store custom metadata for every item in the vector store. For example, if you want to store the `domain` as metadata, use the `metadataObject` like this: {\"domain\": \"apify.com\"}.",
       "editor": "json"
     },
     "performChunking": {
@@ -112,6 +115,34 @@
       "default": 0,
       "minimum": 0
     },
+    "cacheEnabled": {
+      "title": "Enable caching for subsequent runs",
+      "type": "boolean",
+      "description": "This setting is applicable for runs following the initial one. When enabled (set to true), the system only adds new content to the vector database and removes orphaned documents, including their vectors. A document is considered orphaned if it hasn't been crawled in subsequent runs and its last seen date exceeds the `orphanedDocAgeLimitDays`. The system internally compares all documents, including their content and metadata, to identify new or orphaned documents.",
+      "default": true
+    },
+    "cacheName": {
+      "title": "Cache key name",
+      "type": "string",
+      "description": "The name of the cache stored in Apify's key-value store. By default, it is set to the actor ID that triggered this integration. The name must be unique for different actors. Do not change this value unless you know what you are doing.",
+      "editor": "textfield"
+    },
+    "datasetKeysToItemId": {
+      "title": "Keys for Item Identification",
+      "type": "array",
+      "description": "This array contains keys that are used to uniquely identify items, which helps to handle content changes across different runs. For instance, in a web content crawling scenario, the `url` field could serve as a unique identifier for each item.",
+      "editor": "stringList",
+      "default": [
+        "url"
+      ]
+    },
+    "orphanedDocAgeLimitDays": {
+      "title": "Delete orphaned documents older than days limit",
+      "type": "number",
+      "description": "The number of days after which orphaned documents are deleted from the database.",
+      "default": 7,
+      "minimum": 0
+    },
     "datasetId": {
       "title": "Dataset ID",
       "type": "string",
@@ -121,7 +152,7 @@
   },
   "required": [
     "chromaClientHost",
-    "embeddings",
-    "fields"
+    "embeddingsProvider",
+    "datasetFields"
   ]
 }

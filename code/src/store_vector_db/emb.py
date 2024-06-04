@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from apify import Actor
 
-from .constants import SupportedEmbeddings
+from store_vector_db.constants import SupportedEmbeddings
 
 if TYPE_CHECKING:
     from langchain_core.embeddings import Embeddings
