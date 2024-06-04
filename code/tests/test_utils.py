@@ -166,10 +166,10 @@ def test_get_chunks_to_delete_no_delete(documents):
     assert len(old_keep_) == 0
 
 
-def test_get_chunks_to_delete_delete_orphaned(documents):
+def test_get_chunks_to_delete_delete_expired(documents):
 
     chunks_prev = add_item_checksum(documents, ["url"])
-    chunks_prev[0].metadata["updated_at"] = 1
+    chunks_prev[0].metadata["last_seen_at"] = 1
 
     delete_, old_keep = get_chunks_to_delete(chunks_prev, [], 1)
     assert len(delete_) == 1

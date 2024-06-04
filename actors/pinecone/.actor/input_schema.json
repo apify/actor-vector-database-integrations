@@ -18,7 +18,7 @@
     },
     "embeddingsProvider": {
       "title": "Embeddings provider (as defined in the langchain API)",
-      "description": "Choose the embeddings provider to use for generating embeddings",
+      "description": "Select the embeddings provider to use for generating embeddings",
       "type": "string",
       "editor": "select",
       "enum": [
@@ -87,35 +87,33 @@
       "default": 0,
       "minimum": 0
     },
-    "cacheEnabled": {
-      "title": "Enable caching for subsequent runs",
-      "type": "boolean",
-      "description": "This setting is applicable for runs following the initial one. When enabled (set to true), the system only adds new content to the vector database and removes orphaned documents, including their vectors. A document is considered orphaned if it hasn't been crawled in subsequent runs and its last seen date exceeds the `orphanedDocAgeLimitDays`. The system internally compares all documents, including their content and metadata, to identify new or orphaned documents.",
-      "default": true
-    },
-    "cacheName": {
-      "title": "Cache key name",
-      "type": "string",
-      "description": "The name of the cache stored in Apify's key-value store. By default, it is set to the actor ID that triggered this integration. The name must be unique for different actors. Do not change this value unless you know what you are doing.",
-      "editor": "textfield"
-    },
     "datasetKeysToItemId": {
-      "title": "Keys for Item Identification",
+      "title": "Keys for dataset item identification",
       "type": "array",
       "items": {
         "type": "string"
       },
-      "description": "This array contains keys that are used to uniquely identify items, which helps to handle content changes across different runs. For instance, in a web content crawling scenario, the `url` field could serve as a unique identifier for each item.",
+      "description": "This array contains keys that are used to uniquely identify dataset items, which helps to handle content changes across different runs. For instance, in a web content crawling scenario, the `url` field could serve as a unique identifier for each item.",
       "editor": "stringList",
+      "prefill": [
+        "url"
+      ],
       "default": [
         "url"
       ]
     },
-    "orphanedDocAgeLimitDays": {
-      "title": "Delete orphaned documents older than days limit",
+    "enableDeltaUpdates": {
+      "title": "Enable incremental updates for objects based on deltas",
+      "type": "boolean",
+      "description": "When set to true, this setting enables incremental updates for objects in the database by comparing the changes (deltas) between the crawled dataset items and the existing objects, uniquely identified by the `datasetKeysToItemId` field.\n\n The integration will only add new objects and update those that have changed, reducing unnecessary updates. The `datasetFields`, `metadataDatasetFields`, and `metadataObject` fields are used to determine the changes.",
+      "default": true
+    },
+    "expiredObjectDeletionPeriod": {
+      "title": "Delete expired objects from the database after a specified number of days",
       "type": "number",
-      "description": "The number of days after which orphaned documents are deleted from the database.",
-      "default": 7,
+      "description": "This setting allows the integration to manage the deletion of objects from the database that have not been crawled for a specified period. It is typically used in subsequent runs after the initial crawl.\n\nWhen the value is greater than 0, the integration checks if objects have been seen within the last X days (determined by the expiration period). If the objects are expired, they are deleted from the database. The specific value for `deletedExpiredObjectsDays` depends on your use case and how frequently you crawl data.\n\nFor example, if you crawl data daily, you can set `deletedExpiredObjectsDays` to 7 days. If you crawl data weekly, you can set `deletedExpiredObjectsDays` to 30 days.",
+      "default": 30,
+      "prefill": 30,
       "minimum": 0
     },
     "datasetId": {

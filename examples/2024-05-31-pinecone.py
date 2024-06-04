@@ -53,18 +53,18 @@ res = db.search_by_vector(db.dummy_vector, k=10)
 print("Objects in the database:", len(res), res)
 assert len(res) == 4, "Expected 4 objects in the database"
 
-data_add, data_update_meta, data_del = compare_crawled_data_with_db(db, crawl_2)
+data_add, data_update_last_seen, data_del = compare_crawled_data_with_db(db, crawl_2)
 
 print("Data to add", data_add)
-print("Data to update", data_update_meta)
+print("Data to update", data_update_last_seen)
 print("Data to delete", data_del)
 
 assert len(data_add) == 2, "Expected 2 objects to add"
 assert data_add[0].metadata["id"] == "id4#6"
 assert data_add[1].metadata["id"] == "id5#5"
 
-assert len(data_update_meta) == 1
-assert data_update_meta[0].metadata["id"] == "id3#3"
+assert len(data_update_last_seen) == 1
+assert data_update_last_seen[0].metadata["id"] == "id3#3"
 
 assert len(data_del) == 1
 assert data_del[0].metadata["id"] == "id4#4"
@@ -85,17 +85,17 @@ print("Database objects after adding new", len(res), res)
 assert len(res) == 5, "Expected 5 objects in the database after addition"
 
 # Update data
-db.update_metadata(data_update_meta)
+db.update_last_seen_at(data_update_last_seen)
 wait_for_index()
-# delete orphaned objects - not supported by serverless index
-# r = index.delete(filter={"updated_at": {"$lt": 1}})
-# print("Deleted orphaned docs:", r)
+# delete expired objects - not supported by serverless index
+# r = index.delete(filter={"last_seen_at": {"$lt": 1}})
+# print("Deleted expired objects:", r)
 
-res = db.search_by_vector(db.dummy_vector, k=10, filter_={"updated_at": {"$lt": 1}})
-print("Orphaned objects in the database", len(res), res)
-assert len(res) == 1, "Expected 1 orphaned object in the database"
+res = db.search_by_vector(db.dummy_vector, k=10, filter_={"last_seen_at": {"$lt": 1}})
+print("Expired objects in the database", len(res), res)
+assert len(res) == 1, "Expected 1 expired object in the database"
 
-# delete orphaned objects
+# delete expired objects
 db.delete(ids=[d.metadata["id"] for d in res])
 wait_for_index()
 
@@ -110,7 +110,7 @@ for r in expected_results:
     d = v["vectors"][r.metadata["id"]]
     assert d.metadata["item_id"] == r.metadata["item_id"], f"Expected item_id {r.metadata['item_id']}"
     assert d.metadata["checksum"] == r.metadata["checksum"], f"Expected checksum {r.metadata['checksum']}"
-    assert d.metadata["updated_at"] == r.metadata["updated_at"], f"Expected updated_at {r.metadata['updated_at']}"
+    assert d.metadata["last_seen_at"] == r.metadata["last_seen_at"], f"Expected last_seen_at {r.metadata['last_seen_at']}"
 
 print("All tests passed")
 # # Pinecone API - list objects -> return only IDS

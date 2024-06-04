@@ -9,7 +9,7 @@ from uuid import uuid4
 from langchain_community.document_loaders import ApifyDatasetLoader
 from langchain_core.documents import Document
 
-EXCLUDE_KEYS_FROM_CHECKSUM = {"metadata": {"id", "checksum", "updated_at", "item_id"}}
+EXCLUDE_KEYS_FROM_CHECKSUM = {"metadata": {"id", "checksum", "last_seen_at", "item_id"}}
 DAY_IN_SECONDS = 24 * 3600
 
 
@@ -67,29 +67,28 @@ def compute_hash(text: str) -> str:
 
 
 def get_chunks_to_delete(
-    chunks_prev: list[Document], chunks_current: list[Document], orphaned_days: float
+    chunks_prev: list[Document], chunks_current: list[Document], expired_days: float
 ) -> tuple[list[Document], list[Document]]:
     """
-    Identifies chunks to be deleted based on their last update timestamp and presence in the current run.
+    Identifies chunks to be deleted based on their last seen timestamp and presence in the current run.
 
     Compare the chunks from the previous and current runs and identify chunks that are not present
-    in the current run and have not been updated within the specified 'orphaned_days'. These chunks are considered
-    'orphaned' and are marked for deletion.
+    in the current run and have not been updated within the specified 'expired_days'. These chunks are marked for deletion.
     """
     ids_current = {d.metadata["item_id"] for d in chunks_current}
 
-    ts_orphaned = int(datetime.now(timezone.utc).timestamp() - orphaned_days * DAY_IN_SECONDS)
-    chunks_orphaned_delete, chunks_old_keep = [], []
+    ts_expired = int(datetime.now(timezone.utc).timestamp() - expired_days * DAY_IN_SECONDS)
+    chunks_expired_delete, chunks_old_keep = [], []
 
-    # chunks that have been crawled in the current run and are older than orphaned days => to delete
+    # chunks that have been crawled in the current run and are older than ts_expired => to delete
     for d in chunks_prev:
         if d.metadata["item_id"] not in ids_current:
-            if d.metadata["updated_at"] < ts_orphaned:
-                chunks_orphaned_delete.append(d)
+            if d.metadata["last_seen_at"] < ts_expired:
+                chunks_expired_delete.append(d)
             else:
                 chunks_old_keep.append(d)
 
-    return chunks_orphaned_delete, chunks_old_keep
+    return chunks_expired_delete, chunks_old_keep
 
 
 def get_chunks_to_update(chunks_prev: list[Document], chunks_current: list[Document]) -> tuple[list[Document], list[Document]]:
@@ -129,7 +128,7 @@ def add_item_checksum(items: list[Document], dataset_keys_to_item_id: list[str])
     """
     for item in items:
         item.metadata["checksum"] = compute_hash(item.json(exclude=EXCLUDE_KEYS_FROM_CHECKSUM))  # type: ignore[arg-type]
-        item.metadata["updated_at"] = int(datetime.now(timezone.utc).timestamp())
+        item.metadata["last_seen_at"] = int(datetime.now(timezone.utc).timestamp())
         item.metadata["item_id"] = compute_hash("".join([item.metadata.get(key, "") for key in dataset_keys_to_item_id]))
     return items
 

@@ -1,9 +1,9 @@
 import pytest
 import time
 
+from store_vector_db.constants import VCR_HEADERS_EXCLUDE
 from store_vector_db.vcs import compare_crawled_data_with_db, update_db_with_crawled_data
 
-VCR_HEADERS_EXCLUDE = ["Authorization", "Api-Key"]
 
 # Database fixtures to test. Fill here the name of the fixtures you want to test
 DATABASE_FIXTURES = ["db_pinecone", "db_chroma"]
@@ -25,14 +25,14 @@ def test_update_db_with_crawled_data(input_db, crawl_2, request):
     res = db.search_by_vector(db.dummy_vector, k=10)
     assert len(res) == 4, "Expected 4 objects in the database"
 
-    data_add, data_update_meta, data_del = compare_crawled_data_with_db(db, crawl_2)
+    data_add, data_update_last_seen, data_del = compare_crawled_data_with_db(db, crawl_2)
 
     assert len(data_add) == 2, "Expected 2 objects to add"
     assert data_add[0].metadata["id"] == "id4#6"
     assert data_add[1].metadata["id"] == "id5#5"
 
-    assert len(data_update_meta) == 1, "Expected 1 object to update"
-    assert data_update_meta[0].metadata["id"] == "id3#3"
+    assert len(data_update_last_seen) == 1, "Expected 1 object to update"
+    assert data_update_last_seen[0].metadata["id"] == "id3#3"
 
     assert len(data_del) == 1, "Expected 1 object to delete"
     assert data_del[0].metadata["id"] == "id4#4"
@@ -79,25 +79,25 @@ def test_update_metadata(input_db, crawl_2, request):
     _, data_update_meta, _ = compare_crawled_data_with_db(db, crawl_2)
 
     # Update metadata data
-    db.update_metadata(data_update_meta)
+    db.update_last_seen_at(data_update_meta)
     wait_for_db()
     res = db.search_by_vector(db.dummy_vector, k=10)
     assert len(res) == 4, "Expected 4 objects in the database after update"
-    assert [r for r in res if r.metadata["id"] == "id3#3"][0].metadata["updated_at"] == 2, "Expected id3#3 to be updated"
+    assert [r for r in res if r.metadata["id"] == "id3#3"][0].metadata["last_seen_at"] == 2, "Expected id3#3 to be updated"
 
 
 @pytest.mark.integration
 @pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
-def test_deleted_orphaned_data(input_db, crawl_2, request):
+def test_deleted_expired_data(input_db, crawl_2, request):
 
     db = request.getfixturevalue(input_db)
-    # Delete orphaned objects
-    res = db.search_by_vector(db.dummy_vector, k=10, filter_={"updated_at": {"$lt": 1}})
-    assert res, "Expected orphaned objects in the database"
-    assert len(res) == 1, "Expected 1 orphaned object in the database"
+    # Delete expired objects
+    res = db.search_by_vector(db.dummy_vector, k=10, filter_={"last_seen_at": {"$lt": 1}})
+    assert res, "Expected expired objects in the database"
+    assert len(res) == 1, "Expected 1 expired object in the database"
 
-    db.delete_orphaned(ts_orphaned=1)
+    db.delete_expired(ts_expired=1)
     wait_for_db()
 
     res = db.search_by_vector(db.dummy_vector, k=10)
@@ -122,4 +122,4 @@ def test_update_db_with_crawled_data_all(input_db, crawl_2, expected_results, re
         d = [r for r in res if expected.metadata["id"] == r.metadata["id"]][0]
         assert d.metadata["item_id"] == expected.metadata["item_id"], f"Expected item_id {expected.metadata['item_id']}"
         assert d.metadata["checksum"] == expected.metadata["checksum"], f"Expected checksum {expected.metadata['checksum']}"
-        assert d.metadata["updated_at"] == expected.metadata["updated_at"], f"Expected updated_at {expected.metadata['updated_at']}"
+        assert d.metadata["last_seen_at"] == expected.metadata["last_seen_at"], f"Expected last_seen_at {expected.metadata['last_seen_at']}"

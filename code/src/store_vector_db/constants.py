@@ -4,6 +4,7 @@ import enum
 PINECONE_SOURCE_TAG = "apify"
 
 CACHE_KV_STORE_NAME = "cache"
+VCR_HEADERS_EXCLUDE = ["Authorization", "Api-Key"]
 
 
 class SupportedVectorStores(str, enum.Enum):

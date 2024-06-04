@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from langchain_core.documents import Document
 from langchain_openai.embeddings import OpenAIEmbeddings
 
+from store_vector_db.constants import VCR_HEADERS_EXCLUDE
 from store_vector_db.models.chroma_input_model import ChromaIntegration
 from store_vector_db.models.pinecone_input_model import EmbeddingsProvider, PineconeIntegration
 from store_vector_db.utils import add_item_checksum
@@ -17,13 +18,13 @@ embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
 INDEX_NAME = "apify-unit-test"
 
-d1 = Document(page_content="Orphaned->del", metadata={"item_id": "id1", "id": "id1#1", "checksum": "1", "updated_at": 0})
-d2 = Document(page_content="Old->not-del", metadata={"item_id": "id2", "id": "id2#2", "checksum": "2", "updated_at": 1})
-d3a = Document(page_content="Unchanged->upt-meta", metadata={"item_id": "id3", "id": "id3#3", "checksum": "3", "updated_at": 1})
-d3b = Document(page_content="Unchanged->upt-meta", metadata={"item_id": "id3", "id": "id3#3", "checksum": "3", "updated_at": 2})
-d4a = Document(page_content="Changed->del", metadata={"item_id": "id4", "id": "id4#4", "checksum": "4", "updated_at": 1})
-d4b = Document(page_content="Changed->del->add-new", metadata={"item_id": "id4", "id": "id4#6", "checksum": "0", "updated_at": 2})
-d5 = Document(page_content="New->add", metadata={"item_id": "id5", "id": "id5#5", "checksum": "5", "updated_at": 2})
+d1 = Document(page_content="Expired->del", metadata={"item_id": "id1", "id": "id1#1", "checksum": "1", "last_seen_at": 0})
+d2 = Document(page_content="Old->not-del", metadata={"item_id": "id2", "id": "id2#2", "checksum": "2", "last_seen_at": 1})
+d3a = Document(page_content="Unchanged->upt-meta", metadata={"item_id": "id3", "id": "id3#3", "checksum": "3", "last_seen_at": 1})
+d3b = Document(page_content="Unchanged->upt-meta", metadata={"item_id": "id3", "id": "id3#3", "checksum": "3", "last_seen_at": 2})
+d4a = Document(page_content="Changed->del", metadata={"item_id": "id4", "id": "id4#4", "checksum": "4", "last_seen_at": 1})
+d4b = Document(page_content="Changed->del->add-new", metadata={"item_id": "id4", "id": "id4#6", "checksum": "0", "last_seen_at": 2})
+d5 = Document(page_content="New->add", metadata={"item_id": "id5", "id": "id5#5", "checksum": "5", "last_seen_at": 2})
 
 
 @pytest.fixture(scope="function")
@@ -47,6 +48,7 @@ def documents() -> list[Document]:
     return add_item_checksum([d], ["url"])
 
 
+@pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
 @pytest.fixture(scope="function")
 def db_pinecone(crawl_1) -> PineconeDatabase:
     db = PineconeDatabase(
@@ -74,6 +76,7 @@ def db_pinecone(crawl_1) -> PineconeDatabase:
     delete_all()
 
 
+@pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
 @pytest.fixture(scope="function")
 def db_chroma(crawl_1) -> ChromaDatabase:
     db = ChromaDatabase(

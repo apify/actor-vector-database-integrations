@@ -6,7 +6,8 @@ from langchain_pinecone import PineconeVectorStore
 from pinecone import Pinecone as PineconeClient  # type: ignore[import-untyped]
 
 from store_vector_db.constants import PINECONE_SOURCE_TAG
-from store_vector_db.vector_stores.base import FailedToConnectToDatabaseError, VectorDatabaseHelperClass
+from store_vector_db.exceptions import FailedToConnectToDatabaseError
+from store_vector_db.vector_stores.base import VectorDbBase
 
 if TYPE_CHECKING:
     from langchain_core.documents import Document
@@ -15,7 +16,7 @@ if TYPE_CHECKING:
     from store_vector_db.models.pinecone_input_model import PineconeIntegration
 
 
-class PineconeDatabase(PineconeVectorStore, VectorDatabaseHelperClass):
+class PineconeDatabase(PineconeVectorStore, VectorDbBase):
     def __init__(self, actor_input: PineconeIntegration, embeddings: Embeddings) -> None:
 
         try:
@@ -29,12 +30,12 @@ class PineconeDatabase(PineconeVectorStore, VectorDatabaseHelperClass):
     async def is_connected(self) -> bool:
         raise NotImplementedError
 
-    def update_metadata(self, data: list[Document]) -> None:
+    def update_last_seen_at(self, data: list[Document]) -> None:
         for d in data:
-            self.index.update(id=d.metadata["id"], set_metadata={"updated_at": d.metadata["updated_at"]})
+            self.index.update(id=d.metadata["id"], set_metadata={"last_seen_at": d.metadata["last_seen_at"]})
 
-    def delete_orphaned(self, ts_orphaned: int) -> None:
-        res = self.search_by_vector(self.dummy_vector, filter_={"updated_at": {"$lt": ts_orphaned}})
+    def delete_expired(self, ts_expired: int) -> None:
+        res = self.search_by_vector(self.dummy_vector, filter_={"last_seen_at": {"$lt": ts_expired}})
         self.delete(ids=[d.metadata["id"] for d in res])
 
     def search_by_vector(self, vector: list[float], k: int = 10_000, filter_: dict | None = None) -> list[Document]:

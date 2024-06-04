@@ -1,7 +1,7 @@
 .PHONY: clean install-dev lint type-check check-code format
 
 DIRS_WITH_CODE = code
-DIRS_WITH_SRC = code/src
+DIRS_WITH_SRC = code/src/store_vector_db
 DIRS_WITH_ACTORS = actors
 
 clean:

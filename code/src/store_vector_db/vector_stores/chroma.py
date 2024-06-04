@@ -5,7 +5,8 @@ from typing import TYPE_CHECKING
 import chromadb
 from langchain_chroma import Chroma
 
-from store_vector_db.vector_stores.base import FailedToConnectToDatabaseError, VectorDatabaseHelperClass
+from store_vector_db.exceptions import FailedToConnectToDatabaseError
+from store_vector_db.vector_stores.base import VectorDbBase
 
 if TYPE_CHECKING:
     from langchain_core.documents import Document
@@ -14,7 +15,7 @@ if TYPE_CHECKING:
     from store_vector_db.models.chroma_input_model import ChromaIntegration
 
 
-class ChromaDatabase(Chroma, VectorDatabaseHelperClass):
+class ChromaDatabase(Chroma, VectorDbBase):
     def __init__(self, actor_input: ChromaIntegration, embeddings: Embeddings) -> None:
 
         settings = None
@@ -44,12 +45,12 @@ class ChromaDatabase(Chroma, VectorDatabaseHelperClass):
             raise FailedToConnectToDatabaseError("ChromaDB is not reachable")
         return True
 
-    def update_metadata(self, data: list[Document]) -> None:
+    def update_last_seen_at(self, data: list[Document]) -> None:
         for d in data:
-            self.index.update(ids=[d.metadata["id"]], metadatas=[{"updated_at": d.metadata["updated_at"]}])
+            self.index.update(ids=[d.metadata["id"]], metadatas=[{"last_seen_at": d.metadata["last_seen_at"]}])
 
-    def delete_orphaned(self, ts_orphaned: int) -> None:
-        self.index.delete(where={"updated_at": {"$lt": ts_orphaned}})  # type: ignore[dict-item]
+    def delete_expired(self, ts_expired: int) -> None:
+        self.index.delete(where={"last_seen_at": {"$lt": ts_expired}})  # type: ignore[dict-item]
 
     def search_by_vector(self, vector: list[float], k: int = 1_000_000, filter_: dict | None = None) -> list[Document]:
         return self.similarity_search_by_vector(vector, k=k, filter=filter_)
