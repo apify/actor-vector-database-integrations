@@ -62,8 +62,8 @@
       "editor": "json"
     },
     "embeddingsApiKey": {
-      "title": "Embeddings API Key (whenever applicable, depends on provider)",
-      "description": "Enter the API key for the selected embeddings provider, if required. For example, for OpenAI, use the OPENAI_API_KEY, and for Cohere, use the COHERE_API_KEY.",
+      "title": "Embeddings API KEY (whenever applicable, depends on provider)",
+      "description": "Value of the API KEY for the embeddings provider (if required).\n\n For example for OpenAI it is OPENAI_API_KEY, for Cohere it is COHERE_API_KEY)",
       "type": "string",
       "editor": "textfield",
       "isSecret": true
@@ -96,22 +96,22 @@
       "editor": "json"
     },
     "performChunking": {
-      "title": "Perform chunking",
-      "description": "If set to true, the resulting text will be chunked according to the settings below",
+      "title": "Enable text chunking",
+      "description": "When set to true, the text will be divided into smaller chunks based on the settings provided below. Proper chunking helps optimize retrieval and ensures accurate and efficient responses.",
       "default": false,
       "type": "boolean"
     },
     "chunkSize": {
-      "title": "Chunk size",
+      "title": "Maximum chunk size",
       "type": "integer",
-      "description": "The maximum character length of each text chunk",
+      "description": "Defines the maximum number of characters in each text chunk. Choosing the right size balances between detailed context and system performance. Optimal sizes ensure high relevancy and minimal response time.",
       "default": 1000,
       "minimum": 1
     },
     "chunkOverlap": {
       "title": "Chunk overlap",
       "type": "integer",
-      "description": "The character overlap between text chunks that are next to each other",
+      "description": "Specifies the number of overlapping characters between consecutive text chunks. Adjusting this helps maintain context across chunks, which is crucial for accuracy in retrieval-augmented generation systems.",
       "default": 0,
       "minimum": 0
     },
