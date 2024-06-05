@@ -39,16 +39,21 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
         return
 
     # Add parameters related to chunking to every dataset item to be able to update DB when chunkSize, chunkOverlap or performChunking changes
-    metadata = actor_input.metadataObject or {}
-    metadata.update({"chunkSize": actor_input.chunkSize, "chunkOverlap": actor_input.chunkOverlap, "performChunking": actor_input.performChunking})
+    meta_object = actor_input.metadataObject or {}
+    meta_object.update({"chunkSize": actor_input.chunkSize, "chunkOverlap": actor_input.chunkOverlap, "performChunking": actor_input.performChunking})
+
+    # Required for checksum calculation
+    # Update metadata fields with datasetFieldsToItemId for dataset loading
+    meta_fields = actor_input.metadataDatasetFields or {}
+    meta_fields.update({k:k for k in actor_input.datasetFieldsToItemId or []})
 
     Actor.log.info("Load Dataset ID %s and extract fields %s", dataset_id, actor_input.datasetFields)
     try:
         dataset_loader = get_dataset_loader(
             str(actor_input.datasetId),
             fields=actor_input.datasetFields,
-            meta_values=metadata,
-            meta_fields=actor_input.metadataDatasetFields or {},
+            meta_object=meta_object,
+            meta_fields=meta_fields,
         )
         documents = dataset_loader.load()
         documents = [doc for doc in documents if doc.page_content]

@@ -42,7 +42,7 @@ def stringify_dict(d: dict, keys: list[str]) -> str:
     return "\n".join([f"{key}: {value}" for key in keys if (value := get_nested_value(d, key))])
 
 
-def get_dataset_loader(dataset_id: str, fields: list[str], meta_values: dict, meta_fields: dict) -> ApifyDatasetLoader:
+def get_dataset_loader(dataset_id: str, fields: list[str], meta_object: dict, meta_fields: dict) -> ApifyDatasetLoader:
     """Load dataset by dataset_id using ApifyDatasetLoader.
 
     The dataset_mapping_function is used to map the dataset item to a Document object.
@@ -54,7 +54,7 @@ def get_dataset_loader(dataset_id: str, fields: list[str], meta_values: dict, me
         dataset_mapping_function=lambda dataset_item: Document(
             page_content=stringify_dict(dataset_item, fields) or "",
             metadata={
-                **meta_values,
+                **meta_object,
                 **{key: get_nested_value(dataset_item, value) for key, value in meta_fields.items()},
             },
         ),
@@ -123,7 +123,7 @@ def add_item_last_seen_at(items: list[Document]) -> list[Document]:
     return items
 
 
-def add_item_checksum(items: list[Document], dataset_keys_to_item_id: list[str]) -> list[Document]:
+def add_item_checksum(items: list[Document], dataset_fields_to_item_id: list[str]) -> list[Document]:
     """
     Adds a checksum and unique item_id to the metadata of each dataset item.
 
@@ -133,7 +133,7 @@ def add_item_checksum(items: list[Document], dataset_keys_to_item_id: list[str])
     """
     for item in items:
         item.metadata["checksum"] = compute_hash(item.json(exclude=EXCLUDE_KEYS_FROM_CHECKSUM))  # type: ignore[arg-type]
-        item.metadata["item_id"] = compute_hash("".join([item.metadata.get(key, "") for key in dataset_keys_to_item_id]))
+        item.metadata["item_id"] = compute_hash("".join([item.metadata[key] for key in dataset_fields_to_item_id]))
 
     return add_item_last_seen_at(items)
 
