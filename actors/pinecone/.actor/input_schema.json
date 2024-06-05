@@ -45,11 +45,9 @@
       "type": "array",
       "description": "This array specifies the dataset fields to be selected and stored in the vector store. Only the fields listed here will be included in the vector store. For instance, when using the Website Content Crawler, you might choose to include fields such as `text`, `url`, and `metadata.title` in the vector store.",
       "default": [
-        "url",
         "text"
       ],
       "prefill": [
-        "url",
         "text",
         "metadata.title"
       ],
@@ -58,7 +56,7 @@
     "metadataDatasetFields": {
       "title": "A list of dataset fields to be selected from the dataset and stored as metadata in the database",
       "type": "object",
-      "description": "A list of dataset fields which should be selected from the dataset and stored as metadata in the vector stores. \n\n For example, when using the Website Content Crawler, you might want to store `url` in metadata. In this case, use `metadataDatasetFields parameter as follows {\"page_url\": \"url\"}`",
+      "description": "A list of dataset fields which should be selected from the dataset and stored as metadata in the vector stores. \n\n For example, when using the Website Content Crawler, you might want to store `url` in metadata. In this case, use `metadataDatasetFields parameter as follows {\"url\": \"url\"}`",
       "editor": "json"
     },
     "metadataObject": {
@@ -113,8 +111,9 @@
       "type": "integer",
       "description": "This setting allows the integration to manage the deletion of objects from the database that have not been crawled for a specified period. It is typically used in subsequent runs after the initial crawl.\n\nWhen the value is greater than 0, the integration checks if objects have been seen within the last X days (determined by the expiration period). If the objects are expired, they are deleted from the database. The specific value for `deletedExpiredObjectsDays` depends on your use case and how frequently you crawl data.\n\nFor example, if you crawl data daily, you can set `deletedExpiredObjectsDays` to 7 days. If you crawl data weekly, you can set `deletedExpiredObjectsDays` to 30 days.",
       "default": 30,
-      "prefill": 30,
-      "minimum": 0
+      "minimum": 0,
+      "unit": "days",
+      "editor": "number"
     },
     "datasetId": {
       "title": "Dataset ID",
