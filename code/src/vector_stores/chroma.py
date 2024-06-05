@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
 import chromadb
@@ -43,9 +44,10 @@ class ChromaDatabase(Chroma, VectorDbBase):
             raise FailedToConnectToDatabaseError("ChromaDB is not reachable")
         return True
 
-    def update_last_seen_at(self, data: list[Document]) -> None:
-        for d in data:
-            self.index.update(ids=[d.metadata["id"]], metadatas=[{"last_seen_at": d.metadata["last_seen_at"]}])
+    def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:
+        last_seen_at = last_seen_at or int(datetime.now(timezone.utc).timestamp())
+        for _id in ids:
+            self.index.update(ids=_id, metadatas=[{"last_seen_at": last_seen_at}])
 
     def delete_expired(self, ts_expired: int) -> None:
         self.index.delete(where={"last_seen_at": {"$lt": ts_expired}})  # type: ignore[dict-item]

@@ -13,7 +13,7 @@ class FailedToConnectToDatabaseError(Exception):
 
 class VectorDbBase(ABC):
     @abstractmethod
-    def update_last_seen_at(self, data: list[Document]) -> None:
+    def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:
         """Update last_seen_at field in the database."""
 
     @abstractmethod

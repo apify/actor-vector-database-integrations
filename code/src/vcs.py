@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING, TypeAlias
 
 from apify import Actor
@@ -41,45 +42,58 @@ async def get_vector_store(actor_input: ActorInputsDb | None, embeddings: Embedd
 def update_db_with_crawled_data(vector_store: DB, documents: list[Document], ts_expired: int) -> None:
     """Update the database with new crawled data."""
 
-    data_add, data_update_last_seen, data_del = compare_crawled_data_with_db(vector_store, documents)
+    data_add, ids_update_last_seen, ids_del = compare_crawled_data_with_db(vector_store, documents)
+    Actor.log.info("Objects: to add: %s, to update last_seen_at: %s, to delete: %s", len(data_add), len(ids_update_last_seen), len(ids_del))
 
     # Delete data that were updated
-    vector_store.delete([d.metadata["id"] for d in data_del])
-    Actor.log.info("Deleted %s documents from the vector store where the content has changed since the last update", len(data_del))
+    if ids_del:
+        vector_store.delete(ids_del)
+        Actor.log.info("Deleted %s objects from the vector store where the content has changed since the last update", len(ids_del))
 
     # Add new data
-    vector_store.add_documents(data_add, ids=[d.metadata["id"] for d in data_add])
-    Actor.log.info("Added %s new documents to the vector store", len(data_add))
+    if data_add:
+        vector_store.add_documents(data_add, ids=[d.metadata["id"] for d in data_add])
+        Actor.log.info("Added %s new objects to the vector store", len(data_add))
 
     # Update metadata data
-    vector_store.update_last_seen_at(data_update_last_seen)
-    Actor.log.info("Updated last_seen_at metadata for %s documents", len(data_update_last_seen))
+    if ids_update_last_seen:
+        vector_store.update_last_seen_at(ids_update_last_seen)
+        Actor.log.info("Updated last_seen_at metadata for %s objects", len(ids_update_last_seen))
 
     # Delete expired objects
     if ts_expired:
+        dt = datetime.datetime.fromtimestamp(ts_expired, tz=datetime.timezone.utc)
+        Actor.log.info("About to delete objects from the database that were not seen since %s (timestamp: %s)", dt, ts_expired)
         vector_store.delete_expired(ts_expired)
-        Actor.log.info("Deleted objects from the database that were not seen for more than %s seconds", len(data_del), ts_expired)
 
 
-def compare_crawled_data_with_db(vector_store: DB, data: list[Document]) -> tuple[list[Document], list[Document], list[Document]]:
+def compare_crawled_data_with_db(vector_store: DB, data: list[Document]) -> tuple[list[Document], list[str], list[str]]:
     """Compare current crawled data with the data in the database. Return data to add, delete and update.
 
     New data is added
     Data that was not changed -> update metadata last_seen_at
     Data that was changed -> delete and add new
     """
-    data_add, data_delete, data_update_last_seen = [], [], []
+    data_add = []
+    ids_delete: set[str] = set()
+    ids_update_last_seen: set[str] = set()
+
+    crawled_db = {
+        item_id: vector_store.search_by_vector(vector_store.dummy_vector, filter_={"item_id": item_id})
+        for item_id in {d.metadata["item_id"] for d in data}
+    }
+
     for d in data:
-        if res := vector_store.search_by_vector(vector_store.dummy_vector, filter_={"item_id": d.metadata["item_id"]}):
+        if res := crawled_db.get(d.metadata["item_id"]):
             if d.metadata["checksum"] in {r.metadata["checksum"] for r in res}:
-                data_update_last_seen.append(d)
+                ids_update_last_seen.update({r.metadata["id"]: r for r in res})
             else:
-                data_delete.extend(res)
+                ids_delete.update({r.metadata["id"]: r for r in res})
                 data_add.append(d)
         else:
             data_add.append(d)
 
-    return data_add, data_update_last_seen, data_delete
+    return data_add, list(ids_update_last_seen), list(ids_delete)
 
 
 async def update_db_with_crawled_data_using_internal_cache(

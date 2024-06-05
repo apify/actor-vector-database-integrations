@@ -116,6 +116,13 @@ def get_chunks_to_update(chunks_prev: list[Document], chunks_current: list[Docum
     return chunks_add, chunks_update_metadata
 
 
+def add_item_last_seen_at(items: list[Document]) -> list[Document]:
+    """Add last_seen_at timestamp to the metadata of each dataset item."""
+    for item in items:
+        item.metadata["last_seen_at"] = int(datetime.now(timezone.utc).timestamp())
+    return items
+
+
 def add_item_checksum(items: list[Document], dataset_keys_to_item_id: list[str]) -> list[Document]:
     """
     Adds a checksum and unique item_id to the metadata of each dataset item.
@@ -126,9 +133,9 @@ def add_item_checksum(items: list[Document], dataset_keys_to_item_id: list[str])
     """
     for item in items:
         item.metadata["checksum"] = compute_hash(item.json(exclude=EXCLUDE_KEYS_FROM_CHECKSUM))  # type: ignore[arg-type]
-        item.metadata["last_seen_at"] = int(datetime.now(timezone.utc).timestamp())
         item.metadata["item_id"] = compute_hash("".join([item.metadata.get(key, "") for key in dataset_keys_to_item_id]))
-    return items
+
+    return add_item_last_seen_at(items)
 
 
 def add_chunk_id(chunks: list[Document]) -> list[Document]:

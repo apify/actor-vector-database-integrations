@@ -38,12 +38,16 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
         await Actor.fail(status_message=msg)
         return
 
+    # Add parameters related to chunking to every dataset item to be able to update DB when chunkSize, chunkOverlap or performChunking changes
+    metadata = actor_input.metadataObject or {}
+    metadata.update({"chunkSize": actor_input.chunkSize, "chunkOverlap": actor_input.chunkOverlap, "performChunking": actor_input.performChunking})
+
     Actor.log.info("Load Dataset ID %s and extract fields %s", dataset_id, actor_input.datasetFields)
     try:
         dataset_loader = get_dataset_loader(
             str(actor_input.datasetId),
             fields=actor_input.datasetFields,
-            meta_values=actor_input.metadataObject or {},
+            meta_values=metadata,
             meta_fields=actor_input.metadataDatasetFields or {},
         )
         documents = dataset_loader.load()
@@ -72,5 +76,5 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
             await vcs_.aadd_documents(documents)
         await Actor.push_data([doc.dict() for doc in documents])
     except Exception as e:
-        await Actor.set_status_message(f"Document update failed: {e}")
+        await Actor.set_status_message(f"Database update failed: {e}")
         await Actor.fail()

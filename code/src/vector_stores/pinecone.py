@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
 from langchain_pinecone import PineconeVectorStore
@@ -30,9 +31,10 @@ class PineconeDatabase(PineconeVectorStore, VectorDbBase):
     async def is_connected(self) -> bool:
         raise NotImplementedError
 
-    def update_last_seen_at(self, data: list[Document]) -> None:
-        for d in data:
-            self.index.update(id=d.metadata["id"], set_metadata={"last_seen_at": d.metadata["last_seen_at"]})
+    def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:
+        last_seen_at = last_seen_at or int(datetime.now(timezone.utc).timestamp())
+        for _id in ids:
+            self.index.update(id=_id, set_metadata={"last_seen_at": last_seen_at})
 
     def delete_expired(self, ts_expired: int) -> None:
         res = self.search_by_vector(self.dummy_vector, filter_={"last_seen_at": {"$lt": ts_expired}})
