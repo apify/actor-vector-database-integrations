@@ -50,14 +50,13 @@
         "text"
       ],
       "prefill": [
-        "url",
-        "metadata.title"
+        "text"
       ],
       "editor": "stringList",
       "sectionCaption": "Dataset settings"
     },
     "datasetFieldsToItemId": {
-      "title": "Dateset fields to uniquely identify dataset items",
+      "title": "Dataset fields to uniquely identify dataset items",
       "type": "array",
       "items": {
         "type": "string"
@@ -68,8 +67,7 @@
         "url"
       ],
       "prefill": [
-        "url",
-        "metadata.title"
+        "url"
       ]
     },
     "metadataDatasetFields": {
