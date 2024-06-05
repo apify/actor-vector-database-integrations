@@ -119,7 +119,7 @@
     "expiredObjectDeletionPeriod": {
       "title": "Delete expired objects from the database after a specified number of days",
       "type": "integer",
-      "description": "This setting allows the integration to manage the deletion of objects from the database that have not been crawled for a specified period. It is typically used in subsequent runs after the initial crawl.\n\nWhen the value is greater than 0, the integration checks if objects have been seen within the last X days (determined by the expiration period). If the objects are expired, they are deleted from the database. The specific value for `deletedExpiredObjectsDays` depends on your use case and how frequently you crawl data.\n\nFor example, if you crawl data daily, you can set `deletedExpiredObjectsDays` to 7 days. If you crawl data weekly, you can set `deletedExpiredObjectsDays` to 30 days.",
+      "description": "This setting allows the integration to manage the deletion of objects from the database that have not been crawled for a specified period. It is typically used in subsequent runs after the initial crawl.\n\nWhen the value is greater than 0, the integration checks if objects have been seen within the last X days (determined by the expiration period). If the objects are expired, they are deleted from the database. The specific value for `deletedExpiredObjectsDays` depends on your use case and how frequently you crawl data.\n\nFor example, if you crawl data daily, you can set `deletedExpiredObjectsDays` to 7 days. If you crawl data weekly, you can set `deletedExpiredObjectsDays` to 30 days.\n\nSetting `deletedExpiredObjectsDays` to 0 disables this feature",
       "default": 30,
       "minimum": 0,
       "unit": "days",
