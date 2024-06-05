@@ -7,7 +7,8 @@
       "title": "Pinecone index name",
       "type": "string",
       "description": "Name of the Pinecone index where the data will be stored",
-      "editor": "textfield"
+      "editor": "textfield",
+      "sectionCaption": "Pinecone settings"
     },
     "pineconeApiKey": {
       "title": "Pinecone API KEY",
@@ -18,14 +19,15 @@
     },
     "embeddingsProvider": {
       "title": "Embeddings provider (as defined in the langchain API)",
-      "description": "Select the embeddings provider to use for generating embeddings",
+      "description": "Choose the embeddings provider to use for generating embeddings",
       "type": "string",
       "editor": "select",
       "enum": [
         "OpenAIEmbeddings",
         "CohereEmbeddings"
       ],
-      "default": "OpenAIEmbeddings"
+      "default": "OpenAIEmbeddings",
+      "sectionCaption": "Embeddings settings"
     },
     "embeddingsConfig": {
       "title": "Embeddings provider configuration",
@@ -41,35 +43,62 @@
       "isSecret": true
     },
     "datasetFields": {
-      "title": "A list of dataset fields which should be selected from the dataset results",
+      "title": "Dataset fields to select from the dataset results and stor in the database",
       "type": "array",
-      "description": "This array specifies the dataset fields to be selected and stored in the vector store. Only the fields listed here will be included in the vector store. For instance, when using the Website Content Crawler, you might choose to include fields such as `text`, `url`, and `metadata.title` in the vector store.",
+      "description": "This array specifies the dataset fields to be selected and stored in the vector store. Only the fields listed here will be included in the vector store.\n\nFor instance, when using the Website Content Crawler, you might choose to include fields such as `text`, `url`, and `metadata.title` in the vector store.",
       "default": [
-        "text"
-      ],
-      "prefill": [
         "text",
         "metadata.title"
       ],
-      "editor": "stringList"
+      "editor": "stringList",
+      "sectionCaption": "Dataset settings"
+    },
+    "datasetFieldsToItemId": {
+      "title": "Dateset fields to uniquely identify dataset items",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "This array contains fields that are used to uniquely identify dataset items, which helps to handle content changes across different runs.\n\nFor instance, in a web content crawling scenario, the `url` field could serve as a unique identifier for each item.",
+      "editor": "stringList",
+      "default": [
+        "url"
+      ]
     },
     "metadataDatasetFields": {
-      "title": "A list of dataset fields to be selected from the dataset and stored as metadata in the database",
+      "title": "Dataset fields to select from the dataset and store as metadata in the database",
       "type": "object",
-      "description": "A list of dataset fields which should be selected from the dataset and stored as metadata in the vector stores. \n\n For example, when using the Website Content Crawler, you might want to store `url` in metadata. In this case, use `metadataDatasetFields parameter as follows {\"url\": \"url\"}`",
+      "description": "A list of dataset fields which should be selected from the dataset and stored as metadata in the vector stores.\n\nFor example, when using the Website Content Crawler, you might want to store `url` in metadata. In this case, use `metadataDatasetFields parameter as follows {\"url\": \"url\"}`",
       "editor": "json"
     },
     "metadataObject": {
       "title": "Custom object to be stored as metadata in the vector store database",
       "type": "object",
-      "description": "This object allows you to store custom metadata for every item in the vector store. For example, if you want to store the `domain` as metadata, use the `metadataObject` like this: {\"domain\": \"apify.com\"}.",
+      "description": "This object allows you to store custom metadata for every item in the vector store.\n\nFor example, if you want to store the `domain` as metadata, use the `metadataObject` like this: {\"domain\": \"apify.com\"}.",
       "editor": "json"
+    },
+    "enableDeltaUpdates": {
+      "title": "Enable incremental updates for objects based on deltas",
+      "type": "boolean",
+      "description": "When set to true, this setting enables incremental updates for objects in the database by comparing the changes (deltas) between the crawled dataset items and the existing objects, uniquely identified by the `datasetKeysToItemId` field.\n\n The integration will only add new objects and update those that have changed, reducing unnecessary updates. The `datasetFields`, `metadataDatasetFields`, and `metadataObject` fields are used to determine the changes.",
+      "default": true,
+      "sectionCaption": "Incremental update settings"
+    },
+    "expiredObjectDeletionPeriod": {
+      "title": "Delete expired objects from the database after a specified number of days",
+      "type": "integer",
+      "description": "This setting allows the integration to manage the deletion of objects from the database that have not been crawled for a specified period. It is typically used in subsequent runs after the initial crawl.\n\nWhen the value is greater than 0, the integration checks if objects have been seen within the last X days (determined by the expiration period). If the objects are expired, they are deleted from the database. The specific value for `deletedExpiredObjectsDays` depends on your use case and how frequently you crawl data.\n\nFor example, if you crawl data daily, you can set `deletedExpiredObjectsDays` to 7 days. If you crawl data weekly, you can set `deletedExpiredObjectsDays` to 30 days.",
+      "default": 30,
+      "minimum": 0,
+      "unit": "days",
+      "editor": "number"
     },
     "performChunking": {
       "title": "Enable text chunking",
       "description": "When set to true, the text will be divided into smaller chunks based on the settings provided below. Proper chunking helps optimize retrieval and ensures accurate and efficient responses.",
       "default": false,
-      "type": "boolean"
+      "type": "boolean",
+        "sectionCaption": "Text chunking settings"
     },
     "chunkSize": {
       "title": "Maximum chunk size",
@@ -85,41 +114,12 @@
       "default": 0,
       "minimum": 0
     },
-    "datasetKeysToItemId": {
-      "title": "Keys for dataset item identification",
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "This array contains keys that are used to uniquely identify dataset items, which helps to handle content changes across different runs. For instance, in a web content crawling scenario, the `url` field could serve as a unique identifier for each item.",
-      "editor": "stringList",
-      "prefill": [
-        "url"
-      ],
-      "default": [
-        "url"
-      ]
-    },
-    "enableDeltaUpdates": {
-      "title": "Enable incremental updates for objects based on deltas",
-      "type": "boolean",
-      "description": "When set to true, this setting enables incremental updates for objects in the database by comparing the changes (deltas) between the crawled dataset items and the existing objects, uniquely identified by the `datasetKeysToItemId` field.\n\n The integration will only add new objects and update those that have changed, reducing unnecessary updates. The `datasetFields`, `metadataDatasetFields`, and `metadataObject` fields are used to determine the changes.",
-      "default": true
-    },
-    "expiredObjectDeletionPeriod": {
-      "title": "Delete expired objects from the database after a specified number of days",
-      "type": "integer",
-      "description": "This setting allows the integration to manage the deletion of objects from the database that have not been crawled for a specified period. It is typically used in subsequent runs after the initial crawl.\n\nWhen the value is greater than 0, the integration checks if objects have been seen within the last X days (determined by the expiration period). If the objects are expired, they are deleted from the database. The specific value for `deletedExpiredObjectsDays` depends on your use case and how frequently you crawl data.\n\nFor example, if you crawl data daily, you can set `deletedExpiredObjectsDays` to 7 days. If you crawl data weekly, you can set `deletedExpiredObjectsDays` to 30 days.",
-      "default": 30,
-      "minimum": 0,
-      "unit": "days",
-      "editor": "number"
-    },
     "datasetId": {
       "title": "Dataset ID",
       "type": "string",
       "description": "Dataset ID (when running standalone without integration)",
-      "editor": "textfield"
+      "editor": "textfield",
+      "sectionCaption": "Debug settings"
     }
   },
   "required": [

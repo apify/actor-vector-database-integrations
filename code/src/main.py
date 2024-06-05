@@ -57,7 +57,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
         await Actor.fail(status_message=f"Failed to load datasets: {e}")
         return
 
-    documents = add_item_checksum(documents, actor_input.datasetKeysToItemId)  # type: ignore[arg-type]
+    documents = add_item_checksum(documents, actor_input.datasetFieldsToItemId)  # type: ignore[arg-type]
 
     if actor_input.performChunking:
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=actor_input.chunkSize, chunk_overlap=actor_input.chunkOverlap)
