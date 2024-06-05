@@ -41,7 +41,6 @@
       "description": "Chroma client auth provider",
       "type": "string",
       "editor": "textfield",
-      "prefill": "chromadb.auth.token_authn.TokenAuthClientProvider",
       "default": "chromadb.auth.token_authn.TokenAuthClientProvider"
     },
     "embeddingsProvider": {
@@ -73,9 +72,6 @@
       "type": "array",
       "description": "This array specifies the dataset fields to be selected and stored in the vector store. Only the fields listed here will be included in the vector store. For instance, when using the Website Content Crawler, you might choose to include fields such as `text`, `url`, and `metadata.title` in the vector store.",
       "default": [
-        "text"
-      ],
-      "prefill": [
         "text",
         "metadata.title"
       ],
@@ -121,9 +117,6 @@
       },
       "description": "This array contains keys that are used to uniquely identify dataset items, which helps to handle content changes across different runs. For instance, in a web content crawling scenario, the `url` field could serve as a unique identifier for each item.",
       "editor": "stringList",
-      "prefill": [
-        "url"
-      ],
       "default": [
         "url"
       ]
