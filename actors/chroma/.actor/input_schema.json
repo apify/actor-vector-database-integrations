@@ -70,11 +70,14 @@
       "isSecret": true
     },
     "datasetFields": {
-      "title": "Dataset fields to select from the dataset results and stor in the database",
+      "title": "Dataset fields to select from the dataset results and store in the database",
       "type": "array",
       "description": "This array specifies the dataset fields to be selected and stored in the vector store. Only the fields listed here will be included in the vector store.\n\nFor instance, when using the Website Content Crawler, you might choose to include fields such as `text`, `url`, and `metadata.title` in the vector store.",
       "default": [
-        "text",
+        "text"
+      ],
+      "prefill": [
+        "url",
         "metadata.title"
       ],
       "editor": "stringList",
@@ -90,6 +93,10 @@
       "editor": "stringList",
       "default": [
         "url"
+      ],
+      "prefill": [
+        "url",
+        "metadata.title"
       ]
     },
     "metadataDatasetFields": {
