@@ -1,21 +1,26 @@
 # Chroma integration
 
-The Apify Chroma integration seamlessly transfers selected data from Apify Actors to a Chroma database.
+The Apify Chroma integration transfers selected data from Apify Actors to a Chroma database. 
+It processes the data, optionally splits it into chunks, computes embeddings, and saves them to Chroma.
+
+This integration supports incremental updates, updating only the data that has changed. 
+This approach reduces unnecessary embedding computation and storage operations, making it suitable for search and retrieval augmented generation (RAG) use cases.
 
 💡 **Note**: This Actor is meant to be used together with other Actors' integration sections.
 For instance, if you are using the [Website Content Crawler](https://apify.com/apify/website-content-crawler), you can activate Chroma integration to save web data as vectors to Chroma.
 
 For more information how to leverage vector stores in Apify platform, see [Pinecone integration](https://github.com/HonzaTuron/pinecone) and detailed blog post [what Pinecone is and why you should use it with your LLMs](https://blog.apify.com/what-is-pinecone-why-use-it-with-llms/).
 
-## Description
+## How does it work?
 
-Apify Chroma integration computes embeddings and store them in Chroma. It uses [LangChain](https://www.langchain.com/) to compute embeddings and interact with [Chroma](https://www.trychroma.io/).
+Apify Chroma integration computes text embeddings and store them in Chroma. 
+It uses [LangChain](https://www.langchain.com/) to compute embeddings and interact with [Pinecone](https://www.pinecone.io/).
 
-1. Get `datasetId` from an `Apify Actor` output (passed automatically via integration).
-2. Get dataset using `Apify Python SDK`.
-3. [Optional] Split text data into chunks using `langchain`'s `RecursiveCharacterTextSplitter`
+1. Retrieve a dataset as output from an Actor
+2. [Optional] Split text data into chunks using `langchain`'s `RecursiveCharacterTextSplitter`
 (enable/disable using `performChunking` and specify `chunkSize`, `chunkOverlap`)
-4. Compute embeddings
+3. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
+4. Update only changed data in Chroma (enable/disable using `enableDeltaUpdates`
 5. Save data into `Chroma`
 
 ## Before you start
@@ -69,51 +74,120 @@ The URL (`https://fdfe-82-208-25-82.ngrok-free.app`) can be used in the as an in
 Note that your specific URL will vary.
 
 
-## Inputs
-
-For details refer to [input schema](.actor/input_schema.json).
-
-- `chromaCollectionName`: Chroma collection name (default: `chroma`)
-- `chromaClientHost`: Chroma client host
-- `chromaClientPort`: Chroma client port (default: `8080`)
-- `chromaClientSsl`: Enable/disable SSL (default: `false`)
-- `chromaAuthCredentials`: Chroma server auth Static API token credentials
-- `chromaClientAuthProvider`: Chroma client auth provider (default: `chromadb.auth.token_authn.TokenAuthClientProvider`)
-- `fields` - Array of fields you want to save. For example, if you want to push `name` and `user.description` fields, you should set this field to `["name", "user.description"]`.
-- `metadataValues` - Object of metadata values you want to save. For example, if you want to push `url` and `createdAt` values to Chroma, you should set this field to `{"url": "https://www.apify.com", "createdAt": "2021-09-01"}`.
-- `metadataFields` - Object of metadata fields you want to save. For example, if you want to push `url` and `createdAt` fields, you should set this field to `{"url": "url", "createdAt": "createdAt"}`. If it has the same key as `metadataValues`, it's replaced.
-- `openaiApiKey` - OpenAI API KEY.
-- `performChunking` - Whether to compute text chunks
-- `chunkSize` - The maximum character length of each text chunk
-- `chunkOverlap` - The character overlap between text chunks that are next to each other
-- `embeddings` - Embeddings provider to use for computing vectors. For example, `OpenAIEmbeddings` or `CohereEmbeddings`.
-- `embeddingsConfig` - Configuration for the embeddings' provider. For example, `{"model": "text-embedding-ada-002"}`.
-- `embeddingsApiKey` - API key for the embeddings provider (whenever needed)
-
-Fields `fields`, `metadataValues`, and `metadataFields` supports dot notation. For example, if you want to push `name` field from `user` object, you should set `fields` to `["user.name"]`.
-
-## Outputs
-
-This integration will save the selected fields from your Actor to Chroma.
-
 ## Examples
 
-### Example input configuration (Chroma with OpenAI embeddings)
+For detailed input information refer to [input schema](.actor/input_schema.json).
 
-The configuration consists of three parts: Data, Chroma, and OpenAI embeddings that are typically combined, but we show them separately here for clarity.
+The configuration consists of three parts: Chroma, embeddings provider, and data.
 
-#### Data
+#### Database: Chroma
+```json
+{
+  "chromaClientHost": "https://fdfe-82-208-25-82.ngrok-free.app",
+  "chromaCollectionName": "chroma",
+  "chromaServerAuthCredentials": "test-token"
+}
+```
+
+#### Embeddings provider: OpenAI
+```json 
+{
+  "embeddingsProvider": "OpenAIEmbeddings",
+  "embeddingsApiKey": "YOUR-OPENAI-API-KEY",
+  "embeddingsConfig": {"model":  "text-embedding-3-large"}
+}
+```
+
+### Save data from Website Content Crawler to Chroma
+
+Data is transferred in the form of a dataset from [Website Content Crawler](https://apify.com/apify/website-content-crawler), which provides a dataset with the following output fields (truncated for brevity):
 
 ```json
 {
-  "fields": ["text"],
-  "metadataValues": {"domain": "apify.com"},
-  "metadataFields": {"title": "metadata.title", "loadedTime":  "crawl.loadedTime"},
+  "url": "https://www.apify.com",
+  "text": "Apify is a platform that enables developers to build, run, and share automation tasks.",
+  "metadata": {"title": "Apify"}
+}
+```
+This dataset is then processed by the Chroma integration. 
+In the integration settings you need to specify which fields you want to save to Chroma, e.g., `["text"]` and which of them should be used as metadata, e.g., `{"title": "metadata.title"}`.
+Without any other configuration, the data is saved to Chroma as is.
+
+
+```json
+{
+  "datasetFields": ["text"],
+  "metadataDatasetFields": {"title": "metadata.title"}
+}
+```
+
+### Create chunks from Website Content Crawler data and save them to the database
+
+Assume that the text data from the [Website Content Crawler](https://apify.com/apify/website-content-crawler) is too long to compute embeddings. 
+Therefore, we need to divide the data into smaller pieces called chunks. 
+We can leverage LangChain's `RecursiveCharacterTextSplitter` to split the text into chunks and save them into a database.
+The parameters `chunkSize` and `chunkOverlap` are important. 
+The settings depend on your use case where a proper chunking helps optimize retrieval and ensures accurate responses.
+
+```json
+{
+  "datasetFields": ["text"],
+  "metadataDatasetFields": {"title": "metadata.title"},
   "performChunking": true,
   "chunkSize": 1000,
   "chunkOverlap": 0
 }
 ```
+### Incrementally update Chroma data from Website Content Crawler
+
+To incrementally update data from the [Website Content Crawler](https://apify.com/apify/website-content-crawler) to Chroma, configure the integration to update only the changed or new data. 
+This is controlled by the `enableDeltaUpdates` setting. 
+This way, the integration minimizes unnecessary updates and ensures that only new or modified data is processed.
+
+Further, the integration can delete data from Chroma that hasn't been crawled for a specified period. 
+It can happen that data in the Chroma database is outdated, e.g., when a page was removed from the website. 
+But it can also happen that the crawler has missed some pages due to various reasons. 
+It is therefore beneficial to deleted outdated data from Chroma database
+This is controlled by the `expiredObjectDeletionPeriod` setting, where data older than the specified number of days is automatically deleted.
+
+Concrete value of `enableDeltaUpdates` depends on your use case.
+Typically, if a website is crawled every day, the `enableDeltaUpdates` can be set to 7, if you crawl every week, it can be set to 30.
+
+```json
+{
+  "datasetFields": ["text"],
+  "metadataDatasetFields": {"title": "metadata.title"},
+  "enableDeltaUpdates": true,
+  "expiredObjectDeletionPeriod": 30
+}
+```
+
+### Delete outdated data from Chroma
+
+Furthermore, the integration can delete data from Chroma that hasn't been crawled for a specified period. 
+Outdated data can accumulate in the Chroma database, for instance, when a page is removed from a website or when the crawler misses some pages due to various reasons.
+Deleting outdated data from the Chroma database is therefore beneficial. 
+This is controlled by the `expiredObjectDeletionPeriod` setting, which automatically deletes data older than the specified number of days.
+
+The specific value for `expiredObjectDeletionPeriod` depends on your use case.
+For example, if a website is crawled daily, you might set `expiredObjectDeletionPeriod` to 7 days. 
+If you crawl weekly, setting it to 30 days might be more appropriate.
+
+Deletion of outdated data is performed only when `enableDeltaUpdates` is set to `true`.
+
+```json
+{
+  "enableDeltaUpdates": true,
+  "expiredObjectDeletionPeriod": 30
+}
+```
+
+## Outputs
+
+This integration will save the selected fields from your Actor to Chroma.
+
+## Example configuration
+
 #### Chroma
 ```json
 {

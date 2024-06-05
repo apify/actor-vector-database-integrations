@@ -1,10 +1,10 @@
 # Pinecone integration
 
-he Apify Pinecone integration transfers selected data from Apify Actors to a Pinecone database. 
+The Apify Pinecone integration transfers selected data from Apify Actors to a Pinecone database. 
 It processes the data, optionally splits it into chunks, computes embeddings, and saves them to Pinecone.
 
 This integration supports incremental updates, updating only the data that has changed. 
-This reduces unnecessary embedding computation and storage operations and can be used for search and retrieval augmented generation (RAG) use cases.
+This approach reduces unnecessary embedding computation and storage operations, making it suitable for search and retrieval augmented generation (RAG) use cases.
 
 💡 **Note**: This Actor is meant to be used together with other Actors' integration sections.
 For instance, if you are using the [Website Content Crawler](https://apify.com/apify/website-content-crawler), you can activate Pinecone integration to save web data as vectors to Pinecone.
@@ -17,11 +17,11 @@ Apify Pinecone integration computes text embeddings and store them in Pinecone.
 It uses [LangChain](https://www.langchain.com/) to compute embeddings and interact with [Pinecone](https://www.pinecone.io/).
 
 1. Retrieve a dataset as output from an Actor
-1. [Optional] Split text data into chunks using `langchain`'s `RecursiveCharacterTextSplitter`
+2. [Optional] Split text data into chunks using `langchain`'s `RecursiveCharacterTextSplitter`
 (enable/disable using `performChunking` and specify `chunkSize`, `chunkOverlap`)
-1. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
-1. Update only changed data in Pinecone (enable/disable using `enableDeltaUpdates`
-1. Save data into `Pinecone`
+3. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
+4. Update only changed data in Pinecone (enable/disable using `enableDeltaUpdates`
+5. Save data into `Pinecone`
 
 ## Before you start
 
@@ -36,7 +36,7 @@ For detailed input information refer to [input schema](.actor/input_schema.json)
 
 The configuration consists of three parts: Pinecone, embeddings provider, and data.
 
-#### Pinecone
+#### Database: Pinecone
 ```json
 {
   "pineconeApiKey": "YOUR-PINECONE-API-KEY",
@@ -44,7 +44,7 @@ The configuration consists of three parts: Pinecone, embeddings provider, and da
 }
 ```
 
-#### Embeddings provider (OpenAI)
+#### Embeddings provider: OpenAI
 ```json 
 {
   "embeddingsProvider": "OpenAIEmbeddings",
@@ -100,13 +100,13 @@ This is controlled by the `enableDeltaUpdates` setting.
 This way, the integration minimizes unnecessary updates and ensures that only new or modified data is processed.
 
 Further, the integration can delete data from Pinecone that hasn't been crawled for a specified period. 
-It can happend that data in the Pinecone database is outdated, e.g., when a page was removed from the website. 
+It can happen that data in the Pinecone database is outdated, e.g., when a page was removed from the website. 
 But it can also happen that the crawler has missed some pages due to various reasons. 
 It is therefore beneficial to deleted outdated data from Pinecone database
 This is controlled by the `expiredObjectDeletionPeriod` setting, where data older than the specified number of days is automatically deleted.
 
-Concrete value of `enableDeltaUpdates` dependes on your use case.
-Typically if a website is crawled every day, the `enableDeltaUpdates` can be set to 7, if you crawl every week, it can be set to 30.
+Concrete value of `enableDeltaUpdates` depends on your use case.
+Typically, if a website is crawled every day, the `enableDeltaUpdates` can be set to 7, if you crawl every week, it can be set to 30.
 
 ```json
 {
