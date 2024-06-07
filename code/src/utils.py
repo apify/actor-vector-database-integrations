@@ -63,7 +63,7 @@ def get_dataset_loader(dataset_id: str, fields: list[str], meta_object: dict, me
 
 def compute_hash(text: str) -> str:
     """Compute hash of the text."""
-    return hashlib.md5(text.encode()).hexdigest()  # noqa: S324
+    return hashlib.sha256(text.encode()).hexdigest()
 
 
 def get_chunks_to_delete(chunks_prev: list[Document], chunks_current: list[Document], expired_days: float) -> tuple[list[Document], list[Document]]:

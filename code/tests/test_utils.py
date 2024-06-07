@@ -96,7 +96,7 @@ def test_load_page_content_with_metadata():
 
 def test_compute_hash():
     text = "test"
-    assert compute_hash(text) == "098f6bcd4621d373cade4e832627b4f6"
+    assert compute_hash(text) == "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
 
 
 def test_get_chunks_empty():
@@ -129,8 +129,8 @@ def test_get_chunks_update_metadata(documents):
     add_, update_ = get_chunks_to_update(chunks, chunks)
     assert len(add_) == 0
     assert len(update_) == 1
-    assert update_[0].metadata["checksum"] == "98d743a515d313f1c951710cd9af623c"
-    assert update_[0].metadata["item_id"] == "01e53427148c2442b45dc7344b7ed700"
+    assert update_[0].metadata["checksum"] == "04a9294ef00e1ba17270e4fad7319495a2c21999195adf01d12fed2f04201486"
+    assert update_[0].metadata["item_id"] == "f2881510b05f8c3567c1d63a3212d3ebb8bbfc5510241db1f39da8f66df1defd"
 
 
 def test_get_chunks_to_update_with_content_changes(documents):

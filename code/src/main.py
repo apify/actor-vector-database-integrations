@@ -45,7 +45,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
     # Required for checksum calculation
     # Update metadata fields with datasetFieldsToItemId for dataset loading
     meta_fields = actor_input.metadataDatasetFields or {}
-    meta_fields.update({k:k for k in actor_input.datasetFieldsToItemId or []})
+    meta_fields.update({k: k for k in actor_input.datasetFieldsToItemId or []})
 
     Actor.log.info("Load Dataset ID %s and extract fields %s", dataset_id, actor_input.datasetFields)
     try:
