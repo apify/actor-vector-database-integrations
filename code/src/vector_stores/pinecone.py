@@ -26,7 +26,7 @@ class PineconeDatabase(PineconeVectorStore, VectorDbBase):
             self.index = self.client.Index(actor_input.pineconeIndexName)
             self.dummy_vector = embeddings.embed_query("dummy")
         except Exception as e:
-            raise FailedToConnectToDatabaseError("Failed to connect to chroma") from e
+            raise FailedToConnectToDatabaseError("Failed to connect to Pinecone") from e
 
     async def is_connected(self) -> bool:
         raise NotImplementedError
@@ -36,8 +36,8 @@ class PineconeDatabase(PineconeVectorStore, VectorDbBase):
         for _id in ids:
             self.index.update(id=_id, set_metadata={"last_seen_at": last_seen_at})
 
-    def delete_expired(self, ts_expired: int) -> None:
-        res = self.search_by_vector(self.dummy_vector, filter_={"last_seen_at": {"$lt": ts_expired}})
+    def delete_expired(self, expired_ts: int) -> None:
+        res = self.search_by_vector(self.dummy_vector, filter_={"last_seen_at": {"$lt": expired_ts}})
         self.delete(ids=[d.metadata["id"] for d in res])
 
     def search_by_vector(self, vector: list[float], k: int = 10_000, filter_: dict | None = None) -> list[Document]:

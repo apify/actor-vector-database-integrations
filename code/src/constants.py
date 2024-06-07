@@ -1,6 +1,5 @@
 import enum
 
-CACHE_KV_STORE_NAME = "cache"
 VCR_HEADERS_EXCLUDE = ["Authorization", "Api-Key"]
 
 

@@ -103,7 +103,7 @@ def test_deleted_expired_data(input_db, crawl_2, request):
     assert res, "Expected expired objects in the database"
     assert len(res) == 1, "Expected 1 expired object in the database"
 
-    db.delete_expired(ts_expired=1)
+    db.delete_expired(expired_ts=1)
     wait_for_db()
 
     res = db.search_by_vector(db.dummy_vector, k=10)

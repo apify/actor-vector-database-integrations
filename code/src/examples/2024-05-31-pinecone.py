@@ -1,18 +1,28 @@
+# type: ignore
+"""
+This script serves as a playground for playing with Pinecone.
+
+It demonstrates the process of performing delta updates on Pinecone. The process is as follows:
+1. The database is initially populated with a set of crawled data (`crawl_1`).
+2. A new set of data, `crawl_2`, is then crawled and compared with the existing data in the database.
+3. The script contains several checks to validate that the database is updated correctly based on the comparison between `crawl_1` and `crawl_2`.
+
+Run as a module:
+    python -m src.examples.2024-05-30-pinecone
+"""
+
 import os
 import time
-from pathlib import Path
 
 from dotenv import load_dotenv
 from langchain_openai.embeddings import OpenAIEmbeddings
-from langchain_pinecone import PineconeVectorStore  # type: ignore
-from pinecone import Pinecone as PineconeClient  # type: ignore
 
-from data_examples import crawl_1, crawl_2, expected_results
-from models.pinecone_input_model import EmbeddingsProvider, PineconeIntegration
-from vcs import compare_crawled_data_with_db
-from vector_stores.pinecone import PineconeDatabase
+from ..models.pinecone_input_model import EmbeddingsProvider, PineconeIntegration
+from ..vcs import compare_crawled_data_with_db
+from ..vector_stores.pinecone import PineconeDatabase
+from .data_examples import crawl_1, crawl_2, expected_results
 
-load_dotenv(Path.cwd() / ".." / "code" / ".env")
+load_dotenv()
 PINECONE_INDEX_NAME = "apify-unit-test"
 
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
@@ -35,7 +45,7 @@ def wait_for_index(sec=3):
 
 
 if DROP_AND_INSERT:
-    r = list(db.index.list(prefix="i"))
+    r = list(db.index.list(prefix=""))
     print("Objects in database", r)
     if r:
         db.delete(ids=r)
@@ -45,32 +55,33 @@ if DROP_AND_INSERT:
     inserted = db.add_documents(documents=crawl_1, ids=[d.metadata["id"] for d in crawl_1])
     print("Inserted ids:", inserted)
     print("Waiting for indexing")
-    wait_for_index(5)
+    wait_for_index(10)
     print("Database stats", db.index.describe_index_stats())
 
 
 res = db.search_by_vector(db.dummy_vector, k=10)
 print("Objects in the database:", len(res), res)
-assert len(res) == 4, "Expected 4 objects in the database"
+assert len(res) == 5, "Expected 5 objects in the database"
 
-data_add, data_update_last_seen, data_del = compare_crawled_data_with_db(db, crawl_2)
+data_add, ids_update_meta, ids_del = compare_crawled_data_with_db(db, crawl_2)
 
 print("Data to add", data_add)
-print("Data to update", data_update_last_seen)
-print("Data to delete", data_del)
+print("Ids to update", ids_update_meta)
+print("Ids to delete", ids_del)
 
 assert len(data_add) == 2, "Expected 2 objects to add"
-assert data_add[0].metadata["id"] == "id4#6"
+assert data_add[0].metadata["id"] == "id4#4c"
 assert data_add[1].metadata["id"] == "id5#5"
 
-assert len(data_update_last_seen) == 1
-assert data_update_last_seen[0].metadata["id"] == "id3#3"
+assert len(ids_update_meta) == 1
+assert "id3#3" in ids_update_meta
 
-assert len(data_del) == 1
-assert data_del[0].metadata["id"] == "id4#4"
+assert len(ids_del) == 2
+assert "id4#4a" in ids_del
+assert "id4#4b" in ids_del
 
 # Delete data that were updated
-db.delete(ids=[d.metadata["id"] for d in data_del])
+db.delete(ids_del)
 wait_for_index()
 res = db.search_by_vector(db.dummy_vector, k=10)
 print("Database objects after delete: ", len(res), res)
@@ -79,24 +90,22 @@ assert len(res) == 3, "Expected 3 objects in the database after deletion"
 # Add new data
 r = db.add_documents(data_add, ids=[d.metadata["id"] for d in data_add])
 wait_for_index()
-print("Added new crawled and updated objects", len(r), r)
 res = db.search_by_vector(db.dummy_vector, k=10)
 print("Database objects after adding new", len(res), res)
 assert len(res) == 5, "Expected 5 objects in the database after addition"
 
 # Update data
-db.update_last_seen_at(data_update_last_seen)
+db.update_last_seen_at(ids_update_meta)
 wait_for_index()
-# delete expired objects - not supported by serverless index
-# r = index.delete(filter={"last_seen_at": {"$lt": 1}})
-# print("Deleted expired objects:", r)
+res = db.search_by_vector(db.dummy_vector)
+assert [r for r in res if r.metadata["id"] == "id3#3"][0].metadata["last_seen_at"] > 1, "Expected id3#3 to be updated"
 
 res = db.search_by_vector(db.dummy_vector, k=10, filter_={"last_seen_at": {"$lt": 1}})
 print("Expired objects in the database", len(res), res)
 assert len(res) == 1, "Expected 1 expired object in the database"
 
 # delete expired objects
-db.delete(ids=[d.metadata["id"] for d in res])
+db.delete_expired(expired_ts=1)
 wait_for_index()
 
 res = db.search_by_vector(db.dummy_vector, k=10)
@@ -110,20 +119,5 @@ for r in expected_results:
     d = v["vectors"][r.metadata["id"]]
     assert d.metadata["item_id"] == r.metadata["item_id"], f"Expected item_id {r.metadata['item_id']}"
     assert d.metadata["checksum"] == r.metadata["checksum"], f"Expected checksum {r.metadata['checksum']}"
-    assert d.metadata["last_seen_at"] == r.metadata["last_seen_at"], f"Expected last_seen_at {r.metadata['last_seen_at']}"
 
-print("All tests passed")
-# # Pinecone API - list objects -> return only IDS
-# print("List")
-# for r in index.list(prefix="item_id", limit=1):
-#     print(r)
-#
-# # Pinecone API - fetch objects -> returns also vectors
-# print("Fetch vector")
-# print(index.fetch(ids=ids))
-
-# Pinecone API - find objects -> returns only ids, score
-# res = index.query(vector=embeddings.embed_query("apify"), top_k=10_000, filter={"item_id": "item_id2"})
-# print("Query results", res)
-# matches = [match["id"] for match in res["matches"]]
-# print("Object ids", matches)
+print("DONE")

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 import chromadb
 from langchain_chroma import Chroma
 
-from .base import FailedToConnectToDatabaseError, VectorDbBase
+from .base import VectorDbBase
 
 if TYPE_CHECKING:
     from langchain_core.documents import Document
@@ -41,7 +41,7 @@ class ChromaDatabase(Chroma, VectorDbBase):
 
     async def is_connected(self) -> bool:
         if self.client.heartbeat() <= 1:
-            raise FailedToConnectToDatabaseError("ChromaDB is not reachable")
+            return False
         return True
 
     def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:
@@ -49,8 +49,8 @@ class ChromaDatabase(Chroma, VectorDbBase):
         for _id in ids:
             self.index.update(ids=_id, metadatas=[{"last_seen_at": last_seen_at}])
 
-    def delete_expired(self, ts_expired: int) -> None:
-        self.index.delete(where={"last_seen_at": {"$lt": ts_expired}})  # type: ignore[dict-item]
+    def delete_expired(self, expired_ts: int) -> None:
+        self.index.delete(where={"last_seen_at": {"$lt": expired_ts}})  # type: ignore[dict-item]
 
     def search_by_vector(self, vector: list[float], k: int = 1_000_000, filter_: dict | None = None) -> list[Document]:
         return self.similarity_search_by_vector(vector, k=k, filter=filter_)

@@ -46,7 +46,7 @@ chromadb = "^0.5.0"
 
 [tool.ruff]
 line-length = 150
-exclude = ["src/models/**"]
+exclude = ["src/models/**", "src/examples/**"]
 
 [tool.ruff.lint]
 select = ["ALL"]

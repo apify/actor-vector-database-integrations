@@ -7,7 +7,6 @@ from apify import Actor
 from langchain_core.documents import Document
 from langchain_core.vectorstores import VectorStore
 
-from .constants import CACHE_KV_STORE_NAME
 from .models.chroma_input_model import ChromaIntegration
 from .models.pinecone_input_model import PineconeIntegration
 from .utils import get_chunks_to_delete, get_chunks_to_update
@@ -97,7 +96,7 @@ def compare_crawled_data_with_db(vector_store: DB, data: list[Document]) -> tupl
 
 
 async def update_db_with_crawled_data_using_internal_cache(
-    vector_store: VectorStore, documents: list[Document], cache_key_name: str, expired_days: float
+    vector_store: VectorStore, documents: list[Document], cache_key_name: str, cache_kv_store_name: str, expired_days: float
 ) -> None:
     """
     Updates the vector store with new documents and removes outdated ones.
@@ -110,9 +109,9 @@ async def update_db_with_crawled_data_using_internal_cache(
     documents older than the specified 'expired_days' are removed.
     """
 
-    Actor.log.info("Load previous cache %s from the key-value store: %s", cache_key_name, CACHE_KV_STORE_NAME)
+    Actor.log.info("Load previous cache %s from the key-value store: %s", cache_key_name, cache_kv_store_name)
 
-    kv_store = await Actor.open_key_value_store(name=CACHE_KV_STORE_NAME)
+    kv_store = await Actor.open_key_value_store(name=cache_kv_store_name)
     previous_runs = await kv_store.get_value(cache_key_name) or {}
     previous_runs = [Document.parse_obj(doc) for doc in previous_runs]
     Actor.log.info("Previous runs contains: %s records", len(previous_runs))
@@ -124,11 +123,11 @@ async def update_db_with_crawled_data_using_internal_cache(
     Actor.log.info("Chunks to delete: %s", len(chunks_to_delete))
 
     if chunks_to_delete:
-        await vector_store.adelete(ids=[x.metadata["id"] for x in chunks_to_delete if x.metadata["id"]])
+        vector_store.delete(ids=[x.metadata["id"] for x in chunks_to_delete if x.metadata["id"]])
         Actor.log.info("Deleted %s from database", len(chunks_to_delete))
 
     if chunks_to_add:
-        inserted = await vector_store.aadd_documents(chunks_to_add, ids=[x.metadata["id"] for x in chunks_to_add if x.metadata["id"]])
+        inserted = vector_store.add_documents(chunks_to_add, ids=[x.metadata["id"] for x in chunks_to_add if x.metadata["id"]])
         Actor.log.info("Added %s documents to the vector store", len(inserted))
     else:
         Actor.log.info("No new documents to add")
