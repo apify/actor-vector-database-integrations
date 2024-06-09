@@ -24,9 +24,15 @@ class PineconeDatabase(PineconeVectorStore, VectorDbBase):
             self.client = PineconeClient(api_key=actor_input.pineconeApiKey, source_tag=PINECONE_SOURCE_TAG)
             super().__init__(index=self.client.Index(actor_input.pineconeIndexName), embedding=embeddings)
             self.index = self.client.Index(actor_input.pineconeIndexName)
-            self.dummy_vector = embeddings.embed_query("dummy")
+            self._dummy_vector: list[float] = []
         except Exception as e:
             raise FailedToConnectToDatabaseError("Failed to connect to Pinecone") from e
+
+    @property
+    def dummy_vector(self) -> list[float]:
+        if not self._dummy_vector and self.embeddings:
+            self._dummy_vector = self.embeddings.embed_query("dummy")
+        return self._dummy_vector
 
     async def is_connected(self) -> bool:
         raise NotImplementedError

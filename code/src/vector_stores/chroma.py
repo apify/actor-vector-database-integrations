@@ -37,7 +37,13 @@ class ChromaDatabase(Chroma, VectorDbBase):
         )
         self.client = client
         self.index = self.client.get_collection(collection_name)
-        self.dummy_vector = embeddings.embed_query("dummy")
+        self._dummy_vector: list[float] = []
+
+    @property
+    def dummy_vector(self) -> list[float]:
+        if not self._dummy_vector and self.embeddings:
+            self._dummy_vector = self.embeddings.embed_query("dummy")
+        return self._dummy_vector
 
     async def is_connected(self) -> bool:
         if self.client.heartbeat() <= 1:
