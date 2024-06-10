@@ -1,7 +1,6 @@
 import enum
 
-# Pinecone API attribution tag
-PINECONE_SOURCE_TAG = "apify"
+VCR_HEADERS_EXCLUDE = ["Authorization", "Api-Key"]
 
 
 class SupportedVectorStores(str, enum.Enum):

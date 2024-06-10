@@ -5,10 +5,11 @@
   "properties": {
     "chromaCollectionName": {
       "title": "Chroma collection name",
-      "description": "Chroma collection name",
+      "description": "Name of the chroma collection where the data will be stored",
       "type": "string",
       "editor": "textfield",
-      "default": "chroma"
+      "default": "chroma",
+      "sectionCaption": "Chroma settings"
     },
     "chromaClientHost": {
       "title": "Chroma host",
@@ -30,7 +31,7 @@
       "default": false
     },
     "chromaServerAuthCredentials": {
-      "title": "Chroma server auth Static API token credentials",
+      "title": "Chroma server Auth Static API token credentials",
       "description": "Chroma server Auth Static API token.",
       "type": "string",
       "editor": "textfield",
@@ -41,16 +42,19 @@
       "description": "Chroma client auth provider",
       "type": "string",
       "editor": "textfield",
-      "prefill": "chromadb.auth.token_authn.TokenAuthClientProvider",
       "default": "chromadb.auth.token_authn.TokenAuthClientProvider"
     },
-    "embeddings": {
+    "embeddingsProvider": {
       "title": "Embeddings provider (as defined in the langchain API)",
       "description": "Choose the embeddings provider to use for generating embeddings",
       "type": "string",
       "editor": "select",
-      "enum": ["OpenAIEmbeddings", "CohereEmbeddings"],
-      "default": "OpenAIEmbeddings"
+      "enum": [
+        "OpenAIEmbeddings",
+        "CohereEmbeddings"
+      ],
+      "default": "OpenAIEmbeddings",
+      "sectionCaption": "Embeddings settings"
     },
     "embeddingsConfig": {
       "title": "Embeddings provider configuration",
@@ -65,50 +69,80 @@
       "editor": "textfield",
       "isSecret": true
     },
-    "fields": {
-      "title": "A list of fields which should be selected from the items",
+    "datasetFields": {
+      "title": "Dataset fields to select from the dataset results and store in the database",
       "type": "array",
-      "description": "A list of fields which should be selected from the items, only these fields will remain in the resulting record objects.\n\n For example, when using the website content crawler, you might select fields such as `text` and `url`, and `metadata.title` among others, to be included in the vector store file.",
+      "description": "This array specifies the dataset fields to be selected and stored in the vector store. Only the fields listed here will be included in the vector store.\n\nFor instance, when using the Website Content Crawler, you might choose to include fields such as `text`, `url`, and `metadata.title` in the vector store.",
       "default": [
-        "url",
         "text"
       ],
       "prefill": [
-        "url",
-        "text",
-        "metadata.title"
+        "text"
       ],
-      "editor": "stringList"
+      "editor": "stringList",
+      "sectionCaption": "Dataset settings"
     },
-    "metadataFields": {
-      "title": "Metadata fields",
+    "datasetFieldsToItemId": {
+      "title": "Dataset fields to uniquely identify dataset items",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "This array contains fields that are used to uniquely identify dataset items, which helps to handle content changes across different runs.\n\nFor instance, in a web content crawling scenario, the `url` field could serve as a unique identifier for each item.",
+      "editor": "stringList",
+      "default": [
+        "url"
+      ],
+      "prefill": [
+        "url"
+      ]
+    },
+    "metadataDatasetFields": {
+      "title": "Dataset fields to select from the dataset and store as metadata in the database",
       "type": "object",
-      "description": "A list of fields which should be selected from the items and stored as metadata. \n\n For example, when using the website content crawler, you might want to store `url` in metadata. In this case, use `metadata_fields parameter as follows {\"page_url\": \"url\"}`",
+      "description": "A list of dataset fields which should be selected from the dataset and stored as metadata in the vector stores.\n\nFor example, when using the Website Content Crawler, you might want to store `url` in metadata. In this case, use `metadataDatasetFields parameter as follows {\"url\": \"url\"}`",
       "editor": "json"
     },
-    "metadataValues": {
-      "title": "Metadata values",
+    "metadataObject": {
+      "title": "Custom object to be stored as metadata in the vector store database",
       "type": "object",
-      "description": "Custom values to be stored for every Dataset item as metadata.\n\n For example, you might want to store `domain` in metadata, hence use `metadata_values as {\"domain\": \"apify.com\"}`",
+      "description": "This object allows you to store custom metadata for every item in the vector store.\n\nFor example, if you want to store the `domain` as metadata, use the `metadataObject` like this: {\"domain\": \"apify.com\"}.",
       "editor": "json"
+    },
+    "enableDeltaUpdates": {
+      "title": "Enable incremental updates for objects based on deltas",
+      "type": "boolean",
+      "description": "When set to true, this setting enables incremental updates for objects in the database by comparing the changes (deltas) between the crawled dataset items and the existing objects, uniquely identified by the `datasetKeysToItemId` field.\n\n The integration will only add new objects and update those that have changed, reducing unnecessary updates. The `datasetFields`, `metadataDatasetFields`, and `metadataObject` fields are used to determine the changes.",
+      "default": true,
+      "sectionCaption": "Incremental update settings"
+    },
+    "expiredObjectDeletionPeriod": {
+      "title": "Delete expired objects from the database after a specified number of days",
+      "type": "integer",
+      "description": "This setting allows the integration to manage the deletion of objects from the database that have not been crawled for a specified period. It is typically used in subsequent runs after the initial crawl.\n\nWhen the value is greater than 0, the integration checks if objects have been seen within the last X days (determined by the expiration period). If the objects are expired, they are deleted from the database. The specific value for `deletedExpiredObjectsDays` depends on your use case and how frequently you crawl data.\n\nFor example, if you crawl data daily, you can set `deletedExpiredObjectsDays` to 7 days. If you crawl data weekly, you can set `deletedExpiredObjectsDays` to 30 days.\n\nSetting `deletedExpiredObjectsDays` to 0 disables this feature",
+      "default": 30,
+      "minimum": 0,
+      "unit": "days",
+      "editor": "number"
     },
     "performChunking": {
-      "title": "Perform chunking",
-      "description": "If set to true, the resulting text will be chunked according to the settings below",
+      "title": "Enable text chunking",
+      "description": "When set to true, the text will be divided into smaller chunks based on the settings provided below. Proper chunking helps optimize retrieval and ensures accurate and efficient responses.",
       "default": false,
-      "type": "boolean"
+      "type": "boolean",
+        "sectionCaption": "Text chunking settings"
     },
     "chunkSize": {
-      "title": "Chunk size",
+      "title": "Maximum chunk size",
       "type": "integer",
-      "description": "The maximum character length of each text chunk",
+      "description": "Defines the maximum number of characters in each text chunk. Choosing the right size balances between detailed context and system performance. Optimal sizes ensure high relevancy and minimal response time.",
       "default": 1000,
       "minimum": 1
     },
     "chunkOverlap": {
       "title": "Chunk overlap",
       "type": "integer",
-      "description": "The character overlap between text chunks that are next to each other",
+      "description": "Specifies the number of overlapping characters between consecutive text chunks. Adjusting this helps maintain context across chunks, which is crucial for accuracy in retrieval-augmented generation systems.",
       "default": 0,
       "minimum": 0
     },
@@ -116,12 +150,13 @@
       "title": "Dataset ID",
       "type": "string",
       "description": "Dataset ID (when running standalone without integration)",
-      "editor": "textfield"
+      "editor": "textfield",
+      "sectionCaption": "Debug settings"
     }
   },
   "required": [
     "chromaClientHost",
-    "embeddings",
-    "fields"
+    "embeddingsProvider",
+    "datasetFields"
   ]
 }

@@ -1,0 +1,62 @@
+from __future__ import annotations
+
+from datetime import datetime, timezone
+from typing import TYPE_CHECKING
+
+import chromadb
+from langchain_chroma import Chroma
+
+from .base import VectorDbBase
+
+if TYPE_CHECKING:
+    from langchain_core.documents import Document
+    from langchain_core.embeddings import Embeddings
+
+    from ..models.chroma_input_model import ChromaIntegration
+
+
+class ChromaDatabase(Chroma, VectorDbBase):
+    def __init__(self, actor_input: ChromaIntegration, embeddings: Embeddings) -> None:
+        settings = None
+        if auth := actor_input.chromaServerAuthCredentials:
+            settings = chromadb.config.Settings(
+                chroma_client_auth_credentials=auth,
+                chroma_client_auth_provider=actor_input.chromaClientAuthProvider,
+            )
+        client = chromadb.HttpClient(
+            host=actor_input.chromaClientHost,
+            port=actor_input.chromaClientPort or 8000,
+            ssl=actor_input.chromaClientSsl or False,
+            settings=settings,
+        )
+        collection_name = actor_input.chromaCollectionName or "chroma"
+        super().__init__(
+            client=client,
+            collection_name=collection_name,
+            embedding_function=embeddings,
+        )
+        self.client = client
+        self.index = self.client.get_collection(collection_name)
+        self._dummy_vector: list[float] = []
+
+    @property
+    def dummy_vector(self) -> list[float]:
+        if not self._dummy_vector and self.embeddings:
+            self._dummy_vector = self.embeddings.embed_query("dummy")
+        return self._dummy_vector
+
+    async def is_connected(self) -> bool:
+        if self.client.heartbeat() <= 1:
+            return False
+        return True
+
+    def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:
+        last_seen_at = last_seen_at or int(datetime.now(timezone.utc).timestamp())
+        for _id in ids:
+            self.index.update(ids=_id, metadatas=[{"last_seen_at": last_seen_at}])
+
+    def delete_expired(self, expired_ts: int) -> None:
+        self.index.delete(where={"last_seen_at": {"$lt": expired_ts}})  # type: ignore[dict-item]
+
+    def search_by_vector(self, vector: list[float], k: int = 1_000_000, filter_: dict | None = None) -> list[Document]:
+        return self.similarity_search_by_vector(vector, k=k, filter=filter_)

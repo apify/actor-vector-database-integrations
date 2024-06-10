@@ -25,8 +25,7 @@ async def main() -> None:
 
             arg = f"actors/{SupportedVectorStores.pinecone.value}"
             Actor.log.warning(
-                f"The environment variable ACTOR_PATH_IN_DOCKER_CONTEXT was not specified. "
-                f"Using default for local development: {arg}"
+                f"The environment variable ACTOR_PATH_IN_DOCKER_CONTEXT was not specified. " f"Using default for local development: {arg}"
             )
 
         actor_type = arg.split("/")[-1]
