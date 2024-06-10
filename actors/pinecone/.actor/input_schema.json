@@ -8,14 +8,14 @@
       "description": "Pinecone API KEY",
       "type": "string",
       "editor": "textfield",
-      "isSecret": true
+      "isSecret": true,
+      "sectionCaption": "Pinecone settings"
     },
     "pineconeIndexName": {
       "title": "Pinecone index name",
       "type": "string",
       "description": "Name of the Pinecone index where the data will be stored",
       "editor": "textfield",
-      "sectionCaption": "Pinecone settings"
     },
     "embeddingsProvider": {
       "title": "Embeddings provider (as defined in the langchain API)",
