@@ -56,7 +56,8 @@ def db_pinecone(crawl_1) -> PineconeDatabase:
         actor_input=PineconeIntegration(
             pineconeIndexName=INDEX_NAME,
             pineconeApiKey=os.getenv("PINECONE_API_KEY"),
-            embeddingsProvider=EmbeddingsProvider.OpenAIEmbeddings,
+            embeddingsProvider=EmbeddingsProvider.OpenAI,
+            embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],
         ),
         embeddings=embeddings,
@@ -83,7 +84,8 @@ def db_chroma(crawl_1) -> ChromaDatabase:
     db = ChromaDatabase(
         actor_input=ChromaIntegration(
             chromaClientHost="localhost",
-            embeddingsProvider=EmbeddingsProvider.OpenAIEmbeddings.value,
+            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+            embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],
             chromaCollectionName=INDEX_NAME,
         ),

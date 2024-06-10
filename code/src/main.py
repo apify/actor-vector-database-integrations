@@ -45,7 +45,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
     # Required for checksum calculation
     # Update metadata fields with datasetFieldsToItemId for dataset loading
     meta_fields = actor_input.metadataDatasetFields or {}
-    meta_fields.update({k: k for k in actor_input.datasetFieldsToItemId or []})
+    meta_fields.update({k: k for k in actor_input.deltaUpdatesPrimaryDatasetFields or []})
 
     Actor.log.info("Load Dataset ID %s and extract fields %s", dataset_id, actor_input.datasetFields)
     try:
@@ -62,7 +62,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
         await Actor.fail(status_message=f"Failed to load datasets: {e}")
         return
 
-    documents = add_item_checksum(documents, actor_input.datasetFieldsToItemId)  # type: ignore[arg-type]
+    documents = add_item_checksum(documents, actor_input.deltaUpdatesPrimaryDatasetFields)  # type: ignore[arg-type]
 
     if actor_input.performChunking:
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=actor_input.chunkSize, chunk_overlap=actor_input.chunkOverlap)
@@ -74,7 +74,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
     try:
         vcs_: DB = await get_vector_store(actor_input, embeddings)
         if actor_input.enableDeltaUpdates:
-            expired_days = actor_input.expiredObjectDeletionPeriod or 0
+            expired_days = actor_input.expiredObjectDeletionPeriodDays or 0
             ts_expired = expired_days and int(datetime.now(timezone.utc).timestamp() - expired_days * DAY_IN_SECONDS) or 0
             update_db_with_crawled_data(vcs_, documents, ts_expired)
         else:
