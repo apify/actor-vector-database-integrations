@@ -15,7 +15,7 @@
       "title": "Pinecone index name",
       "type": "string",
       "description": "Name of the Pinecone index where the data will be stored",
-      "editor": "textfield",
+      "editor": "textfield"
     },
     "embeddingsProvider": {
       "title": "Embeddings provider (as defined in the langchain API)",
