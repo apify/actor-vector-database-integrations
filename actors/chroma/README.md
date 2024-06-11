@@ -194,7 +194,7 @@ This integration will save the selected fields from your Actor to Chroma.
 
 ```json
 {
-  "chromaClientHost": "https://5d51-82-208-25-82.ngrok-free.app",
+  "chromaClientHost": "https://fdfe-82-208-25-82.ngrok-free.app",
   "chromaClientSsl": false,
   "chromaCollectionName": "chroma",
   "embeddingsApiKey": "YOUR-OPENAI-API-KEY",
