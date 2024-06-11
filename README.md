@@ -11,19 +11,15 @@ This repository contains Actors for different vector databases.
 ## How does it work?
 
 1. Retrieve a dataset as output from an Actor.
-2. [Optional] Split text data into chunks using `langchain`.
-3. [Optional] Update only changed data.
-4. Compute embeddings, e.g. using `OpenAI` or `Cohere`.
+2. _[Optional]_ Split text data into chunks using [langchain](https://python.langchain.com).
+3. _[Optional]_ Update only changed data.
+4. Compute embeddings, e.g. using [OpenAI](https://platform.openai.com/docs/guides/embeddings) or [Cohere](https://cohere.com/embeddings).
 5. Save data into the database.
 
-## Vector store integrations (Actors)
+## Vector database integrations (Actors)
 - [Chroma](https://apify.com/apify/chroma-integration)
 - [Pinecone](https://apify.com/apify/pinecone-integration)
 
-## Code
-This repository contains the core functionality for all vector databases and integrations.
-
- 
 ## Supported Vector Embeddings
 - [OpenAI](https://platform.openai.com/docs/guides/embeddings)
 - [Cohere](https://cohere.com/embeddings)
