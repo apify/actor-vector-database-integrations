@@ -27,4 +27,4 @@ pydantic-model:
 	datamodel-codegen --input $(DIRS_WITH_ACTORS)/pinecone/.actor/input_schema.json --output $(DIRS_WITH_SRC)/models/pinecone_input_model.py  --input-file-type jsonschema  --field-constraints
 
 pytest:
-	poetry run -C $(DIRS_WITH_CODE) pytest
+	poetry run -C $(DIRS_WITH_CODE) pytest --with-integration --vcr-record=none
