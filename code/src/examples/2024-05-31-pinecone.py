@@ -33,7 +33,7 @@ db = PineconeDatabase(
     actor_input=PineconeIntegration(
         pineconeIndexName=PINECONE_INDEX_NAME,
         pineconeApiKey=os.getenv("PINECONE_API_KEY"),
-        embeddingsProvider=EmbeddingsProvider.OpenAIEmbeddings,
+        embeddingsProvider=EmbeddingsProvider.OpenAI,
         datasetFields=["text"],
     ),
     embeddings=embeddings,

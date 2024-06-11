@@ -14,13 +14,13 @@ For more information how to leverage vector stores in Apify platform, see [Pinec
 ## How does it work?
 
 Apify Chroma integration computes text embeddings and store them in Chroma. 
-It uses [LangChain](https://www.langchain.com/) to compute embeddings and interact with [Pinecone](https://www.pinecone.io/).
+It uses [LangChain](https://www.langchain.com/) to compute embeddings and interact with [Chroma](https://www.trychroma.com/).
 
 1. Retrieve a dataset as output from an Actor
 2. [Optional] Split text data into chunks using `langchain`'s `RecursiveCharacterTextSplitter`
 (enable/disable using `performChunking` and specify `chunkSize`, `chunkOverlap`)
-3. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
-4. Update only changed data in Chroma (enable/disable using `enableDeltaUpdates`
+3. [Optional] Update only changed data in Chroma (enable/disable using `enableDeltaUpdates`)
+4. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
 5. Save data into `Chroma`
 
 ## Before you start
@@ -138,47 +138,49 @@ The settings depend on your use case where a proper chunking helps optimize retr
   "chunkOverlap": 0
 }
 ```
-### Incrementally update Chroma data from Website Content Crawler
+### Incrementally update database from the Website Content Crawler
 
 To incrementally update data from the [Website Content Crawler](https://apify.com/apify/website-content-crawler) to Chroma, configure the integration to update only the changed or new data. 
 This is controlled by the `enableDeltaUpdates` setting. 
 This way, the integration minimizes unnecessary updates and ensures that only new or modified data is processed.
 
-Further, the integration can delete data from Chroma that hasn't been crawled for a specified period. 
-It can happen that data in the Chroma database is outdated, e.g., when a page was removed from the website. 
-But it can also happen that the crawler has missed some pages due to various reasons. 
-It is therefore beneficial to deleted outdated data from Chroma database
-This is controlled by the `expiredObjectDeletionPeriod` setting, where data older than the specified number of days is automatically deleted.
+A checksum is computed for each dataset item (together with all metadata) and stored in the database alongside the vectors. 
+When the data is re-crawled, the checksum is recomputed and compared with the stored checksum. 
+If the checksum is different, the old data (including vectors) is deleted and new data is saved.
+Otherwise, only the `last_seen_at` metadata field is updated to indicate when the data was last seen.
 
-Concrete value of `enableDeltaUpdates` depends on your use case.
-Typically, if a website is crawled every day, the `enableDeltaUpdates` can be set to 7, if you crawl every week, it can be set to 30.
+
+#### Provide unique identifier for each dataset item
+
+To incrementally update the data, you need to be able to uniquely identify each dataset item. 
+The variable `deltaUpdatesPrimaryDatasetFields` specifies which fields are used to uniquely identify each dataset item and helps track content changes across different crawls. 
+For instance, when working with the Website Content Crawler, you can use the URL as a unique identifier.
 
 ```json
 {
-  "datasetFields": ["text"],
-  "metadataDatasetFields": {"title": "metadata.title"},
   "enableDeltaUpdates": true,
-  "expiredObjectDeletionPeriod": 30
+  "deltaUpdatesPrimaryDatasetFields": ["url"]
 }
 ```
 
-### Delete outdated data from Chroma
+#### Delete outdated data
 
-Furthermore, the integration can delete data from Chroma that hasn't been crawled for a specified period. 
-Outdated data can accumulate in the Chroma database, for instance, when a page is removed from a website or when the crawler misses some pages due to various reasons.
-Deleting outdated data from the Chroma database is therefore beneficial. 
-This is controlled by the `expiredObjectDeletionPeriod` setting, which automatically deletes data older than the specified number of days.
+The integration can also delete data from Chroma that hasn't been crawled for a specified period. 
+This is useful when data in the Chroma database becomes outdated, such as when a page is removed from a website. 
 
-The specific value for `expiredObjectDeletionPeriod` depends on your use case.
-For example, if a website is crawled daily, you might set `expiredObjectDeletionPeriod` to 7 days. 
-If you crawl weekly, setting it to 30 days might be more appropriate.
+This is controlled by the `expiredObjectDeletionPeriodDays` setting, which automatically deletes data older than the specified number of days.
+For each crawl, the `last_seen_at` metadata field is updated.
+When a database object has not been seen for more than `expiredObjectDeletionPeriodDays` days, it is deleted.
 
-Deletion of outdated data is performed only when `enableDeltaUpdates` is set to `true`.
+The specific value of `expiredObjectDeletionPeriodDays` depends on your use case. 
+Typically, if a website is crawled daily, `expiredObjectDeletionPeriodDays` can be set to 7. 
+If you crawl weekly, it can be set to 30.
+To disable this feature, set `expiredObjectDeletionPeriodDays` to `0`.
 
 ```json
 {
   "enableDeltaUpdates": true,
-  "expiredObjectDeletionPeriod": 30
+  "expiredObjectDeletionPeriodDays": 30
 }
 ```
 
@@ -187,6 +189,30 @@ Deletion of outdated data is performed only when `enableDeltaUpdates` is set to 
 This integration will save the selected fields from your Actor to Chroma.
 
 ## Example configuration
+
+#### Full Input Example for Website Content Crawler Actor with Chroma integration
+
+```json
+{
+  "chromaClientHost": "https://fdfe-82-208-25-82.ngrok-free.app",
+  "chromaClientSsl": false,
+  "chromaCollectionName": "chroma",
+  "embeddingsApiKey": "YOUR-OPENAI-API-KEY",
+  "embeddingsConfig": {
+    "model": "text-embedding-3-small"
+  },
+  "embeddingsProvider": "OpenAI",
+  "datasetFields": [
+    "text"
+  ],
+  "enableDeltaUpdates": true,
+  "deltaUpdatesPrimaryDatasetFields": ["url"],
+  "expiredObjectDeletionPeriodDays": 7,
+  "performChunking": true,
+  "chunkSize": 2000,
+  "chunkOverlap": 200
+}
+```
 
 #### Chroma
 ```json
@@ -201,7 +227,7 @@ This integration will save the selected fields from your Actor to Chroma.
 ```json 
 {
   "embeddingsApiKey": "YOUR-OPENAI-API-KEY",
-  "embeddings": "OpenAIEmbeddings",
+  "embeddings": "OpenAI",
   "embeddingsConfig": {"model":  "text-embedding-3-large"}
 }
 ```
@@ -209,7 +235,7 @@ This integration will save the selected fields from your Actor to Chroma.
 ```json 
 {
   "embeddingsApiKey": "YOUR-COHERE-API-KEY",
-  "embeddings": "CohereEmbeddings",
+  "embeddings": "Cohere",
   "embeddingsConfig": {"model":  "embed-multilingual-v3.0"}
 }
 ```

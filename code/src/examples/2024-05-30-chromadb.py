@@ -33,7 +33,7 @@ db = asyncio.run(
         ChromaIntegration(
             chromaCollectionName=CHROMA_COLLECTION_NAME,
             chromaClientHost="localhost",
-            embeddingsProvider=EmbeddingsProvider.OpenAIEmbeddings.value,
+            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
             datasetFields=["text"],
         ),
         embeddings=embeddings,

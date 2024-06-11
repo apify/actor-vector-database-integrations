@@ -23,8 +23,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
     payload = payload.get("payload", {})
     resource = payload.get("resource", {})
     if not (dataset_id := resource.get("defaultDatasetId") or actor_input.datasetId):
-        msg = "No Dataset ID provided. It should be provided either in payload or in actor_input"
-        await Actor.fail(status_message=msg)
+        await Actor.fail(status_message="No Dataset ID provided. It should be provided either in payload or in actor_input")
 
     try:
         Actor.log.info("Get embeddings class: %s", actor_input.embeddingsProvider.value)  # type: ignore[union-attr]
@@ -34,8 +33,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
             actor_input.embeddingsConfig,
         )
     except Exception as e:
-        msg = f"Failed to get embeddings: {e}"
-        await Actor.fail(status_message=msg)
+        await Actor.fail(status_message=f"Failed to get embeddings: {e}")
         return
 
     # Add parameters related to chunking to every dataset item to be able to update DB when chunkSize, chunkOverlap or performChunking changes
@@ -45,7 +43,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
     # Required for checksum calculation
     # Update metadata fields with datasetFieldsToItemId for dataset loading
     meta_fields = actor_input.metadataDatasetFields or {}
-    meta_fields.update({k: k for k in actor_input.datasetFieldsToItemId or []})
+    meta_fields.update({k: k for k in actor_input.deltaUpdatesPrimaryDatasetFields or []})
 
     Actor.log.info("Load Dataset ID %s and extract fields %s", dataset_id, actor_input.datasetFields)
     try:
@@ -62,7 +60,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
         await Actor.fail(status_message=f"Failed to load datasets: {e}")
         return
 
-    documents = add_item_checksum(documents, actor_input.datasetFieldsToItemId)  # type: ignore[arg-type]
+    documents = add_item_checksum(documents, actor_input.deltaUpdatesPrimaryDatasetFields)  # type: ignore[arg-type]
 
     if actor_input.performChunking:
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=actor_input.chunkSize, chunk_overlap=actor_input.chunkOverlap)
@@ -74,12 +72,12 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
     try:
         vcs_: DB = await get_vector_store(actor_input, embeddings)
         if actor_input.enableDeltaUpdates:
-            expired_days = actor_input.expiredObjectDeletionPeriod or 0
+            expired_days = actor_input.expiredObjectDeletionPeriodDays or 0
             ts_expired = expired_days and int(datetime.now(timezone.utc).timestamp() - expired_days * DAY_IN_SECONDS) or 0
             update_db_with_crawled_data(vcs_, documents, ts_expired)
         else:
             await vcs_.aadd_documents(documents)
         await Actor.push_data([doc.dict() for doc in documents])
     except Exception as e:
-        await Actor.set_status_message(f"Database update failed: {e}")
-        await Actor.fail()
+        msg = f"Database update failed: {e}"
+        await Actor.fail(status_message=msg)
