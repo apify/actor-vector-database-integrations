@@ -34,8 +34,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
             actor_input.embeddingsConfig,
         )
     except Exception as e:
-        msg = f"Failed to get embeddings: {e}"
-        await Actor.fail(status_message=msg)
+        await Actor.fail(status_message=f"Failed to get embeddings: {e}")
         return
 
     # Add parameters related to chunking to every dataset item to be able to update DB when chunkSize, chunkOverlap or performChunking changes
@@ -81,5 +80,6 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
             await vcs_.aadd_documents(documents)
         await Actor.push_data([doc.dict() for doc in documents])
     except Exception as e:
-        await Actor.set_status_message(f"Database update failed: {e}")
-        await Actor.fail()
+        msg = f"Database update failed: {e}"
+        Actor.log.error(msg)
+        await Actor.fail(status_message=msg)

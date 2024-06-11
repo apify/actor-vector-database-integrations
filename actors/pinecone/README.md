@@ -145,6 +145,29 @@ This integration will save the selected fields from your Actor to Pinecone.
 
 ## Example configuration
 
+#### Full Input Example for Website Content Crawler Actor with Pinecone integration
+
+```json
+{
+  "pineconeApiKey": "YOUR-PINECONE-API-KEY",
+  "pineconeIndexName": "apify",
+  "embeddingsApiKey": "YOUR-OPENAI-API-KEY",
+  "embeddingsConfig": {
+    "model": "text-embedding-3-small"
+  },
+  "embeddingsProvider": "OpenAI",
+  "datasetFields": [
+    "text"
+  ],
+  "enableDeltaUpdates": true,
+  "deltaUpdatesPrimaryDatasetFields": ["url"],
+  "expiredObjectDeletionPeriodDays": 7,
+  "performChunking": true,
+  "chunkSize": 2000,
+  "chunkOverlap": 200
+}
+```
+
 #### Pinecone
 ```json
 {
