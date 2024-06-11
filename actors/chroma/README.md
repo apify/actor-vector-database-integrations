@@ -175,6 +175,7 @@ When a database object has not been seen for more than `expiredObjectDeletionPer
 The specific value of `expiredObjectDeletionPeriodDays` depends on your use case. 
 Typically, if a website is crawled daily, `expiredObjectDeletionPeriodDays` can be set to 7. 
 If you crawl weekly, it can be set to 30.
+To disable this feature, set `expiredObjectDeletionPeriodDays` to `0`.
 
 ```json
 {
