@@ -190,6 +190,30 @@ This integration will save the selected fields from your Actor to Chroma.
 
 ## Example configuration
 
+#### Full Input Example for Website Content Crawler Actor with Chroma integration
+
+```json
+{
+  "chromaClientHost": "https://5d51-82-208-25-82.ngrok-free.app",
+  "chromaClientSsl": false,
+  "chromaCollectionName": "chroma",
+  "embeddingsApiKey": "YOUR-OPENAI-API-KEY",
+  "embeddingsConfig": {
+    "model": "text-embedding-3-small"
+  },
+  "embeddingsProvider": "OpenAI",
+  "datasetFields": [
+    "text"
+  ],
+  "enableDeltaUpdates": true,
+  "deltaUpdatesPrimaryDatasetFields": ["url"],
+  "expiredObjectDeletionPeriodDays": 7,
+  "performChunking": true,
+  "chunkSize": 2000,
+  "chunkOverlap": 200
+}
+```
+
 #### Chroma
 ```json
 {
