@@ -23,8 +23,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
     payload = payload.get("payload", {})
     resource = payload.get("resource", {})
     if not (dataset_id := resource.get("defaultDatasetId") or actor_input.datasetId):
-        msg = "No Dataset ID provided. It should be provided either in payload or in actor_input"
-        await Actor.fail(status_message=msg)
+        await Actor.fail(status_message="No Dataset ID provided. It should be provided either in payload or in actor_input")
 
     try:
         Actor.log.info("Get embeddings class: %s", actor_input.embeddingsProvider.value)  # type: ignore[union-attr]
@@ -81,5 +80,4 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
         await Actor.push_data([doc.dict() for doc in documents])
     except Exception as e:
         msg = f"Database update failed: {e}"
-        Actor.log.error(msg)
         await Actor.fail(status_message=msg)
