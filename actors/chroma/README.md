@@ -19,7 +19,7 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 1. Retrieve a dataset as output from an Actor
 2. [Optional] Split text data into chunks using `langchain`'s `RecursiveCharacterTextSplitter`
 (enable/disable using `performChunking` and specify `chunkSize`, `chunkOverlap`)
-3. [Optional] Update only changed data in Pinecone (enable/disable using `enableDeltaUpdates`)
+3. [Optional] Update only changed data in Chroma (enable/disable using `enableDeltaUpdates`)
 4. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
 5. Save data into `Chroma`
 
@@ -144,12 +144,17 @@ To incrementally update data from the [Website Content Crawler](https://apify.co
 This is controlled by the `enableDeltaUpdates` setting. 
 This way, the integration minimizes unnecessary updates and ensures that only new or modified data is processed.
 
+A checksum is computed for each dataset item (together with all metadata) and stored in the database alongside the vectors. 
+When the data is re-crawled, the checksum is recomputed and compared with the stored checksum. 
+If the checksum is different, the old data (including vectors) is deleted and new data is saved.
+Otherwise, only the `last_seen_at` metadata field is updated to indicate when the data was last seen.
+
+
 #### Provide unique identifier for each dataset item
 
 To incrementally update the data, you need to be able to uniquely identify each dataset item. 
-The variable deltaUpdatesPrimaryDatasetFields specifies which fields are used to uniquely identify each dataset item and helps to track content changes across different crawls. 
-For instance, when you are working with the Website Content Crawler, you can use the URL as a unique identifier.
-
+The variable `deltaUpdatesPrimaryDatasetFields` specifies which fields are used to uniquely identify each dataset item and helps track content changes across different crawls. 
+For instance, when working with the Website Content Crawler, you can use the URL as a unique identifier.
 
 ```json
 {
@@ -160,14 +165,16 @@ For instance, when you are working with the Website Content Crawler, you can use
 
 #### Delete outdated data
 
-Further, the integration can delete data from Chroma that hasn't been crawled for a specified period. 
-It can happen that data in the Chroma database is outdated, e.g., when a page was removed from the website. 
-But it can also happen that the crawler has missed some pages due to various reasons. 
-It is therefore beneficial to deleted outdated data from Chroma database.
-This is controlled by the `expiredObjectDeletionPeriodDays` setting, where data older than the specified number of days is automatically deleted.
+The integration can also delete data from Chroma that hasn't been crawled for a specified period. 
+This is useful when data in the Chroma database becomes outdated, such as when a page is removed from a website. 
 
-Concrete value of `expiredObjectDeletionPeriodDays` depends on your use case.
-Typically, if a website is crawled every day, the `expiredObjectDeletionPeriodDays` can be set to 7, if you crawl every week, it can be set to 30.
+This is controlled by the `expiredObjectDeletionPeriodDays` setting, which automatically deletes data older than the specified number of days.
+For each crawl, the `last_seen_at` metadata field is updated.
+When a database object has not been seen for more than `expiredObjectDeletionPeriodDays` days, it is deleted.
+
+The specific value of `expiredObjectDeletionPeriodDays` depends on your use case. 
+Typically, if a website is crawled daily, `expiredObjectDeletionPeriodDays` can be set to 7. 
+If you crawl weekly, it can be set to 30.
 
 ```json
 {

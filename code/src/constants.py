@@ -9,6 +9,5 @@ class SupportedVectorStores(str, enum.Enum):
 
 
 class SupportedEmbeddings(str, enum.Enum):
-    open_ai_embeddings = "OpenAIEmbeddings"
-    cohere_embeddings = "CohereEmbeddings"
-    hugging_face_embeddings = "HuggingFaceEmbeddings"
+    openai = "OpenAI"
+    cohere = "Cohere"
