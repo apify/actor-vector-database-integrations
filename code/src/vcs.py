@@ -9,6 +9,7 @@ from langchain_core.vectorstores import VectorStore
 
 from .models.chroma_input_model import ChromaIntegration
 from .models.pinecone_input_model import PineconeIntegration
+from .models.qdrant_input_model import QdrantIntegration
 from .utils import get_chunks_to_delete, get_chunks_to_update
 
 if TYPE_CHECKING:
@@ -17,9 +18,10 @@ if TYPE_CHECKING:
 
     from .vector_stores.chroma import ChromaDatabase
     from .vector_stores.pinecone import PineconeDatabase
+    from .vector_stores.qdrant import QdrantDatabase
 
-    ActorInputsDb: TypeAlias = ChromaIntegration | PineconeIntegration
-    DB: TypeAlias = ChromaDatabase | PineconeDatabase
+    ActorInputsDb: TypeAlias = ChromaIntegration | PineconeIntegration | QdrantIntegration
+    DB: TypeAlias = ChromaDatabase | PineconeDatabase | QdrantDatabase
 
 
 async def get_vector_store(actor_input: ActorInputsDb | None, embeddings: Embeddings) -> DB:
@@ -34,6 +36,11 @@ async def get_vector_store(actor_input: ActorInputsDb | None, embeddings: Embedd
         from .vector_stores.pinecone import PineconeDatabase
 
         return PineconeDatabase(actor_input, embeddings)
+
+    if isinstance(actor_input, QdrantIntegration):
+        from .vector_stores.qdrant import QdrantDatabase
+
+        return QdrantDatabase(actor_input, embeddings)
 
     raise ValueError("Unknown integration type")
 

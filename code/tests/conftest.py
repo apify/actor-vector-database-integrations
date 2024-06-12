@@ -2,30 +2,46 @@ import os
 import time
 
 import pytest
+from constants import VCR_HEADERS_EXCLUDE
 from dotenv import load_dotenv
 from langchain_core.documents import Document
 from langchain_openai.embeddings import OpenAIEmbeddings
-
-from constants import VCR_HEADERS_EXCLUDE
 from models.chroma_input_model import ChromaIntegration
 from models.pinecone_input_model import EmbeddingsProvider, PineconeIntegration
+from models.qdrant_input_model import QdrantIntegration
 from utils import add_item_checksum
 from vector_stores.chroma import ChromaDatabase
 from vector_stores.pinecone import PineconeDatabase
+from vector_stores.qdrant import QdrantDatabase
+from qdrant_client import models
 
 load_dotenv()
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
 INDEX_NAME = "apify-unit-test"
 
-d1 = Document(page_content="Expired->del", metadata={"item_id": "id1", "id": "id1#1", "checksum": "1", "last_seen_at": 0})
-d2 = Document(page_content="Old->not-del", metadata={"item_id": "id2", "id": "id2#2", "checksum": "2", "last_seen_at": 1})
-d3a = Document(page_content="Unchanged->upt-meta", metadata={"item_id": "id3", "id": "id3#3", "checksum": "3", "last_seen_at": 1})
-d3b = Document(page_content="Unchanged->upt-meta", metadata={"item_id": "id3", "id": "id3#3", "checksum": "3", "last_seen_at": 2})
-d4a = Document(page_content="Changed->del", metadata={"item_id": "id4", "id": "id4#4a", "checksum": "4", "last_seen_at": 1})
-d4b = Document(page_content="Changed->del", metadata={"item_id": "id4", "id": "id4#4b", "checksum": "4", "last_seen_at": 1})
-d4c = Document(page_content="Changed->add-new", metadata={"item_id": "id4", "id": "id4#4c", "checksum": "0", "last_seen_at": 2})
-d5 = Document(page_content="New->add", metadata={"item_id": "id5", "id": "id5#5", "checksum": "5", "last_seen_at": 2})
+d1 = Document(
+    page_content="Expired->del", metadata={"item_id": "id1", "id": "00000000-0000-0000-0000-000000000001", "checksum": "1", "last_seen_at": 0}
+)
+d2 = Document(
+    page_content="Old->not-del", metadata={"item_id": "id2", "id": "00000000-0000-0000-0000-000000000002", "checksum": "2", "last_seen_at": 1}
+)
+d3a = Document(
+    page_content="Unchanged->upt-meta", metadata={"item_id": "id3", "id": "00000000-0000-0000-0000-000000000003", "checksum": "3", "last_seen_at": 1}
+)
+d3b = Document(
+    page_content="Unchanged->upt-meta", metadata={"item_id": "id3", "id": "00000000-0000-0000-0000-000000000003", "checksum": "3", "last_seen_at": 2}
+)
+d4a = Document(
+    page_content="Changed->del", metadata={"item_id": "id4", "id": "00000000-0000-0000-0000-00000000004a", "checksum": "4", "last_seen_at": 1}
+)
+d4b = Document(
+    page_content="Changed->del", metadata={"item_id": "id4", "id": "00000000-0000-0000-0000-00000000004b", "checksum": "4", "last_seen_at": 1}
+)
+d4c = Document(
+    page_content="Changed->add-new", metadata={"item_id": "id4", "id": "00000000-0000-0000-0000-00000000004c", "checksum": "0", "last_seen_at": 2}
+)
+d5 = Document(page_content="New->add", metadata={"item_id": "id5", "id": "00000000-0000-0000-0000-000000000005", "checksum": "5", "last_seen_at": 2})
 
 
 @pytest.fixture(scope="function")
@@ -96,6 +112,31 @@ def db_chroma(crawl_1) -> ChromaDatabase:
         r = db.index.get()
         if r["ids"]:
             db.delete(ids=r["ids"])
+
+    delete_all()
+    # Insert initially crawled objects
+    db.add_documents(documents=crawl_1, ids=[d.metadata["id"] for d in crawl_1])
+
+    yield db
+    delete_all()
+
+
+@pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
+@pytest.fixture(scope="function")
+def db_qdrant(crawl_1) -> QdrantDatabase:
+    db = QdrantDatabase(
+        actor_input=QdrantIntegration(
+            qdrantUrl="http://localhost:6333",
+            qdrantCollectionName=INDEX_NAME,
+            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+            embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
+            datasetFields=["text"],
+        ),
+        embeddings=embeddings,
+    )
+
+    def delete_all():
+        db.client.delete(INDEX_NAME, models.Filter(must=[]))
 
     delete_all()
     # Insert initially crawled objects
