@@ -16,7 +16,7 @@ def wait_for_db(sec=3):
     time.sleep(sec)
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 @pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_update_db_with_crawled_data(input_db, crawl_2, request):
@@ -40,7 +40,7 @@ def test_update_db_with_crawled_data(input_db, crawl_2, request):
     assert ID4B in ids_del, f"Expected {ID4B} to be deleted"
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 @pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_delete_updated_data(input_db, crawl_2, request):
@@ -56,7 +56,7 @@ def test_delete_updated_data(input_db, crawl_2, request):
     assert ID4B not in [r.metadata["id"] for r in res], f"Expected {ID4B} to be deleted"
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 @pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_add_newly_crawled_data(input_db, crawl_2, request):
@@ -73,7 +73,7 @@ def test_add_newly_crawled_data(input_db, crawl_2, request):
     assert ID5 in [r.metadata["id"] for r in res], F"Expected {ID5} to be added"
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 @pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_update_metadata_last_seen_at(input_db, crawl_2, request):
@@ -93,7 +93,7 @@ def test_update_metadata_last_seen_at(input_db, crawl_2, request):
     assert next(r for r in res if r.metadata["id"] == ID3).metadata["last_seen_at"] > 1, f"Expected {ID3} to be updated"
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 @pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_deleted_expired_data(input_db, crawl_2, request):

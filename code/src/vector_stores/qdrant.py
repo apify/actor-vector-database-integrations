@@ -4,7 +4,8 @@ from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
 from langchain_qdrant import Qdrant
-from qdrant_client import QdrantClient, models
+from qdrant_client import QdrantClient
+from qdrant_client.models import FieldCondition, Filter, Range
 
 from .base import FailedToConnectToDatabaseError, VectorDbBase
 
@@ -62,11 +63,11 @@ class QdrantDatabase(Qdrant, VectorDbBase):
     def delete_expired(self, expired_ts: int) -> None:
         self.client.delete(
             self.collection_name,
-            models.Filter(
+            Filter(
                 must=[
-                    models.FieldCondition(
+                    FieldCondition(
                         key=f"{self.metadata_payload_key}.last_seen_at",
-                        range=models.Range(
+                        range=Range(
                             lt=expired_ts,
                         ),
                     )
