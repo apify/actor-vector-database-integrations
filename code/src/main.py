@@ -48,7 +48,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
     Actor.log.info("Load Dataset ID %s and extract fields %s", dataset_id, actor_input.datasetFields)
     try:
         dataset_loader = get_dataset_loader(
-            str(actor_input.datasetId),
+            str(dataset_id),
             fields=actor_input.datasetFields,
             meta_object=meta_object,
             meta_fields=meta_fields,
@@ -57,7 +57,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
         documents = [doc for doc in documents if doc.page_content]
         Actor.log.info("Dataset loaded, number of documents: %s", len(documents))
     except Exception as e:
-        await Actor.fail(status_message=f"Failed to load datasets: {e}")
+        await Actor.fail(status_message=f"Failed to load datasetId {dataset_id}: {e}")
         return
 
     documents = add_item_checksum(documents, actor_input.deltaUpdatesPrimaryDatasetFields)  # type: ignore[arg-type]
