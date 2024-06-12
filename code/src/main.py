@@ -48,7 +48,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
     Actor.log.info("Load Dataset ID %s and extract fields %s", dataset_id, actor_input.datasetFields)
     try:
         dataset_loader = get_dataset_loader(
-            str(actor_input.datasetId),
+            str(dataset_id),
             fields=actor_input.datasetFields,
             meta_object=meta_object,
             meta_fields=meta_fields,
@@ -57,7 +57,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
         documents = [doc for doc in documents if doc.page_content]
         Actor.log.info("Dataset loaded, number of documents: %s", len(documents))
     except Exception as e:
-        await Actor.fail(status_message=f"Failed to load datasets: {e}")
+        await Actor.fail(status_message=f"Failed to load datasetId {dataset_id}: {e}")
         return
 
     documents = add_item_checksum(documents, actor_input.deltaUpdatesPrimaryDatasetFields)  # type: ignore[arg-type]
@@ -71,12 +71,16 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
 
     try:
         vcs_: DB = await get_vector_store(actor_input, embeddings)
+
         if actor_input.enableDeltaUpdates:
             expired_days = actor_input.expiredObjectDeletionPeriodDays or 0
             ts_expired = expired_days and int(datetime.now(timezone.utc).timestamp() - expired_days * DAY_IN_SECONDS) or 0
+            Actor.log.info("Update database with crawled data. Delta updates enabled, expired_days: %d, expired_ts.", expired_days, ts_expired)
             update_db_with_crawled_data(vcs_, documents, ts_expired)
         else:
             await vcs_.aadd_documents(documents)
+            Actor.log.info("Added %s new objects to the vector store", len(documents))
+
         await Actor.push_data([doc.dict() for doc in documents])
     except Exception as e:
         msg = f"Database update failed: {e}"
