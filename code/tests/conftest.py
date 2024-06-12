@@ -9,39 +9,33 @@ from langchain_openai.embeddings import OpenAIEmbeddings
 from models.chroma_input_model import ChromaIntegration
 from models.pinecone_input_model import EmbeddingsProvider, PineconeIntegration
 from models.qdrant_input_model import QdrantIntegration
+from qdrant_client.models import Filter
 from utils import add_item_checksum
 from vector_stores.chroma import ChromaDatabase
 from vector_stores.pinecone import PineconeDatabase
 from vector_stores.qdrant import QdrantDatabase
-from qdrant_client import models
 
 load_dotenv()
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
 INDEX_NAME = "apify-unit-test"
 
-d1 = Document(
-    page_content="Expired->del", metadata={"item_id": "id1", "id": "00000000-0000-0000-0000-000000000001", "checksum": "1", "last_seen_at": 0}
-)
-d2 = Document(
-    page_content="Old->not-del", metadata={"item_id": "id2", "id": "00000000-0000-0000-0000-000000000002", "checksum": "2", "last_seen_at": 1}
-)
-d3a = Document(
-    page_content="Unchanged->upt-meta", metadata={"item_id": "id3", "id": "00000000-0000-0000-0000-000000000003", "checksum": "3", "last_seen_at": 1}
-)
-d3b = Document(
-    page_content="Unchanged->upt-meta", metadata={"item_id": "id3", "id": "00000000-0000-0000-0000-000000000003", "checksum": "3", "last_seen_at": 2}
-)
-d4a = Document(
-    page_content="Changed->del", metadata={"item_id": "id4", "id": "00000000-0000-0000-0000-00000000004a", "checksum": "4", "last_seen_at": 1}
-)
-d4b = Document(
-    page_content="Changed->del", metadata={"item_id": "id4", "id": "00000000-0000-0000-0000-00000000004b", "checksum": "4", "last_seen_at": 1}
-)
-d4c = Document(
-    page_content="Changed->add-new", metadata={"item_id": "id4", "id": "00000000-0000-0000-0000-00000000004c", "checksum": "0", "last_seen_at": 2}
-)
-d5 = Document(page_content="New->add", metadata={"item_id": "id5", "id": "00000000-0000-0000-0000-000000000005", "checksum": "5", "last_seen_at": 2})
+ID1 = "00000000-0000-0000-0000-000000000001"
+ID2 = "00000000-0000-0000-0000-000000000002"
+ID3 = "00000000-0000-0000-0000-000000000003"
+ID4A = "00000000-0000-0000-0000-00000000004a"
+ID4B = "00000000-0000-0000-0000-00000000004b"
+ID4C = "00000000-0000-0000-0000-00000000004c"
+ID5 = "00000000-0000-0000-0000-000000000005"
+
+d1 = Document(page_content="Expired->del", metadata={"item_id": "id1", "id": ID1, "checksum": "1", "last_seen_at": 0})
+d2 = Document(page_content="Old->not-del", metadata={"item_id": "id2", "id": ID2, "checksum": "2", "last_seen_at": 1})
+d3a = Document(page_content="Unchanged->upt-meta", metadata={"item_id": "id3", "id": ID3, "checksum": "3", "last_seen_at": 1})
+d3b = Document(page_content="Unchanged->upt-meta", metadata={"item_id": "id3", "id": ID3, "checksum": "3", "last_seen_at": 2})
+d4a = Document(page_content="Changed->del", metadata={"item_id": "id4", "id": ID4A, "checksum": "4", "last_seen_at": 1})
+d4b = Document(page_content="Changed->del", metadata={"item_id": "id4", "id": ID4B, "checksum": "4", "last_seen_at": 1})
+d4c = Document(page_content="Changed->add-new", metadata={"item_id": "id4", "id": ID4C, "checksum": "0", "last_seen_at": 2})
+d5 = Document(page_content="New->add", metadata={"item_id": "id5", "id": ID5, "checksum": "5", "last_seen_at": 2})
 
 
 @pytest.fixture(scope="function")
@@ -136,7 +130,7 @@ def db_qdrant(crawl_1) -> QdrantDatabase:
     )
 
     def delete_all():
-        db.client.delete(INDEX_NAME, models.Filter(must=[]))
+        db.client.delete(INDEX_NAME, Filter(must=[]))
 
     delete_all()
     # Insert initially crawled objects
