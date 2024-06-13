@@ -75,7 +75,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
         if actor_input.enableDeltaUpdates:
             expired_days = actor_input.expiredObjectDeletionPeriodDays or 0
             ts_expired = expired_days and int(datetime.now(timezone.utc).timestamp() - expired_days * DAY_IN_SECONDS) or 0
-            Actor.log.info("Update database with crawled data. Delta updates enabled, expired_days: %d, expired_ts.", expired_days, ts_expired)
+            Actor.log.info("Update database with crawled data. Delta updates enabled, expired_days: %s, expired_ts %s", expired_days, ts_expired)
             update_db_with_crawled_data(vcs_, documents, ts_expired)
         else:
             await vcs_.aadd_documents(documents)

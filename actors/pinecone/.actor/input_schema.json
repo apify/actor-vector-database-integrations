@@ -55,7 +55,6 @@
       "editor": "stringList",
       "sectionCaption": "Dataset settings"
     },
-
     "metadataDatasetFields": {
       "title": "Dataset fields to select from the dataset and store as metadata in the database",
       "type": "object",
