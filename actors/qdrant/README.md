@@ -14,11 +14,11 @@ For instance, if you are using the [Website Content Crawler](https://apify.com/a
 It uses [LangChain](https://www.langchain.com/) to compute vector embeddings and interact with [Qdrant](https://www.qdrant.tech/).
 
 1. Retrieve a dataset as output from an Actor
-2. [Optional] Split text data into chunks using `langchain`'s `RecursiveCharacterTextSplitter`
+2. _[Optional]_ Split text data into chunks using `langchain`'s `RecursiveCharacterTextSplitter`
 (enable/disable using `performChunking` and specify `chunkSize`, `chunkOverlap`)
-3. [Optional] Update only changed data in Qdrant (enable/disable using `enableDeltaUpdates`)
+3. _[Optional]_ Update only changed data in Pinecone (enable/disable using `enableDeltaUpdates`)
 4. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
-5. Save data into `Qdrant`
+5. Save data into the database
 
 ## Before you start
 
