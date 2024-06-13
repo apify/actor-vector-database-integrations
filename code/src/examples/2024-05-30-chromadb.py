@@ -12,14 +12,15 @@ Run as a module:
 """
 
 import asyncio
+import os
 
 from dotenv import load_dotenv
 from langchain_openai.embeddings import OpenAIEmbeddings
 
+from .data_examples import crawl_1, crawl_2, expected_results
 from ..models.chroma_input_model import ChromaIntegration
 from ..models.pinecone_input_model import EmbeddingsProvider
 from ..vcs import compare_crawled_data_with_db, get_vector_store
-from .data_examples import crawl_1, crawl_2, expected_results
 
 load_dotenv()
 CHROMA_COLLECTION_NAME = "apify"
@@ -34,6 +35,7 @@ db = asyncio.run(
             chromaCollectionName=CHROMA_COLLECTION_NAME,
             chromaClientHost="localhost",
             embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+            embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],
         ),
         embeddings=embeddings,
