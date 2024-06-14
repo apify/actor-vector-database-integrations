@@ -141,5 +141,5 @@ def add_item_checksum(items: list[Document], dataset_fields_to_item_id: list[str
 def add_chunk_id(chunks: list[Document]) -> list[Document]:
     """For every chunk (document stored in vector db) add id to metadata."""
     for d in chunks:
-        d.metadata["id"] = d.metadata.get("id", uuid4().hex)
+        d.metadata["id"] = d.metadata.get("id", uuid4())
     return chunks

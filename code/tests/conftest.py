@@ -1,32 +1,32 @@
+from __future__ import annotations
+
 import os
 import time
 
 import pytest
-from constants import VCR_HEADERS_EXCLUDE
 from dotenv import load_dotenv
 from langchain_core.documents import Document
 from langchain_openai.embeddings import OpenAIEmbeddings
-from models.chroma_input_model import ChromaIntegration
-from models.pinecone_input_model import EmbeddingsProvider, PineconeIntegration
-from models.qdrant_input_model import QdrantIntegration
-from qdrant_client.models import Filter
-from utils import add_item_checksum
-from vector_stores.chroma import ChromaDatabase
-from vector_stores.pinecone import PineconeDatabase
-from vector_stores.qdrant import QdrantDatabase
+from models.chroma_input_model import ChromaIntegration  # type: ignore[import]
+from models.pinecone_input_model import EmbeddingsProvider, PineconeIntegration  # type: ignore[import]
+from models.qdrant_input_model import QdrantIntegration  # type: ignore[import]
+from utils import add_item_checksum  # type: ignore[import]
+from vector_stores.chroma import ChromaDatabase  # type: ignore[import]
+from vector_stores.pinecone import PineconeDatabase  # type: ignore[import]
+from vector_stores.qdrant import QdrantDatabase  # type: ignore[import]
 
 load_dotenv()
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
 INDEX_NAME = "apify-unit-test"
 
-ID1 = "00000000-0000-0000-0000-000000000001"
-ID2 = "00000000-0000-0000-0000-000000000002"
-ID3 = "00000000-0000-0000-0000-000000000003"
-ID4A = "00000000-0000-0000-0000-00000000004a"
-ID4B = "00000000-0000-0000-0000-00000000004b"
-ID4C = "00000000-0000-0000-0000-00000000004c"
-ID5 = "00000000-0000-0000-0000-000000000005"
+UUID = "00000000-0000-0000-0000-0000000000"
+ID1 = f"{UUID}10"
+ID2 = f"{UUID}20"
+ID3 = f"{UUID}30"
+ID4A, ID4B, ID4C = f"{UUID}4a", f"{UUID}4b", f"{UUID}4c"
+ID5A, ID5B, ID5C = f"{UUID}5a", f"{UUID}5b", f"{UUID}5c"
+ID6 = f"{UUID}60"
 
 d1 = Document(page_content="Expired->del", metadata={"item_id": "id1", "id": ID1, "checksum": "1", "last_seen_at": 0})
 d2 = Document(page_content="Old->not-del", metadata={"item_id": "id2", "id": ID2, "checksum": "2", "last_seen_at": 1})
@@ -34,34 +34,36 @@ d3a = Document(page_content="Unchanged->upt-meta", metadata={"item_id": "id3", "
 d3b = Document(page_content="Unchanged->upt-meta", metadata={"item_id": "id3", "id": ID3, "checksum": "3", "last_seen_at": 2})
 d4a = Document(page_content="Changed->del", metadata={"item_id": "id4", "id": ID4A, "checksum": "4", "last_seen_at": 1})
 d4b = Document(page_content="Changed->del", metadata={"item_id": "id4", "id": ID4B, "checksum": "4", "last_seen_at": 1})
-d4c = Document(page_content="Changed->add-new", metadata={"item_id": "id4", "id": ID4C, "checksum": "0", "last_seen_at": 2})
-d5 = Document(page_content="New->add", metadata={"item_id": "id5", "id": ID5, "checksum": "5", "last_seen_at": 2})
+d4c = Document(page_content="Changed->add-new", metadata={"item_id": "id4", "id": ID4C, "checksum": "4c", "last_seen_at": 2})
+d5a = Document(page_content="Changed->del", metadata={"item_id": "id5", "id": ID5A, "checksum": "5", "last_seen_at": 1})
+d5b = Document(page_content="Changed->add-new", metadata={"item_id": "id5", "id": ID5B, "checksum": "5bc", "last_seen_at": 2})
+d5c = Document(page_content="Changed->add-new", metadata={"item_id": "id5", "id": ID5C, "checksum": "5bc", "last_seen_at": 2})
+d6 = Document(page_content="New->add", metadata={"item_id": "id5", "id": ID6, "checksum": "6", "last_seen_at": 2})
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def crawl_1() -> list[Document]:
-    return [d1, d2, d3a, d4a, d4b]
+    return [d1, d2, d3a, d4a, d4b, d5a]
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def crawl_2() -> list[Document]:
-    return [d3b, d4c, d5]
+    return [d3b, d4c, d5b, d5c, d6]
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def expected_results() -> list[Document]:
-    return [d2, d3b, d4c, d5]
+    return [d2, d3b, d4c, d5b, d5c, d6]
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def documents() -> list[Document]:
     d = Document(page_content="Content", metadata={"url": "https://url1.com"})
     return add_item_checksum([d], ["url"])
 
 
-@pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
-@pytest.fixture(scope="function")
-def db_pinecone(crawl_1) -> PineconeDatabase:
+@pytest.fixture()
+def db_pinecone(crawl_1: list[Document]) -> PineconeDatabase:
     db = PineconeDatabase(
         actor_input=PineconeIntegration(
             pineconeIndexName=INDEX_NAME,
@@ -72,28 +74,25 @@ def db_pinecone(crawl_1) -> PineconeDatabase:
         ),
         embeddings=embeddings,
     )
+    # Data freshness - Pinecone is eventually consistent, so there can be a slight delay before new or changed records are visible to queries.
+    db.unit_test_wait_for_index = 10
 
-    def delete_all():
-        if r := list(db.index.list(prefix="id")):
-            db.delete(ids=r)
-
-    delete_all()
+    db.delete_all()
     # Insert initially crawled objects
     db.add_documents(documents=crawl_1, ids=[d.metadata["id"] for d in crawl_1])
-    # Data freshness -  Pinecone is eventually consistent, so there can be a slight delay before new or changed records are visible to queries.
-    time.sleep(5)
+    time.sleep(db.unit_test_wait_for_index)
 
     yield db
 
-    delete_all()
+    db.delete_all()
+    time.sleep(db.unit_test_wait_for_index)
 
 
-@pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
-@pytest.fixture(scope="function")
-def db_chroma(crawl_1) -> ChromaDatabase:
+@pytest.fixture()
+def db_chroma(crawl_1: list[Document]) -> ChromaDatabase:
     db = ChromaDatabase(
         actor_input=ChromaIntegration(
-            chromaClientHost="localhost",
+            chromaClientHost=os.getenv("CHROMA_CLIENT_HOST"),
             embeddingsProvider=EmbeddingsProvider.OpenAI.value,
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],
@@ -102,25 +101,22 @@ def db_chroma(crawl_1) -> ChromaDatabase:
         embeddings=embeddings,
     )
 
-    def delete_all():
-        r = db.index.get()
-        if r["ids"]:
-            db.delete(ids=r["ids"])
+    db.unit_test_wait_for_index = 0
 
-    delete_all()
+    db.delete_all()
     # Insert initially crawled objects
     db.add_documents(documents=crawl_1, ids=[d.metadata["id"] for d in crawl_1])
 
     yield db
-    delete_all()
+
+    db.delete_all()
 
 
-@pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
-@pytest.fixture(scope="function")
-def db_qdrant(crawl_1) -> QdrantDatabase:
+@pytest.fixture()
+def db_qdrant(crawl_1: list[Document]) -> QdrantDatabase:
     db = QdrantDatabase(
         actor_input=QdrantIntegration(
-            qdrantUrl="http://localhost:6333",
+            qdrantUrl=os.getenv("QDRANT_URL"),
             qdrantCollectionName=INDEX_NAME,
             embeddingsProvider=EmbeddingsProvider.OpenAI.value,
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
@@ -129,12 +125,12 @@ def db_qdrant(crawl_1) -> QdrantDatabase:
         embeddings=embeddings,
     )
 
-    def delete_all():
-        db.client.delete(INDEX_NAME, Filter(must=[]))
+    db.unit_test_wait_for_index = 0
 
-    delete_all()
+    db.delete_all()
     # Insert initially crawled objects
     db.add_documents(documents=crawl_1, ids=[d.metadata["id"] for d in crawl_1])
 
     yield db
-    delete_all()
+
+    db.delete_all()

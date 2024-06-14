@@ -46,6 +46,12 @@ class PineconeDatabase(PineconeVectorStore, VectorDbBase):
         res = self.search_by_vector(self.dummy_vector, filter_={"last_seen_at": {"$lt": expired_ts}})
         self.delete(ids=[d.metadata["id"] for d in res])
 
+    def delete_all(self) -> None:
+        # Fist, get all object and then delete them
+        # We can use delete_all flag but that is raising 404 exception if namespace is not found
+        if r := list(self.index.list(prefix="")):
+            self.delete(ids=r)
+
     def search_by_vector(self, vector: list[float], k: int = 10_000, filter_: dict | None = None) -> list[Document]:
         res = self.similarity_search_by_vector_with_score(vector, k=k, filter=filter_)
         return [r for r, _ in res]

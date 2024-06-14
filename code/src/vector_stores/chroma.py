@@ -58,5 +58,10 @@ class ChromaDatabase(Chroma, VectorDbBase):
     def delete_expired(self, expired_ts: int) -> None:
         self.index.delete(where={"last_seen_at": {"$lt": expired_ts}})  # type: ignore[dict-item]
 
+    def delete_all(self) -> None:
+        r = self.index.get()
+        if r["ids"]:
+            self.delete(ids=r["ids"])
+
     def search_by_vector(self, vector: list[float], k: int = 1_000_000, filter_: dict | None = None) -> list[Document]:
         return self.similarity_search_by_vector(vector, k=k, filter=filter_)

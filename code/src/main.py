@@ -8,10 +8,10 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from .emb import get_embeddings
 from .utils import DAY_IN_SECONDS, add_chunk_id, add_item_checksum, get_dataset_loader
-from .vcs import get_vector_store, update_db_with_crawled_data
+from .vcs import get_vector_database, update_db_with_crawled_data
 
 if TYPE_CHECKING:
-    from .vcs import DB, ActorInputsDb
+    from ._types import ActorInputsDb, VectorDb
 
 
 async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
@@ -70,7 +70,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
     documents = add_chunk_id(documents)
 
     try:
-        vcs_: DB = await get_vector_store(actor_input, embeddings)
+        vcs_: VectorDb = await get_vector_database(actor_input, embeddings)
 
         if actor_input.enableDeltaUpdates:
             expired_days = actor_input.expiredObjectDeletionPeriodDays or 0
