@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, TypeAlias
+from typing import TYPE_CHECKING
 
 from apify import Actor
 from langchain_core.documents import Document
@@ -16,15 +16,10 @@ if TYPE_CHECKING:
     from langchain.vectorstores import VectorStore
     from langchain_core.embeddings import Embeddings
 
-    from .vector_stores.chroma import ChromaDatabase
-    from .vector_stores.pinecone import PineconeDatabase
-    from .vector_stores.qdrant import QdrantDatabase
-
-    ActorInputsDb: TypeAlias = ChromaIntegration | PineconeIntegration | QdrantIntegration
-    DB: TypeAlias = ChromaDatabase | PineconeDatabase | QdrantDatabase
+    from ._types import ActorInputsDb, VectorDb
 
 
-async def get_vector_store(actor_input: ActorInputsDb | None, embeddings: Embeddings) -> DB:
+async def get_vector_database(actor_input: ActorInputsDb | None, embeddings: Embeddings) -> VectorDb:
     """Get database based on the integration type."""
 
     if isinstance(actor_input, ChromaIntegration):
@@ -45,7 +40,7 @@ async def get_vector_store(actor_input: ActorInputsDb | None, embeddings: Embedd
     raise ValueError("Unknown integration type")
 
 
-def update_db_with_crawled_data(vector_store: DB, documents: list[Document], ts_expired: int) -> None:
+def update_db_with_crawled_data(vector_store: VectorDb, documents: list[Document], ts_expired: int) -> None:
     """Update the database with new crawled data."""
 
     data_add, ids_update_last_seen, ids_del = compare_crawled_data_with_db(vector_store, documents)
@@ -73,7 +68,7 @@ def update_db_with_crawled_data(vector_store: DB, documents: list[Document], ts_
         vector_store.delete_expired(ts_expired)
 
 
-def compare_crawled_data_with_db(vector_store: DB, data: list[Document]) -> tuple[list[Document], list[str], list[str]]:
+def compare_crawled_data_with_db(vector_store: VectorDb, data: list[Document]) -> tuple[list[Document], list[str], list[str]]:
     """Compare current crawled data with the data in the database. Return data to add, delete and update.
 
     New data is added

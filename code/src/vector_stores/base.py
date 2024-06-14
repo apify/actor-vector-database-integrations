@@ -12,6 +12,9 @@ class FailedToConnectToDatabaseError(Exception):
 
 
 class VectorDbBase(ABC):
+    # only for testing purposes (to wait for the index to be updated, e.g. in Pinecone)
+    unit_test_wait_for_index = 0
+
     @abstractmethod
     def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:
         """Update last_seen_at field in the database."""
@@ -19,6 +22,10 @@ class VectorDbBase(ABC):
     @abstractmethod
     def delete_expired(self, expired_ts: int) -> None:
         """Delete documents that are older than the ts_expired timestamp."""
+
+    @abstractmethod
+    def delete_all(self) -> None:
+        """Delete all documents from the database."""
 
     @abstractmethod
     async def is_connected(self) -> bool:

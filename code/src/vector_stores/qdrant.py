@@ -75,5 +75,8 @@ class QdrantDatabase(Qdrant, VectorDbBase):
             ),
         )
 
+    def delete_all(self) -> None:
+        self.client.delete(self.collection_name, Filter(must=[]))
+
     def search_by_vector(self, vector: list[float], k: int = 10_000, filter_: dict | None = None) -> list[Document]:
         return self.similarity_search_by_vector(embedding=vector, k=k, filter=filter_)
