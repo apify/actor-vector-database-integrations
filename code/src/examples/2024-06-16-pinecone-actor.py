@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 
 load_dotenv("../../.env")
 
-# Load environment variables from .env file or specify them here (see .env.example)
+# Load environment variables from .env file or specify them here
 APIFY_API_TOKEN = os.getenv("APIFY_API_TOKEN") or "YOUR-APIFY-TOKEN"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or "YOUR-OPENAI-API-KEY"
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY") or "YOUR-PINECONE-API-KEY"
