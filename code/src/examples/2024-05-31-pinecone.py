@@ -23,7 +23,7 @@ from ..vcs import compare_crawled_data_with_db
 from ..vector_stores.pinecone import PineconeDatabase
 
 load_dotenv()
-PINECONE_INDEX_NAME = "apify-unit-test"
+PINECONE_INDEX_NAME = "apify"
 
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
