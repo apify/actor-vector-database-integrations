@@ -7,7 +7,7 @@ from langchain_qdrant import Qdrant
 from qdrant_client import QdrantClient
 from qdrant_client.models import FieldCondition, Filter, Range
 
-from .base import FailedToConnectToDatabaseError, VectorDbBase
+from .base import VectorDbBase
 
 if TYPE_CHECKING:
     from langchain_core.documents import Document
@@ -18,20 +18,18 @@ if TYPE_CHECKING:
 
 class QdrantDatabase(Qdrant, VectorDbBase):
     def __init__(self, actor_input: QdrantIntegration, embeddings: Embeddings) -> None:
-        try:
-            if actor_input.qdrantAutoCreateCollection:
-                # The collection is created if it doesn't exist
-                # The text passed is used to determine the dimension of the vector
-                # This method is usually called internally by Qdrant#from_documents and Qdrant#from_texts
-                Qdrant.construct_instance(
-                    ["<dummy-text>"],
-                    embedding=embeddings,
-                    url=actor_input.qdrantUrl,
-                    api_key=actor_input.qdrantApiKey,
-                    collection_name=actor_input.qdrantCollectionName,
-                )
-        except Exception as e:
-            raise FailedToConnectToDatabaseError("Failed to connect to Qdrant") from e
+
+        if actor_input.qdrantAutoCreateCollection:
+            # The collection is created if it doesn't exist
+            # The text passed is used to determine the dimension of the vector
+            # This method is usually called internally by Qdrant#from_documents and Qdrant#from_texts
+            Qdrant.construct_instance(
+                ["<dummy-text>"],
+                embedding=embeddings,
+                url=actor_input.qdrantUrl,
+                api_key=actor_input.qdrantApiKey,
+                collection_name=actor_input.qdrantCollectionName,
+            )
 
         client = QdrantClient(url=actor_input.qdrantUrl, api_key=actor_input.qdrantApiKey)
         super().__init__(client=client, collection_name=actor_input.qdrantCollectionName, embeddings=embeddings)
