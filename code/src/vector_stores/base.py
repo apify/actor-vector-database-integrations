@@ -7,10 +7,6 @@ if TYPE_CHECKING:
     from langchain_core.documents import Document
 
 
-class FailedToConnectToDatabaseError(Exception):
-    """Failed to connect to a vector database."""
-
-
 class VectorDbBase(ABC):
     # only for testing purposes (to wait for the index to be updated, e.g. in Pinecone)
     unit_test_wait_for_index = 0
