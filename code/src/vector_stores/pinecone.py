@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from langchain_pinecone import PineconeVectorStore
 from pinecone import Pinecone as PineconeClient  # type: ignore[import-untyped]
 
-from .base import FailedToConnectToDatabaseError, VectorDbBase
+from .base import VectorDbBase
 
 if TYPE_CHECKING:
     from langchain_core.documents import Document
@@ -20,13 +20,11 @@ PINECONE_SOURCE_TAG = "apify"
 
 class PineconeDatabase(PineconeVectorStore, VectorDbBase):
     def __init__(self, actor_input: PineconeIntegration, embeddings: Embeddings) -> None:
-        try:
-            self.client = PineconeClient(api_key=actor_input.pineconeApiKey, source_tag=PINECONE_SOURCE_TAG)
-            super().__init__(index=self.client.Index(actor_input.pineconeIndexName), embedding=embeddings)
-            self.index = self.client.Index(actor_input.pineconeIndexName)
-            self._dummy_vector: list[float] = []
-        except Exception as e:
-            raise FailedToConnectToDatabaseError("Failed to connect to Pinecone") from e
+
+        self.client = PineconeClient(api_key=actor_input.pineconeApiKey, source_tag=PINECONE_SOURCE_TAG)
+        super().__init__(index=self.client.Index(actor_input.pineconeIndexName), embedding=embeddings)
+        self.index = self.client.Index(actor_input.pineconeIndexName)
+        self._dummy_vector: list[float] = []
 
     @property
     def dummy_vector(self) -> list[float]:
