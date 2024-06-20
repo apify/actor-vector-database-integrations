@@ -109,7 +109,7 @@
       "description": "When set to true, the text will be divided into smaller chunks based on the settings provided below. Proper chunking helps optimize retrieval and ensures accurate and efficient responses.",
       "default": false,
       "type": "boolean",
-        "sectionCaption": "Text chunking settings"
+      "sectionCaption": "Text chunking settings"
     },
     "chunkSize": {
       "title": "Maximum chunk size",

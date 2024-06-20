@@ -41,7 +41,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
         )
     except Exception as e:
         Actor.log.error(e)
-        await Actor.fail(status_message=f"Failed to get embeddings: {e}")
+        await Actor.fail(status_message=f"Failed to get embeddings: {e}. Ensure that the configuration is correct.")
         return
 
     # Add parameters related to chunking to every dataset item to be able to update DB when chunkSize, chunkOverlap or performChunking changes
@@ -109,7 +109,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
         Actor.log.error(e)
         # I had to create a msg variable to avoid a ruff lint error S608 (SQL Injection)
         msg = (
-            "Update operation failed. Please ensure the following:"
+            "Failed to update database. Please ensure the following:"
             "1. Database is configured properly."
             "2. The vector dimension of your embedding model matches the one set up in the database."
             "Error message:"
