@@ -23,9 +23,11 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
     payload = payload.get("payload", {})
     resource = payload.get("resource", {})
     if not (dataset_id := resource.get("defaultDatasetId") or actor_input.datasetId):
-        msg = """The dataset ID is missing. Please ensure the following:
-               1. It is provided in the payload when this integration is used with other Actors, such as the Website Content Crawler.
-               2. It is manually specified by entering 'datasetId' in the Actor's input screen."""
+        msg = (
+            "The dataset ID is missing. Please ensure the following:"
+            "1. It is provided in the payload when this integration is used with other Actors, such as the Website Content Crawler."
+            "2. It is manually specified by entering 'datasetId' in the Actor's input screen."
+        )
         Actor.log.error(msg)
         await Actor.fail(status_message=msg)
         return
@@ -106,8 +108,10 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
     except Exception as e:
         Actor.log.error(e)
         # I had to create a msg variable to avoid a ruff lint error S608 (SQL Injection)
-        msg = """Update operation failed. Please ensure the following: "
-            "1. Database is configured properly. "
+        msg = (
+            "Update operation failed. Please ensure the following:"
+            "1. Database is configured properly."
             "2. The vector dimension of your embedding model matches the one set up in the database."
-            " Error message:"""
+            "Error message:"
+        )
         await Actor.fail(status_message=f"{msg} {e}")
