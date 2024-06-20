@@ -105,4 +105,9 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
         await Actor.push_data([doc.dict() for doc in documents])
     except Exception as e:
         Actor.log.error(e)
-        await Actor.fail(status_message=f"Failed to update database with crawled data: {e}")
+        # I had to create a msg variable to avoid a ruff lint error S608 (SQL Injection)
+        msg = """Update operation failed. Please ensure the following: "
+            "1. Database is configured properly. "
+            "2. The vector dimension of your embedding model matches the one set up in the database."
+            " Error message:"""
+        await Actor.fail(status_message=f"{msg} {e}")
