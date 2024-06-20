@@ -30,8 +30,8 @@
       "sectionCaption": "Embeddings settings"
     },
     "embeddingsConfig": {
-      "title": "Embeddings provider configuration",
-      "description": "LangChain parameters for the embedding class. Typically, you need to provide only the model name. For instance, for OpenAI, set the model name as {\"model\": \"text-embedding-3-small\"}. \n**Ensure that the vector size of your embeddings matches the size of embeddings in the database**.\n - [OpenAI embeddings](https://platform.openai.com/docs/guides/embeddings): e.g. `text-embedding-3-small`, `text-embedding-3-large`, etc.\n- [Cohere embeddings](https://docs.cohere.com/docs/cohere-embed): e.g. `embed-english-v3.0`, `embed-multilingual-light-v3.0`, etc.\n\nRefer to the [LangChain documentation](https://python.langchain.com/v0.2/docs/integrations/text_embedding/) for more details.",
+      "title": "Configuration for embeddings provider",
+      "description": "Configure the parameters for the LangChain embedding class. Key points to consider:\n\n1. Typically, you only need to specify the model name. For example, for OpenAI, set the model name as {\"model\": \"text-embedding-3-small\"}.\n\n2. It's crucial to ensure that the vector size of your embeddings matches the size of embeddings in the database.\n\n3. Here are some examples of embedding models:\n   - [OpenAI](https://platform.openai.com/docs/guides/embeddings): `text-embedding-3-small`, `text-embedding-3-large`, etc.\n   - [Cohere](https://docs.cohere.com/docs/cohere-embed): `embed-english-v3.0`, `embed-multilingual-light-v3.0`, etc.\n\n4. For more details about other parameters, refer to the [LangChain documentation](https://python.langchain.com/v0.2/docs/integrations/text_embedding/).",
       "type": "object",
       "editor": "json"
     },
