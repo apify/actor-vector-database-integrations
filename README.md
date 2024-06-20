@@ -25,3 +25,7 @@ This repository contains Actors for different vector databases.
 - [OpenAI](https://platform.openai.com/docs/guides/embeddings)
 - [Cohere](https://cohere.com/embeddings)
 
+## How to add a new integration?
+
+1. 
+
