@@ -55,6 +55,7 @@ optional = true
 
 [tool.poetry.group.pgvector.dependencies]
 langchain-postgres = "^0.0.8"
+psycopg = {extras = ["binary", "pool"], version = "^3.1.19"}
 psycopg2-binary = "^2.9.9"
 
 [tool.ruff]
