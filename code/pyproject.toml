@@ -50,6 +50,13 @@ optional = true
 [tool.poetry.group.qdrant.dependencies]
 langchain-qdrant = "^0.1.0"
 
+[tool.poetry.group.pgvector]
+optional = true
+
+[tool.poetry.group.pgvector.dependencies]
+langchain-postgres = "^0.0.8"
+psycopg2-binary = "^2.9.9"
+
 [tool.ruff]
 line-length = 150
 exclude = ["src/models/**", "src/examples/**"]

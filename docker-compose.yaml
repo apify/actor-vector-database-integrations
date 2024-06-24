@@ -10,3 +10,11 @@ services:
     image: chromadb/chroma
     ports:
       - "8000:8000"
+
+  pgvector:
+    image: pgvector/pgvector:pg16
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=apify
+    ports:
+      - "5432:5432"

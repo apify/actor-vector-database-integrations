@@ -6,8 +6,9 @@ from typing import TYPE_CHECKING
 from apify import Actor
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+from .constants import DAY_IN_SECONDS
 from .emb import get_embeddings
-from .utils import DAY_IN_SECONDS, add_chunk_id, add_item_checksum, get_dataset_loader
+from .utils import add_chunk_id, add_item_checksum, get_dataset_loader
 from .vcs import get_vector_database, update_db_with_crawled_data
 
 if TYPE_CHECKING:
