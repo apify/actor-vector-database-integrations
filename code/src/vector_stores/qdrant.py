@@ -18,7 +18,6 @@ if TYPE_CHECKING:
 
 class QdrantDatabase(Qdrant, VectorDbBase):
     def __init__(self, actor_input: QdrantIntegration, embeddings: Embeddings) -> None:
-
         if actor_input.qdrantAutoCreateCollection:
             # The collection is created if it doesn't exist
             # The text passed is used to determine the dimension of the vector
@@ -43,6 +42,7 @@ class QdrantDatabase(Qdrant, VectorDbBase):
         return self._dummy_vector
 
     async def is_connected(self) -> bool:
+        # noinspection PyBroadException
         try:
             self.client.get_collections()
         except Exception:

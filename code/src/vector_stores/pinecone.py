@@ -20,7 +20,6 @@ PINECONE_SOURCE_TAG = "apify"
 
 class PineconeDatabase(PineconeVectorStore, VectorDbBase):
     def __init__(self, actor_input: PineconeIntegration, embeddings: Embeddings) -> None:
-
         self.client = PineconeClient(api_key=actor_input.pineconeApiKey, source_tag=PINECONE_SOURCE_TAG)
         super().__init__(index=self.client.Index(actor_input.pineconeIndexName), embedding=embeddings)
         self.index = self.client.Index(actor_input.pineconeIndexName)

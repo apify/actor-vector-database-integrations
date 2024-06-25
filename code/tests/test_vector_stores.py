@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
 import pytest
@@ -17,7 +18,7 @@ if TYPE_CHECKING:
     from src._types import VectorDb
 
 # Database fixtures to test. Fill here the name of the fixtures you want to test
-DATABASE_FIXTURES = ["db_pinecone", "db_chroma", "db_qdrant"]
+DATABASE_FIXTURES = ["db_chroma", "db_pgvector", "db_pinecone", "db_qdrant"]
 
 
 def wait_for_db(sec: int = 3) -> None:
@@ -59,6 +60,9 @@ def test_add_newly_crawled_data(input_db: str, crawl_2: list[Document], request:
 @pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_update_metadata_last_seen_at(input_db: str, crawl_2: list[Document], request: FixtureRequest) -> None:
+    # to test whether the object was updated
+    ts_init = int(datetime.now(timezone.utc).timestamp())
+
     db: VectorDb = request.getfixturevalue(input_db)
 
     res = db.search_by_vector(db.dummy_vector, k=10)
@@ -78,9 +82,11 @@ def test_update_metadata_last_seen_at(input_db: str, crawl_2: list[Document], re
 
     res = db.search_by_vector(db.dummy_vector, k=10)
     assert len(res) == 6, "Expected 6 objects in the database after last_seen update"
-    assert next(r for r in res if r.metadata["id"] == ID3).metadata["last_seen_at"] > 1, f"Expected {ID3} to be updated"
+    assert next(r for r in res if r.metadata["id"] == ID3).metadata["last_seen_at"] >= ts_init, f"Expected {ID3} to be updated"
 
 
+@pytest.mark.integration()
+@pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_delete_updated_data(input_db: str, crawl_2: list[Document], request: FixtureRequest) -> None:
     db: VectorDb = request.getfixturevalue(input_db)

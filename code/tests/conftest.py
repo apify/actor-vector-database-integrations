@@ -7,11 +7,11 @@ import pytest
 from dotenv import load_dotenv
 from langchain_core.documents import Document
 from langchain_openai.embeddings import OpenAIEmbeddings
-from models.chroma_input_model import ChromaIntegration  # type: ignore[import]
-from models.pinecone_input_model import EmbeddingsProvider, PineconeIntegration  # type: ignore[import]
-from models.qdrant_input_model import QdrantIntegration  # type: ignore[import]
+from models import ChromaIntegration, PgvectorIntegration, PineconeIntegration, QdrantIntegration  # type: ignore[import]
+from models.pinecone_input_model import EmbeddingsProvider  # type: ignore[import]
 from utils import add_item_checksum  # type: ignore[import]
 from vector_stores.chroma import ChromaDatabase  # type: ignore[import]
+from vector_stores.pgvector import PGVectorDatabase  # type: ignore[import]
 from vector_stores.pinecone import PineconeDatabase  # type: ignore[import]
 from vector_stores.qdrant import QdrantDatabase  # type: ignore[import]
 
@@ -118,6 +118,30 @@ def db_qdrant(crawl_1: list[Document]) -> QdrantDatabase:
         actor_input=QdrantIntegration(
             qdrantUrl=os.getenv("QDRANT_URL"),
             qdrantCollectionName=INDEX_NAME,
+            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+            embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
+            datasetFields=["text"],
+        ),
+        embeddings=embeddings,
+    )
+
+    db.unit_test_wait_for_index = 0
+
+    db.delete_all()
+    # Insert initially crawled objects
+    db.add_documents(documents=crawl_1, ids=[d.metadata["id"] for d in crawl_1])
+
+    yield db
+
+    db.delete_all()
+
+
+@pytest.fixture()
+def db_pgvector(crawl_1: list[Document]) -> PGVectorDatabase:
+    db = PGVectorDatabase(
+        actor_input=PgvectorIntegration(
+            postgresSqlConnectionStr=os.getenv("POSTGRESQL_CONNECTION_STR"),
+            postgresCollectionName=INDEX_NAME,
             embeddingsProvider=EmbeddingsProvider.OpenAI.value,
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],

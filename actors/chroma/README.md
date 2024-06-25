@@ -9,7 +9,7 @@ This approach reduces unnecessary embedding computation and storage operations, 
 💡 **Note**: This Actor is meant to be used together with other Actors' integration sections.
 For instance, if you are using the [Website Content Crawler](https://apify.com/apify/website-content-crawler), you can activate Chroma integration to save web data as vectors to Chroma.
 
-For more information how to leverage vector stores in Apify platform, see [Pinecone integration](https://github.com/HonzaTuron/pinecone) and detailed blog post [what Pinecone is and why you should use it with your LLMs](https://blog.apify.com/what-is-pinecone-why-use-it-with-llms/).
+For more information how to leverage vector stores in Apify platform, see [Pinecone integration](https://github.com/apify/pinecone) and detailed blog post [what Pinecone is and why you should use it with your LLMs](https://blog.apify.com/what-is-pinecone-why-use-it-with-llms/).
 
 ## How does it work?
 
@@ -19,7 +19,7 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 1. Retrieve a dataset as output from an Actor
 2. _[Optional]_ Split text data into chunks using `langchain`'s `RecursiveCharacterTextSplitter`
 (enable/disable using `performChunking` and specify `chunkSize`, `chunkOverlap`)
-3. _[Optional]_ Update only changed data in Pinecone (enable/disable using `enableDeltaUpdates`)
+3. _[Optional]_ Update only changed data in Chroma (enable/disable using `enableDeltaUpdates`)
 4. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
 5. Save data into the database
 
@@ -82,7 +82,7 @@ The configuration consists of three parts: Chroma, embeddings provider, and data
 
 Ensure that the vector size of your embeddings aligns with the configuration of your Chroma database.
 For instance, if you're using the `text-embedding-3-small` model from `OpenAI`, it generates vectors of size `1536`.
-This means your Pinecone index should also be configured to accommodate vectors of the same size, `1536` in this case.
+This means your Chroma index should also be configured to accommodate vectors of the same size, `1536` in this case.
 
 #### Database: Chroma
 ```json
