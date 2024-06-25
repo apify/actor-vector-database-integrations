@@ -1,7 +1,7 @@
 # Change Log
 
 ## 0.0.2 (2024-06-24)
-- Add PGVector integration
+- Add PostgreSQL database integration (PGVector integration)
 
 ## 0.0.1 (2024-06-20)
 - Improved README.md and error messages

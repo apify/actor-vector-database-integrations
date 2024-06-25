@@ -26,7 +26,7 @@ This repository contains Actors for different vector databases.
 - [OpenAI](https://platform.openai.com/docs/guides/embeddings)
 - [Cohere](https://cohere.com/embeddings)
 
-## How to add a new integration (example for PG-Vector)?
+## How to add a new integration (an example for PG-Vector)?
 
 1. Add database to [docker-compose.yml](docker-compose.yaml) for local testing (if the database is available in docker).
 
@@ -40,7 +40,7 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=apify
     ports:
-      - "6024:5432"
+      - "5432:5432"
 ```
 
 1. Add postgres dependency to `pyproject.toml`:
