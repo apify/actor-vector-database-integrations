@@ -25,7 +25,7 @@ from ..vcs import compare_crawled_data_with_db
 from ..vector_stores.pgvector import PGVectorDatabase
 
 load_dotenv()
-PGVECTOR_COLLECTION_NAME = "test-coll"
+PGVECTOR_COLLECTION_NAME = "apify"
 
 POSTGRESQL_CONNECTION_STR = os.getenv("POSTGRESQL_CONNECTION_STR")
 

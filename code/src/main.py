@@ -25,10 +25,14 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
     resource = payload.get("resource", {})
     if not (dataset_id := resource.get("defaultDatasetId") or actor_input.datasetId):
         msg = (
-            "The dataset ID is missing. Please ensure the following:"
-            "1. It is provided in the payload when this integration is used with other Actors, such as the Website Content Crawler."
-            "2. It is manually specified by entering 'datasetId' in the Actor's input screen."
-        )
+            "The `datasetId` is not provided. There are two ways to specify the datasetId:"
+            "1. Automatic Input: If this integration is used with other Actors, such as the Website Content Crawler, the datasetId should be "
+            "automatically passed in the 'payload'. Please check the `Input` payload to ensure the datasetId is included."
+            "2. Manual Input: If you are running this Actor independently, you need to manually specify the 'datasetId'. "
+            "You can do this by entering the dataset ID in the 'Database Settings' section of the Actor's input screen."
+            "Please verify that one of these options is correctly configured to provide the datasetId."
+)
+
         Actor.log.error(msg)
         await Actor.fail(status_message=msg)
         return
@@ -42,7 +46,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
         )
     except Exception as e:
         Actor.log.error(e)
-        await Actor.fail(status_message=f"Failed to get embeddings: {e}. Ensure that the configuration is correct.")
+        await Actor.fail(status_message=f"Failed to get embeddings: {e}. Ensure that the configuration in the Embeddings Settings is correct.")
         return
 
     # Add parameters related to chunking to every dataset item to be able to update DB when chunkSize, chunkOverlap or performChunking changes
@@ -71,7 +75,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
             status_message=f"Failed to load datasetId {dataset_id} due to error: {e}. Ensure the following: "
             f"1. If running this Actor standalone, the dataset should exist. "
             f"2. If this Actor is configured with another Actor (in the integration section), the `datasetId` should be correctly passed. "
-            f"3. If the issue persists, consider creating an issue."
+            f"3. If the problem persists, consider creating an issue."
         )
         return
 
@@ -91,7 +95,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
         await Actor.fail(
             status_message="Failed to connect/get database. Please ensure the following: "
             "1. Database credentials are correct and the database is configure properly. "
-            "2. The vector dimension of your embedding model matches the one set up in the database."
+            "2. The vector dimension of your embedding model in the Actor input (Embedding settings -> model) matches the one set up in the database."
             f" Database error message: {e}"
         )
         return
@@ -112,7 +116,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
         msg = (
             "Failed to update database. Please ensure the following:"
             "1. Database is configured properly."
-            "2. The vector dimension of your embedding model matches the one set up in the database."
+            "2. The vector dimension of your embedding model in the Actor input (Embedding settings -> model) matches the one set up in the database."
             "Error message:"
         )
         await Actor.fail(status_message=f"{msg} {e}")
