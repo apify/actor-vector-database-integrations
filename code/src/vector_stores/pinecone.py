@@ -3,13 +3,13 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
+from langchain_core.documents import Document
 from langchain_pinecone import PineconeVectorStore
 from pinecone import Pinecone as PineconeClient  # type: ignore[import-untyped]
 
 from .base import VectorDbBase
 
 if TYPE_CHECKING:
-    from langchain_core.documents import Document
     from langchain_core.embeddings import Embeddings
 
     from ..models.pinecone_input_model import PineconeIntegration
@@ -34,6 +34,11 @@ class PineconeDatabase(PineconeVectorStore, VectorDbBase):
     async def is_connected(self) -> bool:
         raise NotImplementedError
 
+    def get_by_item_id(self, item_id: str) -> list[Document]:
+        # Pinecone does not support to get objects with filter on metadata. Hence we need to do similarity search
+        results = self.index.query(vector=self.dummy_vector, top_k=10_000, filter={"item_id": item_id}, include_metadata=True)
+        return [Document(page_content="", metadata=d["metadata"] | {"chunk_id": d["id"]}) for d in results["matches"]]
+
     def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:
         last_seen_at = last_seen_at or int(datetime.now(timezone.utc).timestamp())
         for _id in ids:
@@ -41,7 +46,7 @@ class PineconeDatabase(PineconeVectorStore, VectorDbBase):
 
     def delete_expired(self, expired_ts: int) -> None:
         res = self.search_by_vector(self.dummy_vector, filter_={"last_seen_at": {"$lt": expired_ts}})
-        self.delete(ids=[d.metadata["id"] for d in res])
+        self.delete(ids=[d.metadata["chunk_id"] for d in res])
 
     def delete_all(self) -> None:
         # Fist, get all object and then delete them

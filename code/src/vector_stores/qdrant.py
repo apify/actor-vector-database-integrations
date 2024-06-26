@@ -3,14 +3,14 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
+from langchain_core.documents import Document
 from langchain_qdrant import Qdrant
 from qdrant_client import QdrantClient
-from qdrant_client.models import FieldCondition, Filter, Range
+from qdrant_client.models import FieldCondition, Filter, MatchValue, Range
 
 from .base import VectorDbBase
 
 if TYPE_CHECKING:
-    from langchain_core.documents import Document
     from langchain_core.embeddings import Embeddings
 
     from ..models.qdrant_input_model import QdrantIntegration
@@ -49,6 +49,20 @@ class QdrantDatabase(Qdrant, VectorDbBase):
             return False
         else:
             return True
+
+    def get_by_item_id(self, item_id: str) -> list[Document]:
+        """Get all documents with the given item_id.
+
+        Scrolling is not used because the number of documents with the same item_id is expected to be small.
+        """
+
+        results, _ = self.client.scroll(
+            self.collection_name,
+            scroll_filter=Filter(must=[FieldCondition(key=f"{self.metadata_payload_key}.item_id", match=MatchValue(value=item_id))]),
+            with_vectors=False,
+            limit=100_000,
+        )
+        return [Document(page_content="", metadata=d.payload.get("metadata", {}) | {"chunk_id": d.id}) for d in results if d.payload]
 
     def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:
         last_seen_at = last_seen_at or int(datetime.now(timezone.utc).timestamp())

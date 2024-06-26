@@ -7,7 +7,7 @@ services:
       - "6333:6333"
 
   chromadb:
-    image: chromadb/chroma
+    image: chromadb/chroma:0.5.1
     ports:
       - "8000:8000"
 
