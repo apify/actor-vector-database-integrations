@@ -56,7 +56,7 @@ def update_db_with_crawled_data(vector_store: VectorDb, documents: list[Document
 
     # Add new data
     if data_add:
-        vector_store.add_documents(data_add, ids=[d.metadata["id"] for d in data_add])
+        vector_store.add_documents(data_add, ids=[d.metadata["chunk_id"] for d in data_add])
         Actor.log.info("Added %s new objects to the vector store", len(data_add))
 
     # Update metadata data
@@ -82,17 +82,15 @@ def compare_crawled_data_with_db(vector_store: VectorDb, data: list[Document]) -
     ids_delete: set[str] = set()
     ids_update_last_seen: set[str] = set()
 
-    crawled_db = {
-        item_id: vector_store.search_by_vector(vector_store.dummy_vector, filter_={"item_id": item_id})
-        for item_id in {d.metadata["item_id"] for d in data}
-    }
+    crawled_db = {item_id: vector_store.get_by_item_id(item_id) for item_id in {d.metadata["item_id"] for d in data}}
 
     for d in data:
         if res := crawled_db.get(d.metadata["item_id"]):
             if d.metadata["checksum"] in {r.metadata["checksum"] for r in res}:
-                ids_update_last_seen.update({r.metadata["id"]: r for r in res})
+                # Because of weaviate database, we need to use chunk_id instead of id
+                ids_update_last_seen.update({r.metadata.get("id") or r.metadata.get("chunk_id", ""): r for r in res})
             else:
-                ids_delete.update({r.metadata["id"]: r for r in res})
+                ids_delete.update({r.metadata.get("id") or r.metadata.get("chunk_id", ""): r for r in res})
                 data_add.append(d)
         else:
             data_add.append(d)

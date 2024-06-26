@@ -14,10 +14,10 @@ Run as a module:
 import os
 
 from dotenv import load_dotenv
-from langchain_core.documents import Document
 from langchain_openai.embeddings import OpenAIEmbeddings
 
 from models.qdrant_input_model import QdrantIntegration
+from .data_examples_uuid import crawl_1
 from ..models.pinecone_input_model import EmbeddingsProvider
 from ..vector_stores.qdrant import QdrantDatabase
 
@@ -40,4 +40,12 @@ db = QdrantDatabase(
     embeddings=embeddings,
 )
 
-r = db.add_documents([Document(page_content="dummy")], ids=["dummy"])
+if DROP_AND_INSERT:
+    db.delete_all()
+    # Insert objects
+    inserted = db.add_documents(documents=crawl_1, ids=[d.metadata["chunk_id"] for d in crawl_1])
+    print("Inserted ids:", inserted)
+
+r = db.similarity_search("text", k=100)
+print("Search results:", r)
+print("Search results count:", len(r))

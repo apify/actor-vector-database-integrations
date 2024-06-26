@@ -12,6 +12,10 @@ class VectorDbBase(ABC):
     unit_test_wait_for_index = 0
 
     @abstractmethod
+    def get_by_item_id(self, item_id: str) -> list[Document]:
+        """Get documents by item_id."""
+
+    @abstractmethod
     def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:
         """Update last_seen_at field in the database."""
 

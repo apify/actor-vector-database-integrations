@@ -9,7 +9,7 @@ from uuid import uuid4
 from langchain_community.document_loaders import ApifyDatasetLoader
 from langchain_core.documents import Document
 
-EXCLUDE_KEYS_FROM_CHECKSUM = {"metadata": {"id", "checksum", "last_seen_at", "item_id"}}
+EXCLUDE_KEYS_FROM_CHECKSUM = {"metadata": {"chunk_id", "id", "checksum", "last_seen_at", "item_id"}}
 DAY_IN_SECONDS = 24 * 3600
 
 
@@ -139,7 +139,10 @@ def add_item_checksum(items: list[Document], dataset_fields_to_item_id: list[str
 
 
 def add_chunk_id(chunks: list[Document]) -> list[Document]:
-    """For every chunk (document stored in vector db) add id to metadata."""
+    """For every chunk (document stored in vector db) add chunk_id to metadata.
+
+    The chunk_id is a unique identifier for each chunk and is not required but it is better to keep it in metadata.
+    """
     for d in chunks:
-        d.metadata["id"] = d.metadata.get("id", str(uuid4()))
+        d.metadata["chunk_id"] = d.metadata.get("chunk_id", str(uuid4()))
     return chunks

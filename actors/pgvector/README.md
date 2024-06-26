@@ -205,6 +205,12 @@ You can connect to the database using psql with the following command:
 ```bash
 psql -h localhost -p 5324 -U postgres -d apify
 ```
+
+Or you can use [PGAdmin](https://www.pgadmin.org/) to connect to the database.
+```bash
+docker run -e PGADMIN_DEFAULT_EMAIL=*@apify.com -e PGADMIN_DEFAULT_PASSWORD=root -p 8000:80 dpage/pgadmin4
+```
+
 LangChain uses the concept of collections to store data. 
 Collections help to separate data for different projects or use cases. 
 For each collection, two tables are created: `langchain_pg_embedding` and `langchain_pg_collection`. 
