@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any
 
+from langchain_core.documents import Document
 from langchain_postgres import PGVector
 from sqlalchemy import delete, text, update
 from sqlalchemy.sql.expression import literal
@@ -10,7 +11,6 @@ from sqlalchemy.sql.expression import literal
 from .base import VectorDbBase
 
 if TYPE_CHECKING:
-    from langchain_core.documents import Document
     from langchain_core.embeddings import Embeddings
 
     from ..models.pgvector_input_model import PgvectorIntegration
@@ -91,6 +91,20 @@ class PGVectorDatabase(PGVector, VectorDbBase):
 
             ids = session.query(self.EmbeddingStore.id).filter(self.EmbeddingStore.collection_id == collection.uuid).all()
             return [r[0] for r in ids]
+
+    def get_by_item_id(self, item_id: str) -> list[Document]:
+        with self._make_sync_session() as session:
+            if not (collection := self.get_collection(session)):
+                raise ValueError("Collection not found")
+
+            results = (
+                session.query(self.EmbeddingStore)
+                .where(self.EmbeddingStore.collection_id == collection.uuid)
+                .where(text("(cmetadata ->> 'item_id') = :value").bindparams(value=item_id))
+                .all()
+            )
+
+        return [Document(page_content="", metadata=r.cmetadata | {"chunk_id": r.id}) for r in results]
 
     def delete_all(self) -> None:
         """Delete all documents from the database.

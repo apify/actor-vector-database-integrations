@@ -28,17 +28,20 @@ ID4A, ID4B, ID4C = f"{UUID}4a", f"{UUID}4b", f"{UUID}4c"
 ID5A, ID5B, ID5C = f"{UUID}5a", f"{UUID}5b", f"{UUID}5c"
 ID6 = f"{UUID}60"
 
-d1 = Document(page_content="Expired->del", metadata={"item_id": "id1", "id": ID1, "checksum": "1", "last_seen_at": 0})
-d2 = Document(page_content="Old->not-del", metadata={"item_id": "id2", "id": ID2, "checksum": "2", "last_seen_at": 1})
-d3a = Document(page_content="Unchanged->upt-meta", metadata={"item_id": "id3", "id": ID3, "checksum": "3", "last_seen_at": 1})
-d3b = Document(page_content="Unchanged->upt-meta", metadata={"item_id": "id3", "id": ID3, "checksum": "3", "last_seen_at": 2})
-d4a = Document(page_content="Changed->del", metadata={"item_id": "id4", "id": ID4A, "checksum": "4", "last_seen_at": 1})
-d4b = Document(page_content="Changed->del", metadata={"item_id": "id4", "id": ID4B, "checksum": "4", "last_seen_at": 1})
-d4c = Document(page_content="Changed->add-new", metadata={"item_id": "id4", "id": ID4C, "checksum": "4c", "last_seen_at": 2})
-d5a = Document(page_content="Changed->del", metadata={"item_id": "id5", "id": ID5A, "checksum": "5", "last_seen_at": 1})
-d5b = Document(page_content="Changed->add-new", metadata={"item_id": "id5", "id": ID5B, "checksum": "5bc", "last_seen_at": 2})
-d5c = Document(page_content="Changed->add-new", metadata={"item_id": "id5", "id": ID5C, "checksum": "5bc", "last_seen_at": 2})
-d6 = Document(page_content="New->add", metadata={"item_id": "id5", "id": ID6, "checksum": "6", "last_seen_at": 2})
+ITEM_ID1 = "id1"
+ITEM_ID4 = "id4"
+
+d1 = Document(page_content="Expired->del", metadata={"item_id": ITEM_ID1, "chunk_id": ID1, "checksum": "1", "last_seen_at": 0})
+d2 = Document(page_content="Old->not-del", metadata={"item_id": "id2", "chunk_id": ID2, "checksum": "2", "last_seen_at": 1})
+d3a = Document(page_content="Unchanged->upt-meta", metadata={"item_id": "id3", "chunk_id": ID3, "checksum": "3", "last_seen_at": 1})
+d3b = Document(page_content="Unchanged->upt-meta", metadata={"item_id": "id3", "chunk_id": ID3, "checksum": "3", "last_seen_at": 2})
+d4a = Document(page_content="Changed->del", metadata={"item_id": ITEM_ID4, "chunk_id": ID4A, "checksum": "4", "last_seen_at": 1})
+d4b = Document(page_content="Changed->del", metadata={"item_id": ITEM_ID4, "chunk_id": ID4B, "checksum": "4", "last_seen_at": 1})
+d4c = Document(page_content="Changed->add-new", metadata={"item_id": ITEM_ID4, "chunk_id": ID4C, "checksum": "4c", "last_seen_at": 2})
+d5a = Document(page_content="Changed->del", metadata={"item_id": "id5", "chunk_id": ID5A, "checksum": "5", "last_seen_at": 1})
+d5b = Document(page_content="Changed->add-new", metadata={"item_id": "id5", "chunk_id": ID5B, "checksum": "5bc", "last_seen_at": 2})
+d5c = Document(page_content="Changed->add-new", metadata={"item_id": "id5", "chunk_id": ID5C, "checksum": "5bc", "last_seen_at": 2})
+d6 = Document(page_content="New->add", metadata={"item_id": "id5", "chunk_id": ID6, "checksum": "6", "last_seen_at": 2})
 
 
 @pytest.fixture()
@@ -79,7 +82,7 @@ def db_pinecone(crawl_1: list[Document]) -> PineconeDatabase:
 
     db.delete_all()
     # Insert initially crawled objects
-    db.add_documents(documents=crawl_1, ids=[d.metadata["id"] for d in crawl_1])
+    db.add_documents(documents=crawl_1, ids=[d.metadata["chunk_id"] for d in crawl_1])
     time.sleep(db.unit_test_wait_for_index)
 
     yield db
@@ -105,7 +108,7 @@ def db_chroma(crawl_1: list[Document]) -> ChromaDatabase:
 
     db.delete_all()
     # Insert initially crawled objects
-    db.add_documents(documents=crawl_1, ids=[d.metadata["id"] for d in crawl_1])
+    db.add_documents(documents=crawl_1, ids=[d.metadata["chunk_id"] for d in crawl_1])
 
     yield db
 
@@ -129,7 +132,7 @@ def db_qdrant(crawl_1: list[Document]) -> QdrantDatabase:
 
     db.delete_all()
     # Insert initially crawled objects
-    db.add_documents(documents=crawl_1, ids=[d.metadata["id"] for d in crawl_1])
+    db.add_documents(documents=crawl_1, ids=[d.metadata["chunk_id"] for d in crawl_1])
 
     yield db
 
@@ -153,7 +156,7 @@ def db_pgvector(crawl_1: list[Document]) -> PGVectorDatabase:
 
     db.delete_all()
     # Insert initially crawled objects
-    db.add_documents(documents=crawl_1, ids=[d.metadata["id"] for d in crawl_1])
+    db.add_documents(documents=crawl_1, ids=[d.metadata["chunk_id"] for d in crawl_1])
 
     yield db
 

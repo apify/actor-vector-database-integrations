@@ -5,11 +5,11 @@ from typing import TYPE_CHECKING
 
 import chromadb
 from langchain_chroma import Chroma
+from langchain_core.documents import Document
 
 from .base import VectorDbBase
 
 if TYPE_CHECKING:
-    from langchain_core.documents import Document
     from langchain_core.embeddings import Embeddings
 
     from ..models.chroma_input_model import ChromaIntegration
@@ -49,6 +49,12 @@ class ChromaDatabase(Chroma, VectorDbBase):
         if self.client.heartbeat() <= 1:
             return False
         return True
+
+    def get_by_item_id(self, item_id: str) -> list[Document]:
+        results = self.index.get(where={"item_id": item_id}, include=["metadatas"])
+        if (ids := results.get("ids")) and (metadata := results.get("metadatas")):
+            return [Document(page_content="", metadata={**m, "chunk_id": _id}) for _id, m in zip(ids, metadata)]
+        return []
 
     def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:
         last_seen_at = last_seen_at or int(datetime.now(timezone.utc).timestamp())

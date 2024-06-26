@@ -31,7 +31,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
             "2. Manual Input: If you are running this Actor independently, you need to manually specify the 'datasetId'. "
             "You can do this by entering the dataset ID in the 'Database Settings' section of the Actor's input screen."
             "Please verify that one of these options is correctly configured to provide the datasetId."
-)
+        )
 
         Actor.log.error(msg)
         await Actor.fail(status_message=msg)
