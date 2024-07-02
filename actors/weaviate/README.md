@@ -38,6 +38,10 @@ Ensure that the vector size of your embeddings aligns with the configuration of 
 For instance, if you're using the `text-embedding-3-small` model from `OpenAI`, it generates vectors of size `1536`. 
 This means your Weaviate index should also be configured to accommodate vectors of the same size, `1536` in this case.
 
+⚠️ **Important**: Currently, LangChain and Weaviate do not raise an error if there's a mismatch between these sizes.
+If the embedding model is not set up correctly, the only indication might be in the logs.
+Therefore, it's crucial to double-check your configuration to avoid any potential issues.
+
 #### Database: Weaviate
 ```json
 {
