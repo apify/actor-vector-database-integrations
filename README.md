@@ -97,7 +97,7 @@ services:
            return PGVectorDatabase(actor_input, embeddings)
    ```
 
-1. Add `PGVectorDatabase` fixture into `tests/confets.py`
+1. Add `PGVectorDatabase` fixture into `tests/conftets.py`
    ```python
       @pytest.fixture()
       def db_pgvector(crawl_1: list[Document]) -> PGVectorDatabase:

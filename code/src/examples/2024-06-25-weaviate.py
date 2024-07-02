@@ -11,25 +11,22 @@ Run as a module:
     python -m src.examples.2024-06-25-weaviate
 """
 
+import os
 from datetime import datetime, timezone
 
 from dotenv import load_dotenv
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_openai.embeddings import OpenAIEmbeddings
 
 from .data_examples_uuid import ID1, ID3, ID4A, ID4B, ID4C, ID5A, ID5B, ID5C, ID6, crawl_1, crawl_2, expected_results
 from ..models import EmbeddingsProvider, WeaviateIntegration
 from ..vcs import compare_crawled_data_with_db
 from ..vector_stores.weaviate import WeaviateDatabase
 
-# from langchain_openai.embeddings import OpenAIEmbeddings
-
 load_dotenv()
 WEAVIATE_COLLECTION_NAME = "apify"
 
 
-# embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-embeddings = HuggingFaceEmbeddings()
-import os
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
 # client = weaviate.connect_to_local()
 # Connect to a WCS instance

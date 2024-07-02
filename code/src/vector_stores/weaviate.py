@@ -44,6 +44,9 @@ class WeaviateDatabase(WeaviateVectorStore, VectorDbBase):
     def get_by_item_id(self, item_id: str) -> list[Document]:
         """Get object by item_id."""
 
+        if not item_id:
+            return []
+
         collection = self.client.collections.get(name=self.collection_name)
         response = collection.query.fetch_objects(
             filters=Filter.by_property("item_id").equal(item_id),
