@@ -7,11 +7,14 @@ from apify import Actor
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from .constants import DAY_IN_SECONDS
-from .emb import get_embeddings
+from .emb import get_embedding_provider
 from .utils import add_chunk_id, add_item_checksum, get_dataset_loader
 from .vcs import get_vector_database, update_db_with_crawled_data
 
 if TYPE_CHECKING:
+    from langchain_core.documents import Document
+    from langchain_core.embeddings import Embeddings
+
     from ._types import ActorInputsDb, VectorDb
 
 
@@ -37,48 +40,8 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
         await Actor.fail(status_message=msg)
         return
 
-    try:
-        Actor.log.info("Get embeddings class: %s", actor_input.embeddingsProvider.value)  # type: ignore[union-attr]
-        embeddings = await get_embeddings(
-            actor_input.embeddingsProvider.value,  # type: ignore[union-attr]
-            actor_input.embeddingsApiKey,
-            actor_input.embeddingsConfig,
-        )
-    except Exception as e:
-        Actor.log.error(e)
-        await Actor.fail(status_message=f"Failed to get embeddings: {e}. Ensure that the configuration in the Embeddings Settings is correct.")
-        return
-
-    # Add parameters related to chunking to every dataset item to be able to update DB when chunkSize, chunkOverlap or performChunking changes
-    meta_object = actor_input.metadataObject or {}
-    meta_object.update({"chunkSize": actor_input.chunkSize, "chunkOverlap": actor_input.chunkOverlap, "performChunking": actor_input.performChunking})
-
-    # Required for checksum calculation
-    # Update metadata fields with datasetFieldsToItemId for dataset loading
-    meta_fields = actor_input.metadataDatasetFields or {}
-    meta_fields.update({k: k for k in actor_input.deltaUpdatesPrimaryDatasetFields or []})
-
-    Actor.log.info("Load Dataset ID %s and extract fields %s", dataset_id, actor_input.datasetFields)
-    try:
-        dataset_loader = get_dataset_loader(
-            str(dataset_id),
-            fields=actor_input.datasetFields,
-            meta_object=meta_object,
-            meta_fields=meta_fields,
-        )
-        documents = dataset_loader.load()
-        documents = [doc for doc in documents if doc.page_content]
-        Actor.log.info("Dataset loaded, number of documents: %s", len(documents))
-    except Exception as e:
-        Actor.log.error(e)
-        await Actor.fail(
-            status_message=f"Failed to load datasetId {dataset_id} due to error: {e}. Ensure the following: "
-            f"1. If running this Actor standalone, the dataset should exist. "
-            f"2. If this Actor is configured with another Actor (in the integration section), the `datasetId` should be correctly passed. "
-            f"3. If the problem persists, consider creating an issue."
-        )
-        return
-
+    embeddings = await get_embeddings(actor_input)
+    documents = await load_dataset(actor_input, dataset_id)
     documents = add_item_checksum(documents, actor_input.deltaUpdatesPrimaryDatasetFields)  # type: ignore[arg-type]
 
     if actor_input.performChunking:
@@ -99,6 +62,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
             f" Database error message: {e}"
         )
         return
+
     try:
         if actor_input.enableDeltaUpdates:
             expired_days = actor_input.expiredObjectDeletionPeriodDays or 0
@@ -110,6 +74,10 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
             Actor.log.info("Added %s new objects to the vector store", len(documents))
 
         await Actor.push_data([doc.dict() for doc in documents])
+
+        if hasattr(vcs_, "close"):
+            vcs_.close()
+
     except Exception as e:
         Actor.log.error(e)
         # I had to create a msg variable to avoid a ruff lint error S608 (SQL Injection)
@@ -120,3 +88,55 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
             "Error message:"
         )
         await Actor.fail(status_message=f"{msg} {e}")
+
+
+async def get_embeddings(actor_input: ActorInputsDb) -> Embeddings:  # type: ignore[return]
+
+    try:
+        Actor.log.info("Get embeddings class: %s", actor_input.embeddingsProvider.value)  # type: ignore[union-attr]
+        embeddings = await get_embedding_provider(
+            actor_input.embeddingsProvider.value,  # type: ignore[union-attr]
+            actor_input.embeddingsApiKey,
+            actor_input.embeddingsConfig,
+        )
+    except Exception as e:
+        Actor.log.error(e)
+        await Actor.fail(status_message=f"Failed to get embeddings: {e}. Ensure that the configuration in the Embeddings Settings is correct.")
+    else:
+        return embeddings
+
+
+async def load_dataset(actor_input: ActorInputsDb, dataset_id: str) -> list[Document]:  # type: ignore[return]
+    """Load dataset from the datasetId and extract fields from the dataset."""
+
+    # Add parameters related to chunking to every dataset item to be able to update DB when chunkSize, chunkOverlap or performChunking changes
+    meta_object = actor_input.metadataObject or {}
+    meta_object.update({"chunkSize": actor_input.chunkSize, "chunkOverlap": actor_input.chunkOverlap, "performChunking": actor_input.performChunking})
+
+    # Required for checksum calculation
+    # Update metadata fields with datasetFieldsToItemId for dataset loading
+    meta_fields = actor_input.metadataDatasetFields or {}
+    meta_fields.update({k: k for k in actor_input.deltaUpdatesPrimaryDatasetFields or []})
+    Actor.log.info("Load Dataset ID %s and extract fields %s", dataset_id, actor_input.datasetFields)
+
+    try:
+        dataset_loader = get_dataset_loader(
+            str(dataset_id),
+            fields=actor_input.datasetFields,
+            meta_object=meta_object,
+            meta_fields=meta_fields,
+        )
+        documents = dataset_loader.load()
+        documents = [doc for doc in documents if doc.page_content]
+        Actor.log.info("Dataset loaded, number of documents: %s", len(documents))
+
+    except Exception as e:
+        Actor.log.error(e)
+        await Actor.fail(
+            status_message=f"Failed to load datasetId {dataset_id} due to error: {e}. Ensure the following: "
+            f"1. If running this Actor standalone, the dataset should exist. "
+            f"2. If this Actor is configured with another Actor (in the integration section), the `datasetId` should be correctly passed. "
+            f"3. If the problem persists, consider creating an issue."
+        )
+    else:
+        return documents

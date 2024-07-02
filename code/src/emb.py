@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from langchain_core.embeddings import Embeddings
 
 
-async def get_embeddings(embeddings_name: str, api_key: str | None = None, config: dict | None = None) -> Embeddings:
+async def get_embedding_provider(embeddings_name: str, api_key: str | None = None, config: dict | None = None) -> Embeddings:
     """Return the embeddings based on the user preference."""
 
     if embeddings_name == SupportedEmbeddings.openai:

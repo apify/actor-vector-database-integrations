@@ -18,7 +18,6 @@ if TYPE_CHECKING:
 
 class WeaviateDatabase(WeaviateVectorStore, VectorDbBase):
     def __init__(self, actor_input: WeaviateIntegration, embeddings: Embeddings) -> None:
-
         self.collection_name = actor_input.weaviateCollectionName
         self.text_key = "text"
         auth_ = weaviate.auth.AuthApiKey(actor_input.weaviateApiKey) if actor_input.weaviateApiKey else None
@@ -26,7 +25,7 @@ class WeaviateDatabase(WeaviateVectorStore, VectorDbBase):
         if "localhost" in actor_input.weaviateUrl:
             self.client = weaviate.connect_to_local()
         else:
-            self.client = weaviate.connect_to_wcs( cluster_url=actor_input.weaviateUrl, auth_credentials=auth_)
+            self.client = weaviate.connect_to_wcs(cluster_url=actor_input.weaviateUrl, auth_credentials=auth_)
 
         super().__init__(client=self.client, index_name=self.collection_name, text_key=self.text_key, embedding=embeddings)
         self._dummy_vector: list[float] = []
@@ -39,6 +38,9 @@ class WeaviateDatabase(WeaviateVectorStore, VectorDbBase):
 
     async def is_connected(self) -> bool:
         return self.client.is_connected()
+
+    def close(self) -> None:
+        self.client.close()
 
     def get_by_item_id(self, item_id: str) -> list[Document]:
         """Get object by item_id."""
