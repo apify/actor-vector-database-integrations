@@ -21,9 +21,13 @@ class WeaviateDatabase(WeaviateVectorStore, VectorDbBase):
 
         self.collection_name = actor_input.weaviateCollectionName
         self.text_key = "text"
-        self.client = weaviate.connect_to_wcs(
-            cluster_url=actor_input.weaviateUrl, auth_credentials=weaviate.auth.AuthApiKey(actor_input.weaviateApiKey)
-        )
+        auth_ = weaviate.auth.AuthApiKey(actor_input.weaviateApiKey) if actor_input.weaviateApiKey else None
+
+        if "localhost" in actor_input.weaviateUrl:
+            self.client = weaviate.connect_to_local()
+        else:
+            self.client = weaviate.connect_to_wcs( cluster_url=actor_input.weaviateUrl, auth_credentials=auth_)
+
         super().__init__(client=self.client, index_name=self.collection_name, text_key=self.text_key, embedding=embeddings)
         self._dummy_vector: list[float] = []
 
@@ -34,12 +38,7 @@ class WeaviateDatabase(WeaviateVectorStore, VectorDbBase):
         return self._dummy_vector
 
     async def is_connected(self) -> bool:
-        try:
-            self.client.collections.get(name=self.collection_name)
-        except weaviate.exceptions.WeaviateConnectionError:
-            return False
-        else:
-            return True
+        return self.client.is_connected()
 
     def get_by_item_id(self, item_id: str) -> list[Document]:
         """Get object by item_id."""
@@ -50,7 +49,7 @@ class WeaviateDatabase(WeaviateVectorStore, VectorDbBase):
         collection = self.client.collections.get(name=self.collection_name)
         response = collection.query.fetch_objects(
             filters=Filter.by_property("item_id").equal(item_id),
-            limit=100_000,
+            limit=10_000,
         )
         return [Document(page_content="", metadata=dict(o.properties) | {"chunk_id": str(o.uuid)}) for o in response.objects]
 
