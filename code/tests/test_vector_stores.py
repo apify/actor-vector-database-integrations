@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from src._types import VectorDb
 
 # Database fixtures to test. Fill here the name of the fixtures you want to test
-DATABASE_FIXTURES = ["db_chroma", "db_pgvector", "db_pinecone", "db_qdrant"]
+DATABASE_FIXTURES = ["db_chroma", "db_pgvector", "db_pinecone", "db_qdrant", "db_weaviate"]
 
 
 def wait_for_db(sec: int = 3) -> None:
