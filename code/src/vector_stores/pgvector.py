@@ -13,7 +13,7 @@ from .base import VectorDbBase
 if TYPE_CHECKING:
     from langchain_core.embeddings import Embeddings
 
-    from ..models.pgvector_input_model import PgvectorIntegration
+    from ..models import PgvectorIntegration
 
 
 class PGVectorDatabase(PGVector, VectorDbBase):
@@ -31,37 +31,6 @@ class PGVectorDatabase(PGVector, VectorDbBase):
 
     async def is_connected(self) -> bool:
         raise NotImplementedError
-
-    def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:
-        """Update last_seen_at field in the database."""
-
-        last_seen_at = last_seen_at or int(datetime.now(timezone.utc).timestamp())
-
-        with self._make_sync_session() as session:
-            if not (collection := self.get_collection(session)):
-                raise ValueError("Collection not found")
-
-            stmt = (
-                update(self.EmbeddingStore)
-                .where(self.EmbeddingStore.collection_id == literal(str(collection.uuid)))
-                .where(self.EmbeddingStore.id.in_(ids))
-                .values(cmetadata=text(f"cmetadata || jsonb_build_object('last_seen_at', {last_seen_at})"))
-            )
-            session.execute(stmt)
-            session.commit()
-
-    def delete_expired(self, expired_ts: int) -> None:
-        with self._make_sync_session() as session:
-            if not (collection := self.get_collection(session)):
-                raise ValueError("Collection not found")
-
-            stmt = (
-                delete(self.EmbeddingStore)
-                .where(self.EmbeddingStore.collection_id == literal(str(collection.uuid)))
-                .where(text("(cmetadata ->> 'last_seen_at')::int < :value").bindparams(value=expired_ts))
-            )
-            session.execute(stmt)
-            session.commit()
 
     def get(self, id_: str) -> Any:
         """Get a document by id from the database.
@@ -106,6 +75,39 @@ class PGVectorDatabase(PGVector, VectorDbBase):
 
         return [Document(page_content="", metadata=r.cmetadata | {"chunk_id": r.id}) for r in results]
 
+    def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:
+        """Update last_seen_at field in the database."""
+
+        last_seen_at = last_seen_at or int(datetime.now(timezone.utc).timestamp())
+
+        with self._make_sync_session() as session:
+            if not (collection := self.get_collection(session)):
+                raise ValueError("Collection not found")
+
+            stmt = (
+                update(self.EmbeddingStore)
+                .where(self.EmbeddingStore.collection_id == literal(str(collection.uuid)))
+                .where(self.EmbeddingStore.id.in_(ids))
+                .values(cmetadata=text(f"cmetadata || jsonb_build_object('last_seen_at', {last_seen_at})"))
+            )
+            session.execute(stmt)
+            session.commit()
+
+    def delete_expired(self, expired_ts: int) -> None:
+        """Delete objects from the index that are expired."""
+
+        with self._make_sync_session() as session:
+            if not (collection := self.get_collection(session)):
+                raise ValueError("Collection not found")
+
+            stmt = (
+                delete(self.EmbeddingStore)
+                .where(self.EmbeddingStore.collection_id == literal(str(collection.uuid)))
+                .where(text("(cmetadata ->> 'last_seen_at')::int < :value").bindparams(value=expired_ts))
+            )
+            session.execute(stmt)
+            session.commit()
+
     def delete_all(self) -> None:
         """Delete all documents from the database.
 
@@ -115,4 +117,5 @@ class PGVectorDatabase(PGVector, VectorDbBase):
             self.delete(ids=ids, collection_only=True)
 
     def search_by_vector(self, vector: list[float], k: int = 10_000, filter_: dict | None = None) -> list[Document]:
+        """Search by vector and return the results."""
         return self.similarity_search_by_vector(vector, k=k, filter=filter_)

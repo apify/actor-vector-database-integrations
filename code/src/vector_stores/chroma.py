@@ -12,7 +12,7 @@ from .base import VectorDbBase
 if TYPE_CHECKING:
     from langchain_core.embeddings import Embeddings
 
-    from ..models.chroma_input_model import ChromaIntegration
+    from ..models import ChromaIntegration
 
 
 class ChromaDatabase(Chroma, VectorDbBase):
@@ -51,23 +51,30 @@ class ChromaDatabase(Chroma, VectorDbBase):
         return True
 
     def get_by_item_id(self, item_id: str) -> list[Document]:
+        """Get documents by item_id."""
+
         results = self.index.get(where={"item_id": item_id}, include=["metadatas"])
         if (ids := results.get("ids")) and (metadata := results.get("metadatas")):
             return [Document(page_content="", metadata={**m, "chunk_id": _id}) for _id, m in zip(ids, metadata)]
         return []
 
     def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:
+        """Update last_seen_at field in the database."""
+
         last_seen_at = last_seen_at or int(datetime.now(timezone.utc).timestamp())
         for _id in ids:
             self.index.update(ids=_id, metadatas=[{"last_seen_at": last_seen_at}])
 
     def delete_expired(self, expired_ts: int) -> None:
+        """Delete expired objects."""
         self.index.delete(where={"last_seen_at": {"$lt": expired_ts}})  # type: ignore[dict-item]
 
     def delete_all(self) -> None:
+        """Delete all objects."""
         r = self.index.get()
         if r["ids"]:
             self.delete(ids=r["ids"])
 
     def search_by_vector(self, vector: list[float], k: int = 1_000_000, filter_: dict | None = None) -> list[Document]:
+        """Search by vector."""
         return self.similarity_search_by_vector(vector, k=k, filter=filter_)

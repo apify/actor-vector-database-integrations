@@ -66,7 +66,11 @@ services:
    ```bash
    make pydantic-model
    ```
-1. Create a new vector store in the `vector_stores` directory, e.g. `vector_stores/pgvector` and implement all functions
+1. Import the created model in `src/models/__init__.py`:
+   ```python
+   from .pgvector_input_model import PgvectorIntegration
+   ``
+1. Create a new module (`pgvector.py`) in the `vector_stores` directory, e.g. `vector_stores/pgvector` and implement all class `PGVectorDatabase` and all required methods.
 1. Add PGVector into `SupportedVectorStores` in the `constants.py` 
    ```python
       class SupportedVectorStores(str, enum.Enum):

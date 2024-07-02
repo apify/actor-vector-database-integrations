@@ -65,30 +65,26 @@ class QdrantDatabase(Qdrant, VectorDbBase):
         return [Document(page_content="", metadata=d.payload.get("metadata", {}) | {"chunk_id": d.id}) for d in results if d.payload]
 
     def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:
-        last_seen_at = last_seen_at or int(datetime.now(timezone.utc).timestamp())
+        """Update last_seen_at field in the database.
 
-        # Qdrant-Langchain nests metadata and document content in the payload.
-        # We specify the metadata key to update the nested "last_seen_at" field.
-        # https://qdrant.tech/documentation/concepts/payload/#set-payload
+        Qdrant-Langchain nests metadata and document content in the payload.
+        We specify the metadata key to update the nested "last_seen_at" field.
+        https://qdrant.tech/documentation/concepts/payload/#set-payload
+        """
+
+        last_seen_at = last_seen_at or int(datetime.now(timezone.utc).timestamp())
         self.client.set_payload(self.collection_name, {"last_seen_at": last_seen_at}, points=ids, key=self.metadata_payload_key)
 
     def delete_expired(self, expired_ts: int) -> None:
+        """Delete objects from the index that are expired."""
         self.client.delete(
-            self.collection_name,
-            Filter(
-                must=[
-                    FieldCondition(
-                        key=f"{self.metadata_payload_key}.last_seen_at",
-                        range=Range(
-                            lt=expired_ts,
-                        ),
-                    )
-                ]
-            ),
+            self.collection_name, Filter(must=[FieldCondition(key=f"{self.metadata_payload_key}.last_seen_at", range=Range(lt=expired_ts))])
         )
 
     def delete_all(self) -> None:
+        """Delete all objects from the index."""
         self.client.delete(self.collection_name, Filter(must=[]))
 
     def search_by_vector(self, vector: list[float], k: int = 10_000, filter_: dict | None = None) -> list[Document]:
+        """Search for documents by vector."""
         return self.similarity_search_by_vector(embedding=vector, k=k, filter=filter_)
