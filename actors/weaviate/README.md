@@ -45,8 +45,9 @@ Therefore, it's crucial to double-check your configuration to avoid any potentia
 #### Database: Weaviate
 ```json
 {
-  "pineconeApiKey": "YOUR-PINECONE-API-KEY",
-  "pineconeIndexName": "apify-pinecone"
+  "weaviateUrl": "YOUR-WEAVIATE-URL",
+  "weaviateApiKey": "YOUR-WEAVIATE-API-KEY",
+  "weaviateCollectionName": "apify"
 }
 ```
 
@@ -155,8 +156,9 @@ This integration will save the selected fields from your Actor to Weaviate.
 
 ```json
 {
-  "pineconeApiKey": "YOUR-PINECONE-API-KEY",
-  "pineconeIndexName": "apify",
+  "weaviateUrl": "YOUR-WEAVIATE-URL",
+  "weaviateApiKey": "YOUR-WEAVIATE-API-KEY",
+  "weaviateCollectionName": "apify",
   "embeddingsApiKey": "YOUR-OPENAI-API-KEY",
   "embeddingsConfig": {
     "model": "text-embedding-3-small"
@@ -177,8 +179,9 @@ This integration will save the selected fields from your Actor to Weaviate.
 #### Weaviate
 ```json
 {
-  "pineconeApiKey": "YOUR-PINECONE-API-KEY",
-  "pineconeIndexName": "apify-pinecone"
+  "weaviateUrl": "YOUR-WEAVIATE-URL",
+  "weaviateApiKey": "YOUR-WEAVIATE-API-KEY",
+  "weaviateCollectionName": "apify"
 }
 ```
 
