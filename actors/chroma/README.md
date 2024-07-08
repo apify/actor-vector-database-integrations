@@ -9,8 +9,6 @@ This approach reduces unnecessary embedding computation and storage operations, 
 💡 **Note**: This Actor is meant to be used together with other Actors' integration sections.
 For instance, if you are using the [Website Content Crawler](https://apify.com/apify/website-content-crawler), you can activate Chroma integration to save web data as vectors to Chroma.
 
-For more information how to leverage vector stores in Apify platform, see [Pinecone integration](https://github.com/apify/pinecone) and detailed blog post [what Pinecone is and why you should use it with your LLMs](https://blog.apify.com/what-is-pinecone-why-use-it-with-llms/).
-
 ## How does it work?
 
 Apify Chroma integration computes text embeddings and store them in Chroma. 

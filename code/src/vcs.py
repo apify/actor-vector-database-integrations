@@ -7,7 +7,7 @@ from apify import Actor
 from langchain_core.documents import Document
 from langchain_core.vectorstores import VectorStore
 
-from .models import ChromaIntegration, PgvectorIntegration, PineconeIntegration, QdrantIntegration
+from .models import ChromaIntegration, PgvectorIntegration, PineconeIntegration, QdrantIntegration, WeaviateIntegration
 from .utils import get_chunks_to_delete, get_chunks_to_update
 
 if TYPE_CHECKING:
@@ -39,6 +39,11 @@ async def get_vector_database(actor_input: ActorInputsDb | None, embeddings: Emb
         from .vector_stores.qdrant import QdrantDatabase
 
         return QdrantDatabase(actor_input, embeddings)
+
+    if isinstance(actor_input, WeaviateIntegration):
+        from .vector_stores.weaviate import WeaviateDatabase
+
+        return WeaviateDatabase(actor_input, embeddings)
 
     raise ValueError("Unknown integration type")
 

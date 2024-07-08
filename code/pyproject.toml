@@ -20,6 +20,7 @@ langchain-core = "^0.2.1"
 pytest-vcr = "^1.0.2"
 
 [tool.poetry.group.dev.dependencies]
+coverage = "^7.5.4"
 datamodel-code-generator = "^0.25.5"
 ipython = "^8.23.0"
 mypy = "^1.9.0"
@@ -57,6 +58,12 @@ optional = true
 langchain-postgres = "^0.0.8"
 psycopg = {extras = ["binary", "pool"], version = "^3.1.19"}
 psycopg2-binary = "^2.9.9"
+
+[tool.poetry.group.weaviate]
+optional = true
+
+[tool.poetry.group.weaviate.dependencies]
+langchain-weaviate = "^0.0.2"
 
 [tool.ruff]
 line-length = 150

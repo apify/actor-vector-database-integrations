@@ -25,7 +25,7 @@ class VectorDbBase(ABC):
 
     @abstractmethod
     def delete_all(self) -> None:
-        """Delete all documents from the database."""
+        """Delete all documents from the database (internal function for testing purposes)."""
 
     @abstractmethod
     async def is_connected(self) -> bool:

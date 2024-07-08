@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from src._types import VectorDb
 
 # Database fixtures to test. Fill here the name of the fixtures you want to test
-DATABASE_FIXTURES = ["db_chroma", "db_pgvector", "db_pinecone", "db_qdrant"]
+DATABASE_FIXTURES = ["db_chroma", "db_pgvector", "db_pinecone", "db_qdrant", "db_weaviate"]
 
 
 def wait_for_db(sec: int = 3) -> None:
@@ -176,3 +176,20 @@ def test_update_db_with_crawled_data_all(input_db: str, crawl_2: list[Document],
         d = next(r for r in res if expected.metadata["chunk_id"] == r.metadata["chunk_id"])
         assert d.metadata["item_id"] == expected.metadata["item_id"], f"Expected item_id {expected.metadata['item_id']}"
         assert d.metadata["checksum"] == expected.metadata["checksum"], f"Expected checksum {expected.metadata['checksum']}"
+
+
+@pytest.mark.integration()
+@pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
+@pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
+def test_get_delete_all(input_db: str, request: FixtureRequest) -> None:
+    """Test that all items have benn deleted (delete_all is an internal function)."""
+
+    db: VectorDb = request.getfixturevalue(input_db)
+
+    res = db.search_by_vector(db.dummy_vector, k=10)
+    assert res
+
+    db.delete_all()
+
+    res = db.search_by_vector(db.dummy_vector, k=10)
+    assert not res

@@ -10,6 +10,7 @@ class SupportedVectorStores(str, enum.Enum):
     pgvector = "pgvector"
     pinecone = "pinecone"
     qdrant = "qdrant"
+    weaviate = "weaviate"
 
 
 class SupportedEmbeddings(str, enum.Enum):

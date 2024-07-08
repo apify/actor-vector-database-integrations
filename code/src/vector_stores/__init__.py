@@ -5,3 +5,4 @@ if TYPE_CHECKING:
     from .pgvector import PGVectorDatabase
     from .pinecone import PineconeDatabase
     from .qdrant import QdrantDatabase
+    from .weaviate import WeaviateDatabase
