@@ -10,22 +10,21 @@ It demonstrates the process of performing delta updates on Milvus. The process i
 Run as a module:
     python -m src.examples.2024-07-08-milvus
 """
-
 import os
+import time
 from datetime import datetime, timezone
 
 from dotenv import load_dotenv
 from langchain_openai.embeddings import OpenAIEmbeddings
-from langchain_milvus.vectorstores import Milvus
 
+from models import MilvusIntegration
 from .data_examples_uuid import ID1, ID3, ID4A, ID4B, ID4C, ID5A, ID5B, ID5C, ID6, crawl_1, crawl_2, expected_results
-from ..models import EmbeddingsProvider, WeaviateIntegration
+from ..models import EmbeddingsProvider
 from ..vcs import compare_crawled_data_with_db
-
-# from ..vector_stores.weaviate import WeaviateDatabase
+from ..vector_stores.milvus import MilvusDatabase
 
 load_dotenv()
-WEAVIATE_COLLECTION_NAME = "apify"
+MILVUS_COLLECTION_NAME = "apify"
 
 
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
@@ -33,33 +32,36 @@ embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
 DROP_AND_INSERT = True
 
-# db = WeaviateDatabase(
-#     actor_input=WeaviateIntegration(
-#         weaviateUrl=os.getenv("WEAVIATE_URL"),
-#         weaviateApiKey=os.getenv("WEAVIATE_API_KEY"),
-#         weaviateCollectionName=WEAVIATE_COLLECTION_NAME,
-#         embeddingsProvider=EmbeddingsProvider.OpenAI.value,
-#         embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
-#         datasetFields=["text"],
-#     ),
-#     embeddings=embeddings,
-# )
+db = MilvusDatabase(
+    actor_input=MilvusIntegration(
+        milvusUrl=os.getenv("MILVUS_URL"),
+        milvusApiKey=os.getenv("MILVUS_API_KEY"),
+        milvusCollectionName=MILVUS_COLLECTION_NAME,
+        embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+        embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
+        datasetFields=["text"],
+    ),
+    embeddings=embeddings,
+)
 
-db = Milvus(embedding_function=embeddings, connection_args={"uri": os.getenv("MILVUS_URL"), "token": os.getenv("MILVUS_API_KEY")})
 
-print(db.collection_name)
+def wait_for_index(sec=1):
+    time.sleep(sec)
+
 
 if DROP_AND_INSERT:
-    # db.delete_all()
+
+    db.delete_all()
+    r = db.similarity_search("text", k=100)
+    print("Initial results count:", len(r))
+
     inserted = db.add_documents(documents=crawl_1, ids=[d.metadata["chunk_id"] for d in crawl_1])
     print("Inserted ids:", inserted)
-
 
 r = db.similarity_search("text", k=100)
 print("Search results:", r)
 print("Search results count:", len(r))
 
-exit()
 
 res = db.search_by_vector(db.dummy_vector, k=10)
 print("Objects in the database:", len(res), res)
@@ -87,12 +89,14 @@ assert ID5A in ids_del, f"Expected {ID5A} to be deleted"
 
 # Delete data that were updated
 db.delete(ids_del)
+wait_for_index()
 res = db.search_by_vector(db.dummy_vector, k=10)
 print("Database objects after delete: ", len(res), res)
 assert len(res) == 3, "Expected 3 objects in the database after deletion"
 
 # Add new data
 r = db.add_documents(data_add, ids=[d.metadata["chunk_id"] for d in data_add])
+wait_for_index()
 res = db.search_by_vector(db.dummy_vector, k=10)
 print("Database objects after adding new", len(res), res)
 
@@ -109,6 +113,7 @@ assert next(r for r in res if r.metadata["chunk_id"] == ID3).metadata["last_seen
 
 # Update metadata data
 db.update_last_seen_at(ids_update_last_seen)
+wait_for_index()
 
 res = db.search_by_vector(db.dummy_vector, k=10)
 assert len(res) == 7, "Expected 7 objects in the database after last_seen update"
@@ -116,6 +121,7 @@ assert next(r for r in res if r.metadata["chunk_id"] == ID3).metadata["last_seen
 
 # delete expired objects
 db.delete_expired(expired_ts=1)
+wait_for_index()
 
 res = db.search_by_vector(db.dummy_vector, k=10)
 res = [r for r in res]
@@ -126,7 +132,7 @@ assert next((r for r in res if r.metadata["chunk_id"] == ID1), None) is None, f"
 # compare results with expected results
 for r in expected_results:
     d = db.get(r.metadata["chunk_id"])
-    metadata = d.properties
+    metadata = d[0]
     assert metadata["item_id"] == r.metadata["item_id"], f"Expected item_id {r.metadata['item_id']}"
     assert metadata["checksum"] == r.metadata["checksum"], f"Expected checksum {r.metadata['checksum']}"
 
