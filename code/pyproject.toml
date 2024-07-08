@@ -65,6 +65,12 @@ optional = true
 [tool.poetry.group.weaviate.dependencies]
 langchain-weaviate = "^0.0.2"
 
+[tool.poetry.group.milvus]
+optional = true
+
+[tool.poetry.group.milvus.dependencies]
+langchain-milvus = "^0.1.1"
+
 [tool.ruff]
 line-length = 150
 exclude = ["src/models/**", "src/examples/**"]
