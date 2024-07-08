@@ -32,7 +32,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
             "1. Automatic Input: If this integration is used with other Actors, such as the Website Content Crawler, the datasetId should be "
             "automatically passed in the 'payload'. Please check the `Input` payload to ensure the datasetId is included."
             "2. Manual Input: If you are running this Actor independently, you need to manually specify the 'datasetId'. "
-            "You can do this by entering the dataset ID in the 'Database Settings' section of the Actor's input screen."
+            "You can do this by entering the dataset ID in the 'Dataset Settings' section of the Actor's input screen."
             "Please verify that one of these options is correctly configured to provide the datasetId."
         )
 
