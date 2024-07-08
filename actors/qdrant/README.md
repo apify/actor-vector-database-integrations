@@ -40,9 +40,9 @@ This means your Qdrant collection should also be configured to accommodate vecto
 #### Database: Qdrant
 ```json
 {
-  "qdrantUrl": "https://xyz-example.eu-central.aws.cloud.qdrant.io",
+  "qdrantUrl": "YOUR-QDRANT-URL",
   "qdrantApiKey": "YOUR-QDRANT-API-KEY",
-  "qdrantCollectionName": "apify-qdrant"
+  "qdrantCollectionName": "YOUR-QDRANT-COLLECTION-NAME"
 }
 ```
 
@@ -176,9 +176,9 @@ This integration will save the selected fields from your Actor to Qdrant.
 
 ```json
 {
-  "qdrantUrl": "https://xyz-example.eu-central.aws.cloud.qdrant.io",
+  "qdrantUrl": "YOUR-QDRANT-URL",
   "qdrantApiKey": "YOUR-QDRANT-API-KEY",
-  "qdrantCollectionName": "apify-qdrant",
+  "qdrantCollectionName": "YOUR-QDRANT-COLLECTION-NAME",
   "qdrantAutoCreateCollection": true
 }
 ```

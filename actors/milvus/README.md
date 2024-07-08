@@ -1,23 +1,23 @@
-# Weaviate integration
+# Milvus integration
 
-The Apify Weaviate integration transfers selected data from Apify Actors to a Weaviate database. 
-It processes the data, optionally splits it into chunks, computes embeddings, and saves them to Weaviate.
+The Apify Milvus integration transfers selected data from Apify Actors to a Milvus database. 
+It processes the data, optionally splits it into chunks, computes embeddings, and saves them to Milvus.
 
 This integration supports incremental updates, updating only the data that has changed. 
 This approach reduces unnecessary embedding computation and storage operations, making it suitable for search and retrieval augmented generation (RAG) use cases.
 
 💡 **Note**: This Actor is meant to be used together with other Actors' integration sections.
-For instance, if you are using the [Website Content Crawler](https://apify.com/apify/website-content-crawler), you can activate Weaviate integration to save web data as vectors to Weaviate.
+For instance, if you are using the [Website Content Crawler](https://apify.com/apify/website-content-crawler), you can activate Milvus integration to save web data as vectors to Milvus.
 
 ## How does it work?
 
-Apify Weaviate integration computes text embeddings and store them in Weaviate. 
-It uses [LangChain](https://www.langchain.com/) to compute embeddings and interact with [Weaviate](https://weaviate.io/).
+Apify Milvus integration computes text embeddings and store them in Milvus. 
+It uses [LangChain](https://www.langchain.com/) to compute embeddings and interact with [Milvus](https://milvus.io/).
 
 1. Retrieve a dataset as output from an Actor
 2. _[Optional]_ Split text data into chunks using `langchain`'s `RecursiveCharacterTextSplitter`
 (enable/disable using `performChunking` and specify `chunkSize`, `chunkOverlap`)
-3. _[Optional]_ Update only changed data in Weaviate (enable/disable using `enableDeltaUpdates`)
+3. _[Optional]_ Update only changed data in Milvus (enable/disable using `enableDeltaUpdates`)
 4. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
 5. Save data into the database
 
@@ -25,31 +25,32 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 
 To utilize this integration, ensure you have:
 
-- Created or existing `Weaviate` database. You need to know `weaviateUrl`, `weatiateApiKey`, and `weaviateCollectionName`.
+- Created or existing `Milvus` database. You need to know `milvusUrl`, `milvusApiKey`, and `milvusCollectionName`.
 - An account to compute embeddings using one of the providers, e.g., OpenAI or Cohere.
 
-You can run Weaviate using docker or you can try managed Weaviate, see details in the [Weaviate docs](https://weaviate.io).
+You can run Milvus using Docker or try the managed Milvus service. For more details, please refer to the [Milvus documentation](https://milvus.io/docs).
+
 
 ## Examples
 
 For detailed input information refer to [input schema](.actor/input_schema.json).
 
-The configuration consists of three parts: Weaviate, embeddings provider, and data.
+The configuration consists of three parts: Milvus, embeddings provider, and data.
 
-Ensure that the vector size of your embeddings aligns with the configuration of your Weaviate index. 
+Ensure that the vector size of your embeddings aligns with the configuration of your Milvus index. 
 For instance, if you're using the `text-embedding-3-small` model from `OpenAI`, it generates vectors of size `1536`. 
-This means your Weaviate index should also be configured to accommodate vectors of the same size, `1536` in this case.
+This means your Milvus index should also be configured to accommodate vectors of the same size, `1536` in this case.
 
-⚠️ **Important**: Currently, LangChain and Weaviate do not raise an error if there's a mismatch between these sizes.
+⚠️ **Important**: Currently, LangChain and Milvus do not raise an error if there's a mismatch between these sizes.
 If the embedding model is not set up correctly, the only indication might be in the logs.
 Therefore, it's crucial to double-check your configuration to avoid any potential issues.
 
-#### Database: Weaviate
+#### Database: Milvus
 ```json
 {
-  "weaviateUrl": "YOUR-WEAVIATE-URL",
-  "weaviateApiKey": "YOUR-WEAVIATE-API-KEY",
-  "weaviateCollectionName": "YOUR-WEAVIATE-COLLECTION-NAME"
+  "milvusUrl": "YOUR-MILVUS-URL",
+  "milvusApiKey": "YOUR-MILVUS-API-KEY",
+  "milvusCollectionName": "YOUR-MILVUS-COLLECTION-NAME"
 }
 ```
 
@@ -62,7 +63,7 @@ Therefore, it's crucial to double-check your configuration to avoid any potentia
 }
 ```
 
-### Save data from Website Content Crawler to Weaviate
+### Save data from Website Content Crawler to Milvus
 
 Data is transferred in the form of a dataset from [Website Content Crawler](https://apify.com/apify/website-content-crawler), which provides a dataset with the following output fields (truncated for brevity):
 
@@ -73,9 +74,9 @@ Data is transferred in the form of a dataset from [Website Content Crawler](http
   "metadata": {"title": "Apify"}
 }
 ```
-This dataset is then processed by the Weaviate integration. 
-In the integration settings you need to specify which fields you want to save to Weaviate, e.g., `["text"]` and which of them should be used as metadata, e.g., `{"title": "metadata.title"}`.
-Without any other configuration, the data is saved to Weaviate as is.
+This dataset is then processed by the Milvus integration. 
+In the integration settings you need to specify which fields you want to save to Milvus, e.g., `["text"]` and which of them should be used as metadata, e.g., `{"title": "metadata.title"}`.
+Without any other configuration, the data is saved to Milvus as is.
 
 
 ```json
@@ -104,7 +105,7 @@ The settings depend on your use case where a proper chunking helps optimize retr
 ```
 ### Incrementally update database from the Website Content Crawler
 
-To incrementally update data from the [Website Content Crawler](https://apify.com/apify/website-content-crawler) to Weaviate, configure the integration to update only the changed or new data. 
+To incrementally update data from the [Website Content Crawler](https://apify.com/apify/website-content-crawler) to Milvus, configure the integration to update only the changed or new data. 
 This is controlled by the `enableDeltaUpdates` setting. 
 This way, the integration minimizes unnecessary updates and ensures that only new or modified data is processed.
 
@@ -129,8 +130,8 @@ For instance, when working with the Website Content Crawler, you can use the URL
 
 #### Delete outdated data
 
-The integration can also delete data from Weaviate that hasn't been crawled for a specified period. 
-This is useful when data in the Weaviate database becomes outdated, such as when a page is removed from a website. 
+The integration can also delete data from Milvus that hasn't been crawled for a specified period. 
+This is useful when data in the Milvus database becomes outdated, such as when a page is removed from a website. 
 
 This is controlled by the `expiredObjectDeletionPeriodDays` setting, which automatically deletes data older than the specified number of days.
 For each crawl, the `last_seen_at` metadata field is updated.
@@ -150,17 +151,17 @@ To disable this feature, set `expiredObjectDeletionPeriodDays` to `0`.
 
 ## Outputs
 
-This integration will save the selected fields from your Actor to Weaviate.
+This integration will save the selected fields from your Actor to Milvus.
 
 ## Example configuration
 
-#### Full Input Example for Website Content Crawler Actor with Weaviate integration
+#### Full Input Example for Website Content Crawler Actor with Milvus integration
 
 ```json
 {
-  "weaviateUrl": "https://apify-e2g4df23k.weaviate.network",
-  "weaviateApiKey": "YOUR-WEAVIATE-API-KEY",
-  "weaviateCollectionName": "apify",
+  "milvusUrl": "YOUR-MILVUS-URL",
+  "milvusApiKey": "YOUR-MILVUS-API-KEY",
+  "milvusCollectionName": "YOUR-MILVUS-COLLECTION-NAME"
   "embeddingsApiKey": "YOUR-OPENAI-API-KEY",
   "embeddingsConfig": {
     "model": "text-embedding-3-small"
@@ -178,12 +179,12 @@ This integration will save the selected fields from your Actor to Weaviate.
 }
 ```
 
-#### Weaviate
+#### Milvus
 ```json
 {
-  "weaviateUrl": "YOUR-WEAVIATE-URL",
-  "weaviateApiKey": "YOUR-WEAVIATE-API-KEY",
-  "weaviateCollectionName": "YOUR-WEAVIATE-COLLECTION-NAME"
+  "milvusUrl": "YOUR-MILVUS-URL",
+  "milvusApiKey": "YOUR-MILVUS-API-KEY",
+  "milvusCollectionName": "YOUR-MILVUS-COLLECTION-NAME"
 }
 ```
 
