@@ -18,9 +18,11 @@ This repository contains Actors for different vector databases.
 
 ## Vector database integrations (Actors)
 - [Chroma](https://apify.com/apify/chroma-integration)
+- [Milvus](https://milvus.io/)
 - [PGVector](https://github.com/pgvector/pgvector)
 - [Pinecone](https://apify.com/apify/pinecone-integration)
 - [Qdrant](https://qdrant.tech)
+- [Weaviate](https://weaviate.io/)
 
 ## Supported Vector Embeddings
 - [OpenAI](https://platform.openai.com/docs/guides/embeddings)
