@@ -26,7 +26,7 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 To utilize this integration, ensure you have:
 
 - Created or existing `PostgreSQL` database with PGVector extension. You need to know `postgresSqlConnectionStr` and `postgresCollectionName`.
-- An account to compute embeddings using one of the providers, e.g., OpenAI or Cohere.
+- An account to compute embeddings using one of the providers, e.g., [OpenAI](https://platform.openai.com/docs/guides/embeddings) or [Cohere](https://docs.cohere.com/docs/cohere-embed).
 
 ## Examples
 

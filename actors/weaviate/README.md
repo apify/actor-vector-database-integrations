@@ -26,9 +26,9 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 To utilize this integration, ensure you have:
 
 - Created or existing `Weaviate` database. You need to know `weaviateUrl`, `weatiateApiKey`, and `weaviateCollectionName`.
-- An account to compute embeddings using one of the providers, e.g., OpenAI or Cohere.
+- An account to compute embeddings using one of the providers, e.g., [OpenAI](https://platform.openai.com/docs/guides/embeddings) or [Cohere](https://docs.cohere.com/docs/cohere-embed).
 
-You can run Weaviate using docker or you can try managed Weaviate, see details in the [Weaviate docs](https://weaviate.io).
+You can run Weaviate using docker or you can try managed [Weaviate](https://weaviate.io).
 
 ## Examples
 

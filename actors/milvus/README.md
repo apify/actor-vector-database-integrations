@@ -26,9 +26,10 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 To utilize this integration, ensure you have:
 
 - Created or existing `Milvus` database. You need to know `milvusUrl`, `milvusApiKey`, and `milvusCollectionName`.
-- An account to compute embeddings using one of the providers, e.g., OpenAI or Cohere.
+- An account to compute embeddings using one of the providers, e.g., [OpenAI](https://platform.openai.com/docs/guides/embeddings) or [Cohere](https://docs.cohere.com/docs/cohere-embed).
 
-You can run Milvus using Docker or try the managed Milvus service. For more details, please refer to the [Milvus documentation](https://milvus.io/docs).
+You can run Milvus using Docker or try the managed Milvus service at [Zilliz](https://zilliz.com/). 
+For more details, please refer to the [Milvus documentation](https://milvus.io/docs).
 
 
 ## Examples
@@ -40,10 +41,6 @@ The configuration consists of three parts: Milvus, embeddings provider, and data
 Ensure that the vector size of your embeddings aligns with the configuration of your Milvus index. 
 For instance, if you're using the `text-embedding-3-small` model from `OpenAI`, it generates vectors of size `1536`. 
 This means your Milvus index should also be configured to accommodate vectors of the same size, `1536` in this case.
-
-⚠️ **Important**: Currently, LangChain and Milvus do not raise an error if there's a mismatch between these sizes.
-If the embedding model is not set up correctly, the only indication might be in the logs.
-Therefore, it's crucial to double-check your configuration to avoid any potential issues.
 
 #### Database: Milvus
 ```json
@@ -161,7 +158,7 @@ This integration will save the selected fields from your Actor to Milvus.
 {
   "milvusUrl": "YOUR-MILVUS-URL",
   "milvusApiKey": "YOUR-MILVUS-API-KEY",
-  "milvusCollectionName": "YOUR-MILVUS-COLLECTION-NAME"
+  "milvusCollectionName": "YOUR-MILVUS-COLLECTION-NAME",
   "embeddingsApiKey": "YOUR-OPENAI-API-KEY",
   "embeddingsConfig": {
     "model": "text-embedding-3-small"
@@ -184,6 +181,15 @@ This integration will save the selected fields from your Actor to Milvus.
 {
   "milvusUrl": "YOUR-MILVUS-URL",
   "milvusApiKey": "YOUR-MILVUS-API-KEY",
+  "milvusCollectionName": "YOUR-MILVUS-COLLECTION-NAME"
+}
+```
+
+#### Managed Milvus service at [Zilliz](https://zilliz.com/)
+```json
+{
+  "milvusUrl": "https://in03-***********.api.gcp-us-west1.zillizcloud.com",
+  "milvusApiKey": "d46**********b4b",
   "milvusCollectionName": "YOUR-MILVUS-COLLECTION-NAME"
 }
 ```
