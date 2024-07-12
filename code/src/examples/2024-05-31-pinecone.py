@@ -17,9 +17,8 @@ import time
 from dotenv import load_dotenv
 from langchain_openai.embeddings import OpenAIEmbeddings
 
-from .data_examples_uuid import crawl_1, crawl_2, expected_results, ITEM_ID1
+from .data_examples_uuid import ITEM_ID1, crawl_1
 from ..models.pinecone_input_model import EmbeddingsProvider, PineconeIntegration
-from ..vcs import compare_crawled_data_with_db
 from ..vector_stores.pinecone import PineconeDatabase
 
 load_dotenv()

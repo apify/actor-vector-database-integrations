@@ -27,7 +27,7 @@ from vector_stores.weaviate import WeaviateDatabase  # type: ignore[import]
 load_dotenv()
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
-INDEX_NAME = "apify_unit_test"
+INDEX_NAME = "apifyunittest"
 
 UUID = "00000000-0000-0000-0000-0000000000"
 ID1 = f"{UUID}10"
