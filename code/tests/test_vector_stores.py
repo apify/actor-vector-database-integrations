@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from src._types import VectorDb
 
 # Database fixtures to test. Fill here the name of the fixtures you want to test
-DATABASE_FIXTURES = ["db_chroma", "db_pgvector", "db_pinecone", "db_qdrant", "db_weaviate"]
+DATABASE_FIXTURES = ["db_chroma", "db_milvus", "db_pgvector", "db_pinecone", "db_qdrant", "db_weaviate"]
 
 
 def wait_for_db(sec: int = 3) -> None:
@@ -190,6 +190,7 @@ def test_get_delete_all(input_db: str, request: FixtureRequest) -> None:
     assert res
 
     db.delete_all()
+    wait_for_db(db.unit_test_wait_for_index)
 
     res = db.search_by_vector(db.dummy_vector, k=10)
     assert not res

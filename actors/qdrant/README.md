@@ -24,8 +24,8 @@ It uses [LangChain](https://www.langchain.com/) to compute vector embeddings and
 
 To utilize this integration, ensure you have:
 
-- A Qdrant instance to connect to. You can get a free cloud instance at [cloud.qdrant.io](https://cloud.qdrant.io/).
-- An account to compute embeddings using one of the providers, e.g., OpenAI or Cohere.
+- A Qdrant instance to connect to. You can use Qdrant using Docker or you can quickly setup a free cloud instance at [cloud.qdrant.io](https://cloud.qdrant.io/).
+- An account to compute embeddings using one of the providers, e.g., [OpenAI](https://platform.openai.com/docs/guides/embeddings) or [Cohere](https://docs.cohere.com/docs/cohere-embed).
 
 ## Examples
 
@@ -40,9 +40,9 @@ This means your Qdrant collection should also be configured to accommodate vecto
 #### Database: Qdrant
 ```json
 {
-  "qdrantUrl": "https://xyz-example.eu-central.aws.cloud.qdrant.io",
+  "qdrantUrl": "YOUR-QDRANT-URL",
   "qdrantApiKey": "YOUR-QDRANT-API-KEY",
-  "qdrantCollectionName": "apify-qdrant"
+  "qdrantCollectionName": "YOUR-QDRANT-COLLECTION-NAME"
 }
 ```
 
@@ -176,9 +176,9 @@ This integration will save the selected fields from your Actor to Qdrant.
 
 ```json
 {
-  "qdrantUrl": "https://xyz-example.eu-central.aws.cloud.qdrant.io",
+  "qdrantUrl": "YOUR-QDRANT-URL",
   "qdrantApiKey": "YOUR-QDRANT-API-KEY",
-  "qdrantCollectionName": "apify-qdrant",
+  "qdrantCollectionName": "YOUR-QDRANT-COLLECTION-NAME",
   "qdrantAutoCreateCollection": true
 }
 ```

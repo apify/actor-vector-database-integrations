@@ -7,10 +7,18 @@ import pytest
 from dotenv import load_dotenv
 from langchain_core.documents import Document
 from langchain_openai.embeddings import OpenAIEmbeddings
-from models import ChromaIntegration, PgvectorIntegration, PineconeIntegration, QdrantIntegration, WeaviateIntegration  # type: ignore[import]
+from models import (  # type: ignore[import]
+    ChromaIntegration,
+    MilvusIntegration,
+    PgvectorIntegration,
+    PineconeIntegration,
+    QdrantIntegration,
+    WeaviateIntegration,
+)
 from models.pinecone_input_model import EmbeddingsProvider  # type: ignore[import]
 from utils import add_item_checksum  # type: ignore[import]
 from vector_stores.chroma import ChromaDatabase  # type: ignore[import]
+from vector_stores.milvus import MilvusDatabase  # type: ignore[import]
 from vector_stores.pgvector import PGVectorDatabase  # type: ignore[import]
 from vector_stores.pinecone import PineconeDatabase  # type: ignore[import]
 from vector_stores.qdrant import QdrantDatabase  # type: ignore[import]
@@ -19,7 +27,7 @@ from vector_stores.weaviate import WeaviateDatabase  # type: ignore[import]
 load_dotenv()
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
-INDEX_NAME = "apify-unit-test"
+INDEX_NAME = "apifyunittest"
 
 UUID = "00000000-0000-0000-0000-0000000000"
 ID1 = f"{UUID}10"
@@ -67,6 +75,80 @@ def documents() -> list[Document]:
 
 
 @pytest.fixture()
+def db_chroma(crawl_1: list[Document]) -> ChromaDatabase:
+    db = ChromaDatabase(
+        actor_input=ChromaIntegration(
+            chromaClientHost=os.getenv("CHROMA_CLIENT_HOST"),
+            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+            embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
+            datasetFields=["text"],
+            chromaCollectionName=INDEX_NAME,
+        ),
+        embeddings=embeddings,
+    )
+
+    db.unit_test_wait_for_index = 0
+
+    db.delete_all()
+    # Insert initially crawled objects
+    db.add_documents(documents=crawl_1, ids=[d.metadata["chunk_id"] for d in crawl_1])
+
+    yield db
+
+    db.delete_all()
+
+
+@pytest.fixture()
+def db_milvus(crawl_1: list[Document]) -> MilvusDatabase:
+    db = MilvusDatabase(
+        actor_input=MilvusIntegration(
+            milvusUrl=os.getenv("MILVUS_URL"),
+            milvusApiKey=os.getenv("MILVUS_API_KEY"),
+            milvusCollectionName=INDEX_NAME,
+            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+            embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
+            datasetFields=["text"],
+        ),
+        embeddings=embeddings,
+    )
+
+    db.unit_test_wait_for_index = 1
+
+    if db.client.has_collection(db.collection_name):
+        db.delete_all()
+    # Insert initially crawled objects
+    db.add_documents(documents=crawl_1, ids=[d.metadata["chunk_id"] for d in crawl_1])
+
+    yield db
+
+    db.delete_all()
+
+
+@pytest.fixture()
+def db_pgvector(crawl_1: list[Document]) -> PGVectorDatabase:
+    db = PGVectorDatabase(
+        actor_input=PgvectorIntegration(
+            postgresSqlConnectionStr=os.getenv("POSTGRESQL_CONNECTION_STR"),
+            postgresCollectionName=INDEX_NAME,
+            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+            embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
+            datasetFields=["text"],
+        ),
+        embeddings=embeddings,
+    )
+
+    db.unit_test_wait_for_index = 0
+
+    db.delete_all()
+    # Insert initially crawled objects
+    db.add_documents(documents=crawl_1, ids=[d.metadata["chunk_id"] for d in crawl_1])
+
+    yield db
+
+    db.delete_all()
+
+
+@pytest.fixture()
 def db_pinecone(crawl_1: list[Document]) -> PineconeDatabase:
     db = PineconeDatabase(
         actor_input=PineconeIntegration(
@@ -93,59 +175,11 @@ def db_pinecone(crawl_1: list[Document]) -> PineconeDatabase:
 
 
 @pytest.fixture()
-def db_chroma(crawl_1: list[Document]) -> ChromaDatabase:
-    db = ChromaDatabase(
-        actor_input=ChromaIntegration(
-            chromaClientHost=os.getenv("CHROMA_CLIENT_HOST"),
-            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
-            embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
-            datasetFields=["text"],
-            chromaCollectionName=INDEX_NAME,
-        ),
-        embeddings=embeddings,
-    )
-
-    db.unit_test_wait_for_index = 0
-
-    db.delete_all()
-    # Insert initially crawled objects
-    db.add_documents(documents=crawl_1, ids=[d.metadata["chunk_id"] for d in crawl_1])
-
-    yield db
-
-    db.delete_all()
-
-
-@pytest.fixture()
 def db_qdrant(crawl_1: list[Document]) -> QdrantDatabase:
     db = QdrantDatabase(
         actor_input=QdrantIntegration(
             qdrantUrl=os.getenv("QDRANT_URL"),
             qdrantCollectionName=INDEX_NAME,
-            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
-            embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
-            datasetFields=["text"],
-        ),
-        embeddings=embeddings,
-    )
-
-    db.unit_test_wait_for_index = 0
-
-    db.delete_all()
-    # Insert initially crawled objects
-    db.add_documents(documents=crawl_1, ids=[d.metadata["chunk_id"] for d in crawl_1])
-
-    yield db
-
-    db.delete_all()
-
-
-@pytest.fixture()
-def db_pgvector(crawl_1: list[Document]) -> PGVectorDatabase:
-    db = PGVectorDatabase(
-        actor_input=PgvectorIntegration(
-            postgresSqlConnectionStr=os.getenv("POSTGRESQL_CONNECTION_STR"),
-            postgresCollectionName=INDEX_NAME,
             embeddingsProvider=EmbeddingsProvider.OpenAI.value,
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],

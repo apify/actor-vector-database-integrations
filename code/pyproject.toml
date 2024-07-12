@@ -16,8 +16,7 @@ python-dotenv = "^1.0.1"
 langchain-openai = "^0.1.6"
 langchain-cohere = "^0.1.4"
 langchain-community = "^0.2.0"
-langchain-core = "^0.2.1"
-pytest-vcr = "^1.0.2"
+langchain-core = "0.2.10"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.5.4"
@@ -43,7 +42,7 @@ optional = true
 
 [tool.poetry.group.chroma.dependencies]
 langchain-chroma = "^0.1.1"
-chromadb = "^0.5.1"
+chromadb = "=0.5.1"
 
 [tool.poetry.group.qdrant]
 optional = true
@@ -64,6 +63,12 @@ optional = true
 
 [tool.poetry.group.weaviate.dependencies]
 langchain-weaviate = "^0.0.2"
+
+[tool.poetry.group.milvus]
+optional = true
+
+[tool.poetry.group.milvus.dependencies]
+langchain-milvus = "^0.1.1"
 
 [tool.ruff]
 line-length = 150

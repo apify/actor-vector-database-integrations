@@ -25,8 +25,10 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 
 To utilize this integration, ensure you have:
 
-- Created or existing `Weaviate` database. You need to know `indexName` and `apiKey`.
-- An account to compute embeddings using one of the providers, e.g., OpenAI or Cohere.
+- Created or existing `Weaviate` database. You need to know `weaviateUrl`, `weatiateApiKey`, and `weaviateCollectionName`.
+- An account to compute embeddings using one of the providers, e.g., [OpenAI](https://platform.openai.com/docs/guides/embeddings) or [Cohere](https://docs.cohere.com/docs/cohere-embed).
+
+You can run Weaviate using docker or you can try managed [Weaviate](https://weaviate.io).
 
 ## Examples
 
@@ -47,7 +49,7 @@ Therefore, it's crucial to double-check your configuration to avoid any potentia
 {
   "weaviateUrl": "YOUR-WEAVIATE-URL",
   "weaviateApiKey": "YOUR-WEAVIATE-API-KEY",
-  "weaviateCollectionName": "apify"
+  "weaviateCollectionName": "YOUR-WEAVIATE-COLLECTION-NAME"
 }
 ```
 
@@ -156,7 +158,7 @@ This integration will save the selected fields from your Actor to Weaviate.
 
 ```json
 {
-  "weaviateUrl": "YOUR-WEAVIATE-URL",
+  "weaviateUrl": "https://apify-e2g4df23k.weaviate.network",
   "weaviateApiKey": "YOUR-WEAVIATE-API-KEY",
   "weaviateCollectionName": "apify",
   "embeddingsApiKey": "YOUR-OPENAI-API-KEY",
@@ -181,7 +183,7 @@ This integration will save the selected fields from your Actor to Weaviate.
 {
   "weaviateUrl": "YOUR-WEAVIATE-URL",
   "weaviateApiKey": "YOUR-WEAVIATE-API-KEY",
-  "weaviateCollectionName": "apify"
+  "weaviateCollectionName": "YOUR-WEAVIATE-COLLECTION-NAME"
 }
 ```
 

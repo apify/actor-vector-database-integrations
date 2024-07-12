@@ -1,0 +1,15 @@
+{
+	"actorSpecification": 1,
+	"name": "Milvus-integration",
+	"title": "Milvus Integration",
+	"description": "Upload a dataset to Milvus",
+	"version": "0.0",
+	"input": "./input_schema.json",
+	"dockerfile": "../../../shared/Dockerfile",
+	"readme": "./README.md",
+	"changelog":"../../../shared/CHANGELOG.md",
+	"storages": {
+		"dataset": "../../../shared/dataset_schema.json"
+	},
+	"dockerContextDir": "../../.."
+}

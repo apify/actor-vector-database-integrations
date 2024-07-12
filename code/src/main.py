@@ -91,7 +91,6 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
 
 
 async def get_embeddings(actor_input: ActorInputsDb) -> Embeddings:  # type: ignore[return]
-
     try:
         Actor.log.info("Get embeddings class: %s", actor_input.embeddingsProvider.value)  # type: ignore[union-attr]
         embeddings = await get_embedding_provider(

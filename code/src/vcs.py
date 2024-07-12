@@ -7,7 +7,7 @@ from apify import Actor
 from langchain_core.documents import Document
 from langchain_core.vectorstores import VectorStore
 
-from .models import ChromaIntegration, PgvectorIntegration, PineconeIntegration, QdrantIntegration, WeaviateIntegration
+from .models import ChromaIntegration, MilvusIntegration, PgvectorIntegration, PineconeIntegration, QdrantIntegration, WeaviateIntegration
 from .utils import get_chunks_to_delete, get_chunks_to_update
 
 if TYPE_CHECKING:
@@ -24,6 +24,11 @@ async def get_vector_database(actor_input: ActorInputsDb | None, embeddings: Emb
         from .vector_stores.chroma import ChromaDatabase
 
         return ChromaDatabase(actor_input, embeddings)
+
+    if isinstance(actor_input, MilvusIntegration):
+        from .vector_stores.milvus import MilvusDatabase
+
+        return MilvusDatabase(actor_input, embeddings)
 
     if isinstance(actor_input, PgvectorIntegration):
         from .vector_stores.pgvector import PGVectorDatabase

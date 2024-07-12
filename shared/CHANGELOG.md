@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.0.4 (2024-07-12)
+
+- Add integration to Milvus database (Zilliz)
+
 ## 0.0.3 (2024-06-26)
 
 - The key in the metadata dictionary has been refactored from 'id' to 'chunk_id'. This change was necessitated by the requirements of the Weaviate database.
