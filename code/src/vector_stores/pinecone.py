@@ -53,7 +53,9 @@ class PineconeDatabase(PineconeVectorStore, VectorDbBase):
         """Delete objects from the index that are expired."""
 
         res = self.search_by_vector(self.dummy_vector, filter_={"last_seen_at": {"$lt": expired_ts}})
-        self.delete(ids=[d.metadata["chunk_id"] for d in res])
+        ids = [d.metadata.get("id") or d.metadata.get("chunk_id", "") for d in res]
+        ids = [_id for _id in ids if _id]
+        self.delete(ids=ids)
 
     def delete_all(self) -> None:
         """Delete all objects from the index.
