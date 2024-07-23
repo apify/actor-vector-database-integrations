@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any
 
 import weaviate
+from apify import Actor
 from langchain_core.documents import Document
 from langchain_weaviate import WeaviateVectorStore
 from weaviate.classes.query import Filter
@@ -48,11 +49,13 @@ class WeaviateDatabase(WeaviateVectorStore, VectorDbBase):
         if not item_id:
             return []
 
-        collection = self.client.collections.get(name=self.collection_name)
-        response = collection.query.fetch_objects(
-            filters=Filter.by_property("item_id").equal(item_id),
-            limit=10_000,
-        )
+        try:
+            collection = self.client.collections.get(name=self.collection_name)
+            response = collection.query.fetch_objects(filters=Filter.by_property("item_id").equal(item_id), limit=10_000)
+        except weaviate.exceptions.WeaviateQueryError as e:
+            Actor.log.warning(f"Query to Weaviate database failed. It might happen when the collection is empty. Error: {e}")
+            return []
+
         return [Document(page_content="", metadata=dict(o.properties) | {"chunk_id": str(o.uuid)}) for o in response.objects]
 
     def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:

@@ -174,7 +174,7 @@ This integration will save the selected fields from your Actor to Weaviate.
 {
   "weaviateUrl": "https://apify-e2g4df23k.weaviate.network",
   "weaviateApiKey": "YOUR-WEAVIATE-API-KEY",
-  "weaviateCollectionName": "apify",
+  "weaviateCollectionName": "YOUR-WEAVIATE-COLLECTION-NAME",
   "embeddingsApiKey": "YOUR-OPENAI-API-KEY",
   "embeddingsConfig": {
     "model": "text-embedding-3-small"
