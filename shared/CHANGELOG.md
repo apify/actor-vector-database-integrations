@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.0.5 (2024-07-24)
+
+- Introduced the `deleteExpiredObjects` setting to enable or disable the automatic deletion feature.
+- Previously, outdated data deletion was tied to the enableDeltaUpdates setting. Now, the deletion feature can be controlled independently.
+
 ## 0.0.4 (2024-07-12)
 
 - Add integration to Milvus database (Zilliz)

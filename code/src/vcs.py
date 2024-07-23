@@ -53,7 +53,7 @@ async def get_vector_database(actor_input: ActorInputsDb | None, embeddings: Emb
     raise ValueError("Unknown integration type")
 
 
-def update_db_with_crawled_data(vector_store: VectorDb, documents: list[Document], ts_expired: int) -> None:
+def update_db_with_crawled_data(vector_store: VectorDb, documents: list[Document]) -> None:
     """Update the database with new crawled data."""
 
     data_add, ids_update_last_seen, ids_del = compare_crawled_data_with_db(vector_store, documents)
@@ -74,11 +74,14 @@ def update_db_with_crawled_data(vector_store: VectorDb, documents: list[Document
         vector_store.update_last_seen_at(ids_update_last_seen)
         Actor.log.info("Updated last_seen_at metadata for %s objects", len(ids_update_last_seen))
 
-    # Delete expired objects
-    if ts_expired:
-        dt = datetime.datetime.fromtimestamp(ts_expired, tz=datetime.timezone.utc)
-        Actor.log.info("About to delete objects from the database that were not seen since %s (timestamp: %s)", dt, ts_expired)
-        vector_store.delete_expired(ts_expired)
+
+def delete_expired_objects(vector_store: VectorDb, timestamp_expired: int) -> None:
+    """Delete expired objects from the database."""
+
+    if timestamp_expired:
+        dt = datetime.datetime.fromtimestamp(timestamp_expired, tz=datetime.timezone.utc)
+        Actor.log.info("About to delete objects from the database that were not seen since %s (timestamp: %s)", dt, timestamp_expired)
+        vector_store.delete_expired(timestamp_expired)
 
 
 def compare_crawled_data_with_db(vector_store: VectorDb, data: list[Document]) -> tuple[list[Document], list[str], list[str]]:

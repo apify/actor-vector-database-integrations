@@ -84,7 +84,7 @@
       "type": "boolean",
       "description": "When set to true, this setting enables incremental updates for objects in the database by comparing the changes (deltas) between the crawled dataset items and the existing objects, uniquely identified by the `datasetKeysToItemId` field.\n\n The integration will only add new objects and update those that have changed, reducing unnecessary updates. The `datasetFields`, `metadataDatasetFields`, and `metadataObject` fields are used to determine the changes.",
       "default": true,
-      "sectionCaption": "Delta updates settings"
+      "sectionCaption": "Data updates settings"
     },
     "deltaUpdatesPrimaryDatasetFields": {
       "title": "Dataset fields to uniquely identify dataset items (only relevant when `enableDeltaUpdates` is enabled)",
@@ -101,10 +101,16 @@
         "url"
       ]
     },
+    "deleteExpiredObjects": {
+      "title": "Delete expired objects from the database",
+      "type": "boolean",
+      "description": "When set to true, delete objects from the database that have not been crawled for a specified period.",
+      "default": true
+    },
     "expiredObjectDeletionPeriodDays": {
-      "title": "Delete expired objects from the database after a specified number of days (only relevant when `enableDeltaUpdates` is enabled)",
+      "title": "Delete expired objects from the database after a specified number of days",
       "type": "integer",
-      "description": "This setting allows the integration to manage the deletion of objects from the database that have not been crawled for a specified period. It is typically used in subsequent runs after the initial crawl.\n\nWhen the value is greater than 0, the integration checks if objects have been seen within the last X days (determined by the expiration period). If the objects are expired, they are deleted from the database. The specific value for `deletedExpiredObjectsDays` depends on your use case and how frequently you crawl data.\n\nFor example, if you crawl data daily, you can set `deletedExpiredObjectsDays` to 7 days. If you crawl data weekly, you can set `deletedExpiredObjectsDays` to 30 days.\n\nSetting `deletedExpiredObjectsDays` to 0 disables this feature",
+      "description": "This setting allows the integration to manage the deletion of objects from the database that have not been crawled for a specified period. It is typically used in subsequent runs after the initial crawl.\n\nWhen the value is greater than 0, the integration checks if objects have been seen within the last X days (determined by the expiration period). If the objects are expired, they are deleted from the database. The specific value for `deletedExpiredObjectsDays` depends on your use case and how frequently you crawl data.\n\nFor example, if you crawl data daily, you can set `deletedExpiredObjectsDays` to 7 days. If you crawl data weekly, you can set `deletedExpiredObjectsDays` to 30 days.",
       "default": 30,
       "minimum": 0,
       "unit": "days",

@@ -39,6 +39,7 @@ qdrant_integration_inputs = {
     "datasetFields": ["text"],
     "enableDeltaUpdates": True,
     "deltaUpdatesPrimaryDatasetFields": ["url"],
+    "deleteExpiredObjects": True,
     "expiredObjectDeletionPeriodDays": 30,
     "embeddingsProvider": "OpenAI",
     "embeddingsApiKey": OPENAI_API_KEY,

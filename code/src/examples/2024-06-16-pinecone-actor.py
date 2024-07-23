@@ -36,6 +36,7 @@ pinecone_integration_inputs = {
     "datasetId": actor_call["defaultDatasetId"],
     "enableDeltaUpdates": True,
     "deltaUpdatesPrimaryDatasetFields": ["url"],
+    "deleteExpiredObjects": True,
     "expiredObjectDeletionPeriodDays": 30,
     "embeddingsApiKey": OPENAI_API_KEY,
     "embeddingsProvider": "OpenAI",
