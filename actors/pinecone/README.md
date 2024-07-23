@@ -1,6 +1,6 @@
 # Pinecone integration
 
-The Apify Pinecone integration transfers selected data from Apify Actors to a Pinecone database. 
+The Apify Pinecone integration transfers selected data from Apify Actors to a [Pinecone](https://www.pinecone.io) database. 
 It processes the data, optionally splits it into chunks, computes embeddings, and saves them to Pinecone.
 
 This integration supports incremental updates, updating only the data that has changed. 
@@ -10,8 +10,16 @@ This approach reduces unnecessary embedding computation and storage operations, 
 For instance, if you are using the [Website Content Crawler](https://apify.com/apify/website-content-crawler), you can activate Pinecone integration to save web data as vectors to Pinecone.
 
 For more information how to leverage vector stores in Apify platform, see detailed blog post [What Pinecone is and why you should use it with your LLMs](https://blog.apify.com/what-is-pinecone-why-use-it-with-llms/).
+For setup instructions in the Apify Console, see the [Pinecone integration guide](https://docs.apify.com/platform/integrations/pinecone).
 
-## How does it work?
+### What is Pinecone vector database?
+
+[Pinecone](https://www.pinecone.io/) is a cloud-native vector database designed to manage high-dimensional vector data efficiently. 
+Its core functionality is based on the Approximate Nearest Neighbor (ANN) search, which quickly identifies and ranks matches within large datasets. 
+The serverless architecture of Pinecone enables rapid development and deployment of powerful applications. 
+Pinecone supports clients in Python, Java, Node.js, and Golang.
+
+## How does the Apify-Pinecone integration work?
 
 Apify Pinecone integration computes text embeddings and store them in Pinecone. 
 It uses [LangChain](https://www.langchain.com/) to compute embeddings and interact with [Pinecone](https://www.pinecone.io/).

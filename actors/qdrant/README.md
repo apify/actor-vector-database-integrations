@@ -8,8 +8,15 @@ This approach reduces unnecessary embedding computation and storage operations, 
 
 💡 **Note**: This Actor is meant to be used together with other Actors' integration sections.
 For instance, if you are using the [Website Content Crawler](https://apify.com/apify/website-content-crawler), you can activate Qdrant integration to save web data as vectors in a Qdrant collection.
+For setup instructions in the Apify Console, see the [Qdrant integration guide](https://docs.apify.com/platform/integrations/qdrant).
 
-## How does it work?
+### What is Qdrant vector database?
+
+Qdrant is mature, large-scale, high-performance, low-latency vector database, optimized for the most production ready applications.
+Built in Rust, Qdrant offers SDKs for a wide range of programming languages, including Rust, JavaScript/TypeScript, Python, Golang, and Java. 
+It also demonstrates strong performance in [benchmarks](https://qdrant.tech/benchmarks/).
+
+## How does the Apify-Qdrant integration work?
 
 It uses [LangChain](https://www.langchain.com/) to compute vector embeddings and interact with [Qdrant](https://www.qdrant.tech/).
 

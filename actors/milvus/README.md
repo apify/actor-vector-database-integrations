@@ -1,6 +1,6 @@
 # Milvus integration
 
-The Apify Milvus integration transfers selected data from Apify Actors to a Milvus database. 
+The Apify Milvus integration transfers selected data from Apify Actors to a  [Milvus](https://milvus.io/)/[Zilliz](https://zilliz.com) database. 
 It processes the data, optionally splits it into chunks, computes embeddings, and saves them to Milvus.
 
 This integration supports incremental updates, updating only the data that has changed. 
@@ -9,7 +9,13 @@ This approach reduces unnecessary embedding computation and storage operations, 
 💡 **Note**: This Actor is meant to be used together with other Actors' integration sections.
 For instance, if you are using the [Website Content Crawler](https://apify.com/apify/website-content-crawler), you can activate Milvus integration to save web data as vectors to Milvus.
 
-## How does it work?
+### What is Milvus/Zilliz vector database?
+
+Milvus is an open-source vector database designed for similarity searches on large datasets of high-dimensional vectors.
+Its emphasis on efficient vector similarity search enables the development of robust and scalable retrieval systems.
+The Milvus database hosted at [Zilliz](https://zilliz.com/) demonstrates top performance in the [Vector Database Benchmark](https://github.com/zilliztech/VectorDBBench).
+
+## How does the Apify-Milvus/Zilliz integration work?
 
 Apify Milvus integration computes text embeddings and store them in Milvus. 
 It uses [LangChain](https://www.langchain.com/) to compute embeddings and interact with [Milvus](https://milvus.io/).
