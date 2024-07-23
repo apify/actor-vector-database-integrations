@@ -9,7 +9,14 @@ This approach reduces unnecessary embedding computation and storage operations, 
 💡 **Note**: This Actor is meant to be used together with other Actors' integration sections.
 For instance, if you are using the [Website Content Crawler](https://apify.com/apify/website-content-crawler), you can activate Weaviate integration to save web data as vectors to Weaviate.
 
-## How does it work?
+### What is Weaviate vector database?
+
+Weaviate is an open-source vector database designed for storing and querying data objects and their vector embeddings.
+It is useful for similarity searches, making it useful for AI applications such as semantic search, question answering, and generative AI.
+Weaviate supports both raw vectors and structured data, allowing for the combination of vector search with traditional filtering methods. 
+Clients are available for Python, Java, JavaScript/TypeScript, and Golang.
+
+## How does the Apify-Weaviate integration work?
 
 Apify Weaviate integration computes text embeddings and store them in Weaviate. 
 It uses [LangChain](https://www.langchain.com/) to compute embeddings and interact with [Weaviate](https://weaviate.io/).

@@ -1,6 +1,6 @@
 # Chroma integration
 
-The Apify Chroma integration transfers selected data from Apify Actors to a Chroma database. 
+The Apify Chroma integration transfers selected data from Apify Actors to a [Chroma](https://www.trychroma.com/) database. 
 It processes the data, optionally splits it into chunks, computes embeddings, and saves them to Chroma.
 
 This integration supports incremental updates, updating only the data that has changed. 
@@ -9,7 +9,11 @@ This approach reduces unnecessary embedding computation and storage operations, 
 💡 **Note**: This Actor is meant to be used together with other Actors' integration sections.
 For instance, if you are using the [Website Content Crawler](https://apify.com/apify/website-content-crawler), you can activate Chroma integration to save web data as vectors to Chroma.
 
-## How does it work?
+### What is Chroma vector database?
+[Chroma](https://www.trychroma.com/) is an open-source, AI-native vector database designed for simplicity and developer productivity.
+It provides SDKs for Python and JavaScript/TypeScript and includes an option for self-hosted servers.
+
+## How does the Apify-Chroma work?
 
 Apify Chroma integration computes text embeddings and store them in Chroma. 
 It uses [LangChain](https://www.langchain.com/) to compute embeddings and interact with [Chroma](https://www.trychroma.com/).
