@@ -175,7 +175,7 @@ The integration can delete data from the database that hasn't been crawled for a
 
 The deletion feature can be enabled or disabled using the `deleteExpiredObjects` setting.
 
-For each crawl, the `last_seen_at` metadata field is created or updated.  
+For each crawl, the `last_seen_at` metadata field is created or updated.
 This field records the most recent time the data object was crawled.
 The `expiredObjectDeletionPeriodDays` setting is used to control number of days since the last crawl, after which the data object is considered expired.
 If a database object has not been seen for more than the `expiredObjectDeletionPeriodDays`, it will be deleted automatically.

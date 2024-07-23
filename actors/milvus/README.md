@@ -133,24 +133,31 @@ For instance, when working with the Website Content Crawler, you can use the URL
 
 #### Delete outdated data
 
-The integration can also delete data from Milvus that hasn't been crawled for a specified period. 
-This is useful when data in the Milvus database becomes outdated, such as when a page is removed from a website. 
+The integration can delete data from the database that hasn't been crawled for a specified period, which is useful when data becomes outdated, such as when a page is removed from a website.
 
-This is controlled by the `expiredObjectDeletionPeriodDays` setting, which automatically deletes data older than the specified number of days.
-For each crawl, the `last_seen_at` metadata field is updated.
-When a database object has not been seen for more than `expiredObjectDeletionPeriodDays` days, it is deleted.
+The deletion feature can be enabled or disabled using the `deleteExpiredObjects` setting.
+
+For each crawl, the `last_seen_at` metadata field is created or updated.
+This field records the most recent time the data object was crawled.
+The `expiredObjectDeletionPeriodDays` setting is used to control number of days since the last crawl, after which the data object is considered expired.
+If a database object has not been seen for more than the `expiredObjectDeletionPeriodDays`, it will be deleted automatically.
 
 The specific value of `expiredObjectDeletionPeriodDays` depends on your use case. 
-Typically, if a website is crawled daily, `expiredObjectDeletionPeriodDays` can be set to 7. 
-If you crawl weekly, it can be set to 30.
-To disable this feature, set `expiredObjectDeletionPeriodDays` to `0`.
+- If a website is crawled daily, `expiredObjectDeletionPeriodDays` can be set to 7. 
+- If you crawl weekly, it can be set to 30.
+
+To disable this feature, set `deleteExpiredObjects` to `false`.
 
 ```json
 {
-  "enableDeltaUpdates": true,
+  "deleteExpiredObjects": true,
   "expiredObjectDeletionPeriodDays": 30
 }
 ```
+
+💡 If you are using multiple Actors to update the same database, ensure that all Actors crawl the data at the same frequency. 
+Otherwise, data crawled by one Actor might expire due to inconsistent crawling schedules.
+
 
 ## Outputs
 
