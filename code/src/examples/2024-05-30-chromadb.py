@@ -52,3 +52,6 @@ if DROP_AND_INSERT:
     print("Inserted ids:", inserted)
 
 
+r = db.similarity_search("text", k=100)
+print("Search results:", r)
+print("Search results count:", len(r))

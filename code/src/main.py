@@ -9,7 +9,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from .constants import DAY_IN_SECONDS
 from .emb import get_embedding_provider
 from .utils import add_chunk_id, add_item_checksum, get_dataset_loader
-from .vcs import get_vector_database, update_db_with_crawled_data
+from .vcs import delete_expired_objects, get_vector_database, update_db_with_crawled_data
 
 if TYPE_CHECKING:
     from langchain_core.documents import Document
@@ -65,13 +65,17 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
 
     try:
         if actor_input.enableDeltaUpdates:
-            expired_days = actor_input.expiredObjectDeletionPeriodDays or 0
-            ts_expired = expired_days and int(datetime.now(timezone.utc).timestamp() - expired_days * DAY_IN_SECONDS) or 0
-            Actor.log.info("Update database with crawled data. Delta updates enabled, expired_days: %s, expired_ts %s", expired_days, ts_expired)
-            update_db_with_crawled_data(vcs_, documents, ts_expired)
+            Actor.log.info("Update database with crawled data. Delta updates enabled")
+            update_db_with_crawled_data(vcs_, documents)
         else:
             await vcs_.aadd_documents(documents)
             Actor.log.info("Added %s new objects to the vector store", len(documents))
+
+        if actor_input.deleteExpiredObjects:
+            expired_days = actor_input.expiredObjectDeletionPeriodDays or 0
+            ts_expired = expired_days and int(datetime.now(timezone.utc).timestamp() - expired_days * DAY_IN_SECONDS) or 0
+            Actor.log.info("Delete expired objects in the database: expired_days: %s", expired_days)
+            delete_expired_objects(vcs_, ts_expired)
 
         await Actor.push_data([doc.dict() for doc in documents])
 

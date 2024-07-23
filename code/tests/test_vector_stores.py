@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 from src.constants import VCR_HEADERS_EXCLUDE
-from src.vcs import compare_crawled_data_with_db, update_db_with_crawled_data
+from src.vcs import compare_crawled_data_with_db, delete_expired_objects, update_db_with_crawled_data
 
 from .conftest import ID1, ID3, ID4A, ID4B, ID4C, ID5A, ID5B, ID5C, ID6, ITEM_ID1, ITEM_ID4
 
@@ -165,7 +165,8 @@ def test_update_db_with_crawled_data_all(input_db: str, crawl_2: list[Document],
     res = db.search_by_vector(db.dummy_vector, k=10)
     assert len(res) == 6, "Expected 6 initial objects in the database"
 
-    update_db_with_crawled_data(db, crawl_2, 1)
+    update_db_with_crawled_data(db, crawl_2)
+    delete_expired_objects(db, 1)
     wait_for_db(db.unit_test_wait_for_index)
 
     res = db.search_by_vector(db.dummy_vector, k=10)
