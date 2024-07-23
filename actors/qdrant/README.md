@@ -128,7 +128,7 @@ For instance, when working with the Website Content Crawler, you can use the URL
 }
 ```
 
-#### Delete outdated data
+### Delete outdated (expired) data
 
 The integration can delete data from the database that hasn't been crawled for a specified period, which is useful when data becomes outdated, such as when a page is removed from a website.
 
