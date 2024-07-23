@@ -126,7 +126,7 @@
       "title": "Delete expired objects from the database",
       "type": "boolean",
       "description": "When set to true, delete objects from the database that have not been crawled for a specified period.",
-      "default": true,
+      "default": true
     },
     "expiredObjectDeletionPeriodDays": {
       "title": "Delete expired objects from the database after a specified number of days",
