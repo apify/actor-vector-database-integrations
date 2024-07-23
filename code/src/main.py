@@ -91,7 +91,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
             "2. The vector dimension of your embedding model in the Actor input (Embedding settings -> model) matches the one set up in the database."
             "Error message:"
         )
-        await Actor.fail(status_message=f"{msg} {e}")
+        await Actor.fail(status_message=f"{msg} {e}", exception=e)
 
 
 async def get_embeddings(actor_input: ActorInputsDb) -> Embeddings:  # type: ignore[return]
