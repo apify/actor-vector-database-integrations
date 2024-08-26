@@ -27,6 +27,7 @@ pydantic-model:
 	datamodel-codegen --input $(DIRS_WITH_ACTORS)/pgvector/.actor/input_schema.json --output $(DIRS_WITH_CODE)/src/models/pgvector_input_model.py  --input-file-type jsonschema  --field-constraints
 	datamodel-codegen --input $(DIRS_WITH_ACTORS)/pinecone/.actor/input_schema.json --output $(DIRS_WITH_CODE)/src/models/pinecone_input_model.py  --input-file-type jsonschema  --field-constraints
 	datamodel-codegen --input $(DIRS_WITH_ACTORS)/qdrant/.actor/input_schema.json --output $(DIRS_WITH_CODE)/src/models/qdrant_input_model.py  --input-file-type jsonschema  --field-constraints
+	datamodel-codegen --input $(DIRS_WITH_ACTORS)/vectorx/.actor/input_schema.json --output $(DIRS_WITH_CODE)/src/models/vectorx_input_model.py  --input-file-type jsonschema  --field-constraints
 	datamodel-codegen --input $(DIRS_WITH_ACTORS)/weaviate/.actor/input_schema.json --output $(DIRS_WITH_CODE)/src/models/weaviate_input_model.py  --input-file-type jsonschema  --field-constraints
 
 pytest:

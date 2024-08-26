@@ -6,4 +6,5 @@ if TYPE_CHECKING:
     from .pgvector import PGVectorDatabase
     from .pinecone import PineconeDatabase
     from .qdrant import QdrantDatabase
+    from .vectorx import VectorxDatabase
     from .weaviate import WeaviateDatabase

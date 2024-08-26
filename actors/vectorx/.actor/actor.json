@@ -1,0 +1,15 @@
+{
+	"actorSpecification": 1,
+	"name": "VectorX-integration",
+	"title": "VectorX Integration",
+	"description": "Upload a dataset to VectorX",
+	"version": "0.0",
+	"input": "./input_schema.json",
+	"dockerfile": "../../../shared/Dockerfile",
+	"readme": "./README.md",
+	"changelog":"../../../shared/CHANGELOG.md",
+	"storages": {
+		"dataset": "../../../shared/dataset_schema.json"
+	},
+	"dockerContextDir": "../../.."
+}

@@ -4,4 +4,5 @@ from .milvus_input_model import MilvusIntegration
 from .pgvector_input_model import PgvectorIntegration
 from .pinecone_input_model import EmbeddingsProvider, PineconeIntegration
 from .qdrant_input_model import QdrantIntegration
+from .vectorx_input_model import VectorxIntegration
 from .weaviate_input_model import WeaviateIntegration

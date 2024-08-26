@@ -71,6 +71,13 @@ optional = true
 [tool.poetry.group.milvus.dependencies]
 langchain-milvus = "^0.1.1"
 
+[tool.poetry.group.vectorx]
+optional = true
+
+[tool.poetry.group.vectorx.dependencies]
+vecx = "^0.23.3"
+vecx-langchain = "^0.1.2"
+
 [tool.ruff]
 line-length = 150
 exclude = ["src/models/**", "src/examples/**"]
@@ -164,8 +171,13 @@ warn_return_any = true
 warn_unreachable = true
 warn_unused_ignores = true
 
-[tool.mypy-scrapy]
+[[tool.mypy.overrides]]
+module = "vecx"
 ignore_missing_imports = true
+
+#[[tool.mypy.overrides]]
+#module = "vecx_langchain"
+#ignore_missing_imports = true
 
 [tool.mypy-sortedcollections]
 ignore_missing_imports = true
