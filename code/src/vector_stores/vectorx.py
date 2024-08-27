@@ -45,6 +45,7 @@ class VectorxDatabase(VectorXVectorStore, VectorDbBase):
     def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:
         """Update last_seen_at field in the database."""
 
+        raise NotImplementedError
         last_seen_at = last_seen_at or int(datetime.now(timezone.utc).timestamp())
         self.index.upsert()
 
@@ -55,13 +56,16 @@ class VectorxDatabase(VectorXVectorStore, VectorDbBase):
 
     def delete_expired(self, expired_ts: int) -> None:
         """Delete objects from the index that are expired."""
-        self.client.delete(collection_name=self.collection_name, filter=f"last_seen_at < {expired_ts}")
+
+        raise NotImplementedError
+        self.index.delete_with_filter(filter={"last_seen_at": {"$lt": expired_ts}})
 
     def get(self, id_: str) -> Any:
         """Get a document by id from the database.
 
         Used only for testing purposes.
         """
+        raise NotImplementedError
         return self.client.get(collection_name=self.collection_name, ids=[id_])
 
     def get_all_ids(self) -> list[str]:
@@ -69,6 +73,7 @@ class VectorxDatabase(VectorXVectorStore, VectorDbBase):
 
         Used only for testing purposes.
         """
+        raise NotImplementedError
         res = self.client.query(collection_name=self.collection_name, filter="", output_fields=["pk"])
         return [str(o["pk"]) for o in res]
 

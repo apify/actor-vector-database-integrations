@@ -21,7 +21,19 @@ Notes:
     - In the vecx-langchain - prints instead of log.
     - In the vecx-langchain - query_with_filter - limit only 1000 results
     - In the vecx-langchain -  self._vectorx_index.delete(ids=chunk) - vectorx_index has no attribute delete
-    - Unable to update metadata using filter
+
+    Features to make the Apify RAG use case work
+    - Update metadata using filter
+        Pinecone:
+           last_seen_at = last_seen_at or int(datetime.now(timezone.utc).timestamp())
+            for _id in ids:
+                self.index.update(id=_id, set_metadata={"last_seen_at": last_seen_at})
+
+    - It would be handy to get/filter the data by metadata only, i.e. without a vector, similarly to Milvus database
+         res = self.client.query(index_name=index_name, filter=filter_)
+
+    - Delete by timestamp, can I write it like this?
+        self.index.delete_with_filter(filter={"last_seen_at": {"$lt": expired_ts}})
 
 Run as a module:
     python -m src.examples.2024-08-26-vectorx
@@ -98,6 +110,8 @@ if DROP_AND_INSERT:
     inserted = db.add_documents(documents=crawl_1, ids=[d.metadata["chunk_id"] for d in crawl_1])
     print("Inserted ids:", inserted)
 
+
+db.delete()
 
 r = db.similarity_search("text", k=100)
 print("Search results:", r)
