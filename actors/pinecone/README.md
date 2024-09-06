@@ -19,7 +19,7 @@ Its core functionality is based on the Approximate Nearest Neighbor (ANN) search
 The serverless architecture of Pinecone enables rapid development and deployment of powerful applications. 
 Pinecone supports clients in Python, Java, Node.js, and Golang.
 
-## w📋 How does the Apify-Pinecone integration work?
+## 📋 How does the Apify-Pinecone integration work?
 
 Apify Pinecone integration computes text embeddings and store them in Pinecone. 
 It uses [LangChain](https://www.langchain.com/) to compute embeddings and interact with [Pinecone](https://www.pinecone.io/).
