@@ -19,7 +19,7 @@ Its core functionality is based on the Approximate Nearest Neighbor (ANN) search
 The serverless architecture of Pinecone enables rapid development and deployment of powerful applications. 
 Pinecone supports clients in Python, Java, Node.js, and Golang.
 
-## How does the Apify-Pinecone integration work?
+## w📋 How does the Apify-Pinecone integration work?
 
 Apify Pinecone integration computes text embeddings and store them in Pinecone. 
 It uses [LangChain](https://www.langchain.com/) to compute embeddings and interact with [Pinecone](https://www.pinecone.io/).
@@ -31,16 +31,14 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 4. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
 5. Save data into the database
 
-## Before you start
+## ✅ Before you start
 
 To utilize this integration, ensure you have:
 
 - Created or existing `Pinecone` database. You need to know `indexName` and `apiKey`.
 - An account to compute embeddings using one of the providers, e.g., OpenAI or Cohere.
 
-## Examples
-
-For detailed input information refer to [input schema](.actor/input_schema.json).
+## 🔢 Examples
 
 The configuration consists of three parts: Pinecone, embeddings provider, and data.
 
@@ -158,9 +156,10 @@ To disable this feature, set `deleteExpiredObjects` to `false`.
 Otherwise, data crawled by one Actor might expire due to inconsistent crawling schedules.
 
 
-## Outputs
+## 🔚 Outputs
 
-This integration will save the selected fields from your Actor to Pinecone.
+This integration will save the selected fields from your Actor to Pinecone and store the chunked data in the Apify dataset.
+
 
 ## Example configuration
 

@@ -68,7 +68,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
             Actor.log.info("Update database with crawled data. Delta updates enabled")
             update_db_with_crawled_data(vcs_, documents)
         else:
-            await vcs_.aadd_documents(documents)
+            vcs_.add_documents(documents)
             Actor.log.info("Added %s new objects to the vector store", len(documents))
 
         if actor_input.deleteExpiredObjects:

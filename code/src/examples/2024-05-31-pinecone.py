@@ -23,6 +23,7 @@ from ..vector_stores.pinecone import PineconeDatabase
 
 load_dotenv()
 PINECONE_INDEX_NAME = "apify"
+PINECONE_INDEX_NAMESPACE = "ns1"
 
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
@@ -31,6 +32,7 @@ DROP_AND_INSERT = True
 db = PineconeDatabase(
     actor_input=PineconeIntegration(
         pineconeIndexName=PINECONE_INDEX_NAME,
+        pineconeIndexNamespace=PINECONE_INDEX_NAMESPACE,
         pineconeApiKey=os.getenv("PINECONE_API_KEY"),
         embeddingsProvider=EmbeddingsProvider.OpenAI,
         embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
@@ -45,7 +47,7 @@ def wait_for_index(sec=3):
 
 
 if DROP_AND_INSERT:
-    r = list(db.index.list(prefix=""))
+    r = list(db.index.list(prefix="", namespace=PINECONE_INDEX_NAMESPACE))
     print("Objects in database", r)
     if r:
         db.delete(ids=r)
