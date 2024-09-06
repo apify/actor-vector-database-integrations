@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.1.2 (2024-09-04)
+
+- Pinecone - add support to update Pinecone index namespace (Optional arg: `PineconeIndexNamespace`)
+
 ## 0.1.1 (2024-07-24)
 
 - Fixed issue with Weaviate database when collection was not created before inserting data.
