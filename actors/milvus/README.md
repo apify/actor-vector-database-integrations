@@ -32,6 +32,7 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 To utilize this integration, ensure you have:
 
 - Created or existing `Milvus` database. You need to know `milvusUrl`, `milvusApiKey`, and `milvusCollectionName`.
+- If the collection does not exist, it will be created automatically.
 - An account to compute embeddings using one of the providers, e.g., [OpenAI](https://platform.openai.com/docs/guides/embeddings) or [Cohere](https://docs.cohere.com/docs/cohere-embed).
 
 You can run Milvus using Docker or try the managed Milvus service at [Zilliz](https://zilliz.com/). 

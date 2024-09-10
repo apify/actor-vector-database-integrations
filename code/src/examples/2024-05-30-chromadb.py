@@ -45,7 +45,6 @@ print("Database is connected: ", asyncio.run(db.is_connected()))
 
 
 if DROP_AND_INSERT:
-
     db.delete_all()
     # Insert objects
     inserted = db.add_documents(documents=crawl_1, ids=[d.metadata["chunk_id"] for d in crawl_1])

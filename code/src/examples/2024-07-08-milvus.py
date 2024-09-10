@@ -10,6 +10,7 @@ It demonstrates the process of performing delta updates on Milvus. The process i
 Run as a module:
     python -m src.examples.2024-07-08-milvus
 """
+
 import os
 import time
 from datetime import datetime, timezone

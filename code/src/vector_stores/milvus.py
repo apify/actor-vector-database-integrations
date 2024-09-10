@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any
 from langchain_core.documents import Document
 from langchain_milvus.vectorstores import Milvus
 from pymilvus import MilvusClient  # type: ignore
+from pymilvus.exceptions import DescribeCollectionException  # type: ignore
 
 from .base import VectorDbBase
 
@@ -43,8 +44,12 @@ class MilvusDatabase(Milvus, VectorDbBase):
         if not item_id:
             return []
 
-        filter_ = f"item_id == '{item_id}'"
-        res = self.client.query(collection_name=self.collection_name, filter=filter_, output_fields=["chunk_id", "item_id", "checksum"])
+        try:
+            filter_ = f"item_id == '{item_id}'"
+            res = self.client.query(collection_name=self.collection_name, filter=filter_, output_fields=["chunk_id", "item_id", "checksum"])
+        except DescribeCollectionException:
+            return []
+
         return [Document(page_content="", metadata=o) for o in res]
 
     def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:
@@ -81,8 +86,13 @@ class MilvusDatabase(Milvus, VectorDbBase):
 
         Used only for testing purposes.
         """
-        res = self.client.query(collection_name=self.collection_name, filter="", output_fields=["chunk_id"], limit=16_384)
-        ids = [r["chunk_id"] for r in res]
+        res = self.client.query(
+            collection_name=self.collection_name,
+            filter="",
+            output_fields=["chunk_id"],
+            limit=16_384,
+        )
+        ids = [r.get("chunk_id") for r in res if r.get("chunk_id")]
 
         if ids:
             self.client.delete(collection_name=self.collection_name, ids=ids)
