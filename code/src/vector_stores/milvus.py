@@ -86,16 +86,17 @@ class MilvusDatabase(Milvus, VectorDbBase):
 
         Used only for testing purposes.
         """
-        res = self.client.query(
-            collection_name=self.collection_name,
-            filter="",
-            output_fields=["chunk_id"],
-            limit=16_384,
-        )
-        ids = [r.get("chunk_id") for r in res if r.get("chunk_id")]
-
-        if ids:
-            self.client.delete(collection_name=self.collection_name, ids=ids)
+        try:
+            res = self.client.query(
+                collection_name=self.collection_name,
+                filter="",
+                output_fields=["chunk_id"],
+                limit=16_384,
+            )
+            if ids := [r.get("chunk_id") for r in res if r.get("chunk_id")]:
+                self.client.delete(collection_name=self.collection_name, ids=ids)
+        except DescribeCollectionException:
+            return
 
     def search_by_vector(self, vector: list[float], k: int = 100_000, filter_: str | None = None) -> list[Document]:  # type: ignore
         return self.similarity_search_by_vector(embedding=vector, k=k, expr=filter_)

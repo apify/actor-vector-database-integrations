@@ -56,6 +56,7 @@ async def get_vector_database(actor_input: ActorInputsDb | None, embeddings: Emb
 def update_db_with_crawled_data(vector_store: VectorDb, documents: list[Document]) -> None:
     """Update the database with new crawled data."""
 
+    Actor.log.info("Comparing crawled data with the database ...")
     data_add, ids_update_last_seen, ids_del = compare_crawled_data_with_db(vector_store, documents)
     Actor.log.info("Objects: to add: %s, to update last_seen_at: %s, to delete: %s", len(data_add), len(ids_update_last_seen), len(ids_del))
 

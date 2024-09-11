@@ -43,11 +43,11 @@ embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 print("Starting Apify's Website Content Crawler")
 print("Crawling will take some time ... you can check the progress in the Apify console")
 
-actor_call = client.actor("apify/website-content-crawler").call(
+actor_call = client.actor(actor_id="apify/website-content-crawler").call(
     run_input={"maxCrawlPages": 10, "startUrls": [{"url": "https://milvus.io/"}, {"url": "https://zilliz.com/"}]}
 )
 
-print("Actor website content crawler finished")
+print("Actor website content crawler has finished")
 print(actor_call)
 
 milvus_integration_inputs = {
@@ -71,12 +71,7 @@ print(actor_call)
 
 print("Question answering using Milvus/Zilliz database")
 vectorstore = Milvus(
-    connection_args={
-        "uri": MILVUS_URL,
-        "token": MILVUS_API_KEY,
-        "user": MILVUS_USER,
-        "password": MILVUS_PASSWORD,
-    },
+    connection_args={"uri": MILVUS_URL, "token": MILVUS_API_KEY, "user": MILVUS_USER, "password": MILVUS_PASSWORD},
     embedding_function=embeddings,
     collection_name=MILVUS_COLLECTION_NAME,
 )

@@ -29,6 +29,9 @@ embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
 INDEX_NAME = "apifyunittest"
 
+# Database fixtures to test. Fill here the name of the fixtures you want to test
+DATABASE_FIXTURES = ["db_chroma", "db_milvus", "db_pgvector", "db_pinecone", "db_qdrant", "db_weaviate"]
+
 UUID = "00000000-0000-0000-0000-0000000000"
 ID1 = f"{UUID}10"
 ID2 = f"{UUID}20"
