@@ -27,6 +27,8 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 4. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
 5. Save data into the database
 
+![Apify-pinecone-integration](https://raw.githubusercontent.com/apify/actor-vector-database-integrations/master/docs/Apify-milvus-integration-readme.png)
+
 ## ✅ Before you start
 
 To utilize this integration, ensure you have:
