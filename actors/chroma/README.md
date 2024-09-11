@@ -13,7 +13,7 @@ For instance, if you are using the [Website Content Crawler](https://apify.com/a
 [Chroma](https://www.trychroma.com/) is an open-source, AI-native vector database designed for simplicity and developer productivity.
 It provides SDKs for Python and JavaScript/TypeScript and includes an option for self-hosted servers.
 
-## How does the Apify-Chroma work?
+## 📋 How does the Apify-Chroma work?
 
 Apify Chroma integration computes text embeddings and store them in Chroma. 
 It uses [LangChain](https://www.langchain.com/) to compute embeddings and interact with [Chroma](https://www.trychroma.com/).
@@ -25,7 +25,7 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 4. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
 5. Save data into the database
 
-## Before you start
+## ✅ Before you start
 
 To utilize this integration, ensure you have:
 
@@ -76,15 +76,15 @@ The URL (`https://fdfe-82-208-25-82.ngrok-free.app`) can be used in the as an in
 Note that your specific URL will vary.
 
 
-## Examples
-
-For detailed input information refer to [input schema](.actor/input_schema.json).
+## 👉 Examples
 
 The configuration consists of three parts: Chroma, embeddings provider, and data.
 
 Ensure that the vector size of your embeddings aligns with the configuration of your Chroma database.
 For instance, if you're using the `text-embedding-3-small` model from `OpenAI`, it generates vectors of size `1536`.
 This means your Chroma index should also be configured to accommodate vectors of the same size, `1536` in this case.
+
+For detailed input information refer to the [Input page](./input-schema).
 
 #### Database: Chroma
 ```json
@@ -197,11 +197,11 @@ To disable this feature, set `deleteExpiredObjects` to `false`.
 Otherwise, data crawled by one Actor might expire due to inconsistent crawling schedules.
 
 
-## Outputs
+## 💾 Outputs
 
 This integration will save the selected fields from your Actor to Chroma.
 
-## Example configuration
+## 🔢 Example configuration
 
 #### Full Input Example for Website Content Crawler Actor with Chroma integration
 

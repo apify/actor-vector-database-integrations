@@ -140,7 +140,7 @@
     "performChunking": {
       "title": "Enable text chunking",
       "description": "When set to true, the text will be divided into smaller chunks based on the settings provided below. Proper chunking helps optimize retrieval and ensures accurate and efficient responses.",
-      "default": false,
+      "default": true,
       "type": "boolean",
       "sectionCaption": "Text chunking settings"
     },
@@ -148,7 +148,7 @@
       "title": "Maximum chunk size",
       "type": "integer",
       "description": "Defines the maximum number of characters in each text chunk. Choosing the right size balances between detailed context and system performance. Optimal sizes ensure high relevancy and minimal response time.",
-      "default": 1000,
+      "default": 2000,
       "minimum": 1
     },
     "chunkOverlap": {

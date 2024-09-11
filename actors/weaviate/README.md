@@ -16,7 +16,7 @@ It is useful for similarity searches, making it useful for AI applications such 
 Weaviate supports both raw vectors and structured data, allowing for the combination of vector search with traditional filtering methods. 
 Clients are available for Python, Java, JavaScript/TypeScript, and Golang.
 
-## How does the Apify-Weaviate integration work?
+## 📋 How does the Apify-Weaviate integration work?
 
 Apify Weaviate integration computes text embeddings and store them in Weaviate. 
 It uses [LangChain](https://www.langchain.com/) to compute embeddings and interact with [Weaviate](https://weaviate.io/).
@@ -28,7 +28,7 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 4. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
 5. Save data into the database
 
-## Before you start
+## ✅ Before you start
 
 To utilize this integration, ensure you have:
 
@@ -37,9 +37,7 @@ To utilize this integration, ensure you have:
 
 You can run Weaviate using docker or you can try managed [Weaviate](https://weaviate.io).
 
-## Examples
-
-For detailed input information refer to [input schema](.actor/input_schema.json).
+## 👉 Examples
 
 The configuration consists of three parts: Weaviate, embeddings provider, and data.
 
@@ -50,6 +48,8 @@ This means your Weaviate index should also be configured to accommodate vectors 
 ⚠️ **Important**: Currently, LangChain and Weaviate do not raise an error if there's a mismatch between these sizes.
 If the embedding model is not set up correctly, the only indication might be in the logs.
 Therefore, it's crucial to double-check your configuration to avoid any potential issues.
+
+For detailed input information refer to the [Input page](./input-schema).
 
 #### Database: Weaviate
 ```json
@@ -162,11 +162,11 @@ To disable this feature, set `deleteExpiredObjects` to `false`.
 Otherwise, data crawled by one Actor might expire due to inconsistent crawling schedules.
 
 
-## Outputs
+## 💾 Outputs
 
 This integration will save the selected fields from your Actor to Weaviate.
 
-## Example configuration
+## 🔢 Example configuration
 
 #### Full Input Example for Website Content Crawler Actor with Weaviate integration
 

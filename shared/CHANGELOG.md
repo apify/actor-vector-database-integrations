@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.1.3 (2024-09-11)
+
+- Set `performChunking` to `true` by default as some users were not aware of the setting their runs were failing.
+
 ## 0.1.2 (2024-09-04)
 
 - Pinecone - add support to update Pinecone index namespace (Optional arg: `PineconeIndexNamespace`)
