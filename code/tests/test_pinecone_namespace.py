@@ -11,7 +11,7 @@ from src.constants import VCR_HEADERS_EXCLUDE
 from src.models import EmbeddingsProvider, PineconeIntegration
 from src.vector_stores.pinecone import PineconeDatabase  # type: ignore[import]
 
-from .conftest import INDEX_NAME, embeddings
+from .conftest import DATABASE_FIXTURES, INDEX_NAME, embeddings
 
 ID1, ID2 = "1", "2"
 ITEM_ID1, ITEM_ID2 = "id1", "id2"
@@ -29,6 +29,7 @@ def wait_for_db(sec: int = 3) -> None:
     time.sleep(sec)
 
 
+@pytest.mark.skipif("db_pinecone" not in DATABASE_FIXTURES, reason="pinecone database is not enabled")
 @pytest.fixture()
 def db_pinecone_ns() -> PineconeDatabase:  # type: ignore
     db = PineconeDatabase(

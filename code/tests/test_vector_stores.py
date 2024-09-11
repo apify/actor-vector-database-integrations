@@ -9,7 +9,7 @@ import pytest
 from src.constants import VCR_HEADERS_EXCLUDE
 from src.vcs import compare_crawled_data_with_db, delete_expired_objects, update_db_with_crawled_data
 
-from .conftest import ID1, ID3, ID4A, ID4B, ID4C, ID5A, ID5B, ID5C, ID6, ITEM_ID1, ITEM_ID4
+from .conftest import DATABASE_FIXTURES, ID1, ID3, ID4A, ID4B, ID4C, ID5A, ID5B, ID5C, ID6, ITEM_ID1, ITEM_ID4
 
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
@@ -17,8 +17,6 @@ if TYPE_CHECKING:
 
     from src._types import VectorDb
 
-# Database fixtures to test. Fill here the name of the fixtures you want to test
-DATABASE_FIXTURES = ["db_chroma", "db_milvus", "db_pgvector", "db_pinecone", "db_qdrant", "db_weaviate"]
 
 
 def wait_for_db(sec: int = 3) -> None:

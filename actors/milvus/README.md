@@ -15,7 +15,7 @@ Milvus is an open-source vector database designed for similarity searches on lar
 Its emphasis on efficient vector similarity search enables the development of robust and scalable retrieval systems.
 The Milvus database hosted at [Zilliz](https://zilliz.com/) demonstrates top performance in the [Vector Database Benchmark](https://github.com/zilliztech/VectorDBBench).
 
-## How does the Apify-Milvus/Zilliz integration work?
+## 📋 How does the Apify-Milvus/Zilliz integration work?
 
 Apify Milvus integration computes text embeddings and store them in Milvus. 
 It uses [LangChain](https://www.langchain.com/) to compute embeddings and interact with [Milvus](https://milvus.io/).
@@ -27,18 +27,18 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 4. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
 5. Save data into the database
 
-## Before you start
+## ✅ Before you start
 
 To utilize this integration, ensure you have:
 
 - Created or existing `Milvus` database. You need to know `milvusUrl`, `milvusApiKey`, and `milvusCollectionName`.
+- If the collection does not exist, it will be created automatically.
 - An account to compute embeddings using one of the providers, e.g., [OpenAI](https://platform.openai.com/docs/guides/embeddings) or [Cohere](https://docs.cohere.com/docs/cohere-embed).
 
 You can run Milvus using Docker or try the managed Milvus service at [Zilliz](https://zilliz.com/). 
 For more details, please refer to the [Milvus documentation](https://milvus.io/docs).
 
-
-## Examples
+## 👉 Examples
 
 For detailed input information refer to [input schema](.actor/input_schema.json).
 
@@ -159,11 +159,12 @@ To disable this feature, set `deleteExpiredObjects` to `false`.
 Otherwise, data crawled by one Actor might expire due to inconsistent crawling schedules.
 
 
-## Outputs
+## 💾 Outputs
 
-This integration will save the selected fields from your Actor to Milvus.
+This integration will save the selected fields from your Actor to Milvus and store the chunked data in the Apify dataset.
 
-## Example configuration
+
+## 🔢 Example configuration
 
 #### Full Input Example for Website Content Crawler Actor with Milvus integration
 

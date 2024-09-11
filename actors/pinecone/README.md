@@ -38,7 +38,7 @@ To utilize this integration, ensure you have:
 - Created or existing `Pinecone` database. You need to know `indexName` and `apiKey`.
 - An account to compute embeddings using one of the providers, e.g., OpenAI or Cohere.
 
-## 🔢 Examples
+## 👉 Examples
 
 The configuration consists of three parts: Pinecone, embeddings provider, and data.
 
@@ -156,12 +156,12 @@ To disable this feature, set `deleteExpiredObjects` to `false`.
 Otherwise, data crawled by one Actor might expire due to inconsistent crawling schedules.
 
 
-## 🔚 Outputs
+## 💾 Outputs
 
 This integration will save the selected fields from your Actor to Pinecone and store the chunked data in the Apify dataset.
 
 
-## Example configuration
+## 🔢 Example configuration
 
 #### Full Input Example for Website Content Crawler Actor with Pinecone integration
 
