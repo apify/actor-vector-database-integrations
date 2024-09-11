@@ -31,7 +31,7 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 4. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
 5. Save data into the database
 
-![Apify-pinecone-integration](https://github.com/apify/actor-vector-database-integrations/blob/master/docs/Apify-pinecone-integration-readme.png)
+![Apify-pinecone-integration](https://raw.githubusercontent.com/apify/actor-vector-database-integrations/master/docs/Apify-pinecone-integration-readme.png)
 
 ## ✅ Before you start
 
