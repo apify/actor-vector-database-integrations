@@ -49,7 +49,7 @@ This means your Weaviate index should also be configured to accommodate vectors 
 If the embedding model is not set up correctly, the only indication might be in the logs.
 Therefore, it's crucial to double-check your configuration to avoid any potential issues.
 
-For detailed input information refer to the [Input page](./input-schema).
+For detailed input information refer to the [Input page](https://apify.com/apify/weaviate-integration/input-schema).
 
 #### Database: Weaviate
 ```json

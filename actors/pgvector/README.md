@@ -36,7 +36,7 @@ Ensure that the vector size of your embeddings aligns with the configuration of 
 For instance, if you're using the `text-embedding-3-small` model from `OpenAI`, it generates vectors of size `1536`. 
 This means your PostgreSQL vector should also be configured to accommodate vectors of the same size, `1536` in this case.
 
-For detailed input information refer to the [Input page](./input-schema).
+For detailed input information refer to the [Input page](https://apify.com/apify/pgvector-integration/input-schema).
 
 #### Database: PostgreSQL with PGVector
 ```json
