@@ -9,7 +9,7 @@ This approach reduces unnecessary embedding computation and storage operations, 
 💡 **Note**: This Actor is meant to be used together with other Actors' integration sections.
 For instance, if you are using the [Website Content Crawler](https://apify.com/apify/website-content-crawler), you can activate PGVector integration to save web data as vectors to PostgreSQL.
 
-## How does it work?
+## 📋 How does Apify-PGVector integration work?
 
 Apify PGVector integration computes text embeddings and store them in PostgreSQL. 
 It uses [LangChain](https://www.langchain.com/) to compute embeddings and interact with [PGVector](https://github.com/pgvector/pgvector).
@@ -21,22 +21,22 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 4. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
 5. Save data into the database
 
-## Before you start
+## ✅ Before you start
 
 To utilize this integration, ensure you have:
 
 - Created or existing `PostgreSQL` database with PGVector extension. You need to know `postgresSqlConnectionStr` and `postgresCollectionName`.
 - An account to compute embeddings using one of the providers, e.g., [OpenAI](https://platform.openai.com/docs/guides/embeddings) or [Cohere](https://docs.cohere.com/docs/cohere-embed).
 
-## Examples
-
-For detailed input information refer to [input schema](.actor/input_schema.json).
+## 👉 Examples
 
 The configuration consists of three parts: PGVector, embeddings provider, and data.
 
 Ensure that the vector size of your embeddings aligns with the configuration of your PostgreSQL. 
 For instance, if you're using the `text-embedding-3-small` model from `OpenAI`, it generates vectors of size `1536`. 
 This means your PostgreSQL vector should also be configured to accommodate vectors of the same size, `1536` in this case.
+
+For detailed input information refer to the [Input page](https://apify.com/apify/pgvector-integration/input-schema).
 
 #### Database: PostgreSQL with PGVector
 ```json
@@ -148,11 +148,11 @@ To disable this feature, set `deleteExpiredObjects` to `false`.
 Otherwise, data crawled by one Actor might expire due to inconsistent crawling schedules.
 
 
-## Outputs
+## 💾 Outputs
 
 This integration will save the selected fields from your Actor to PostgreSQL.
 
-## Example configuration
+## 🔢 Example configuration
 
 #### Full Input Example for Website Content Crawler Actor with PostgreSQL integration
 

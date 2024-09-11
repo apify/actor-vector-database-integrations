@@ -16,7 +16,7 @@ Qdrant is mature, large-scale, high-performance, low-latency vector database, op
 Built in Rust, Qdrant offers SDKs for a wide range of programming languages, including Rust, JavaScript/TypeScript, Python, Golang, and Java. 
 It also demonstrates strong performance in [benchmarks](https://qdrant.tech/benchmarks/).
 
-## How does the Apify-Qdrant integration work?
+## 📋 How does the Apify-Qdrant integration work?
 
 It uses [LangChain](https://www.langchain.com/) to compute vector embeddings and interact with [Qdrant](https://www.qdrant.tech/).
 
@@ -34,15 +34,15 @@ To utilize this integration, ensure you have:
 - A Qdrant instance to connect to. You can use Qdrant using Docker or you can quickly setup a free cloud instance at [cloud.qdrant.io](https://cloud.qdrant.io/).
 - An account to compute embeddings using one of the providers, e.g., [OpenAI](https://platform.openai.com/docs/guides/embeddings) or [Cohere](https://docs.cohere.com/docs/cohere-embed).
 
-## Examples
-
-For detailed input information refer to [input schema](.actor/input_schema.json).
+## 👉 Examples
 
 The configuration consists of three parts: Qdrant, embeddings provider, and data.
 
 Ensure that the vector size of your embeddings aligns with the configuration of your Qdrant settings. 
 For instance, if you're using the `text-embedding-3-small` model from `OpenAI`, it generates vectors of size `1536`. 
 This means your Qdrant collection should also be configured to accommodate vectors of the same size, `1536` in this case.
+
+For detailed input information refer to the [Input page](https://apify.com/apify/qdrant-integration/input-schema).
 
 #### Database: Qdrant
 ```json
@@ -156,11 +156,11 @@ To disable this feature, set `deleteExpiredObjects` to `false`.
 Otherwise, data crawled by one Actor might expire due to inconsistent crawling schedules.
 
 
-## Outputs
+## 💾 Outputs
 
 This integration will save the selected fields from your Actor to Qdrant.
 
-## Example configuration
+## 🔢 Example configuration
 
 #### Full Input Example for Website Content Crawler Actor with Qdrant integration
 

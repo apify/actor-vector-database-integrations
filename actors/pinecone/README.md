@@ -31,6 +31,8 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 4. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
 5. Save data into the database
 
+![Apify-pinecone-integration](https://raw.githubusercontent.com/apify/actor-vector-database-integrations/master/docs/Apify-pinecone-integration-readme.png)
+
 ## ✅ Before you start
 
 To utilize this integration, ensure you have:
@@ -43,8 +45,10 @@ To utilize this integration, ensure you have:
 The configuration consists of three parts: Pinecone, embeddings provider, and data.
 
 Ensure that the vector size of your embeddings aligns with the configuration of your Pinecone index. 
-For instance, if you're using the `text-embedding-3-small` model from `OpenAI`, it generates vectors of size `1536`. 
+For instance, if you're using the `text-embedding-3-small` model from `OpenAI`, it generates vectors of size `1536`.
 This means your Pinecone index should also be configured to accommodate vectors of the same size, `1536` in this case.
+
+For detailed input information refer to the [Input page](https://apify.com/apify/pinecone-integration/input-schema).
 
 #### Database: Pinecone
 ```json
