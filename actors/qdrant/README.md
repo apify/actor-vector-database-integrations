@@ -27,7 +27,7 @@ It uses [LangChain](https://www.langchain.com/) to compute vector embeddings and
 4. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
 5. Save data into the database
 
-## Before you start
+## ✅ Before you start
 
 To utilize this integration, ensure you have:
 
