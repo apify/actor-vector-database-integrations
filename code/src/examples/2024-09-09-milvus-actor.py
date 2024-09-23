@@ -30,11 +30,8 @@ APIFY_API_TOKEN = os.getenv("APIFY_API_TOKEN") or "YOUR-APIFY-TOKEN"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or "YOUR-OPENAI-API-KEY"
 
 MILVUS_COLLECTION_NAME = "apify"
-MILVUS_URL = os.getenv("MILVUS_URL") or "YOUR-MILVUS-URL"
+MILVUS_URI = os.getenv("MILVUS_URI") or "YOUR-MILVUS-URI"
 MILVUS_API_KEY = os.getenv("MILVUS_API_KEY") or "YOUR-MILVUS-API-KEY"
-MILVUS_USER = os.getenv("MILVUS_USER") or "YOUR-MILVUS-USER"
-MILVUS_PASSWORD = os.getenv("MILVUS_PASSWORD") or "YOUR-MILVUS-PASSWORD"
-
 
 client = ApifyClient(APIFY_API_TOKEN)
 
@@ -51,11 +48,9 @@ print("Actor website content crawler has finished")
 print(actor_call)
 
 milvus_integration_inputs = {
-    "milvusUrl": MILVUS_URL,
+    "milvusUri": MILVUS_URI,
     "milvusApiKey": MILVUS_API_KEY,
     "milvusCollectionName": MILVUS_COLLECTION_NAME,
-    "milvusUser": MILVUS_USER,
-    "milvusPassword": MILVUS_PASSWORD,
     "datasetFields": ["text"],
     "datasetId": actor_call["defaultDatasetId"],
     "deltaUpdatesPrimaryDatasetFields": ["url"],
@@ -71,7 +66,7 @@ print(actor_call)
 
 print("Question answering using Milvus/Zilliz database")
 vectorstore = Milvus(
-    connection_args={"uri": MILVUS_URL, "token": MILVUS_API_KEY, "user": MILVUS_USER, "password": MILVUS_PASSWORD},
+    connection_args={"uri": MILVUS_URI, "token": MILVUS_API_KEY},
     embedding_function=embeddings,
     collection_name=MILVUS_COLLECTION_NAME,
 )

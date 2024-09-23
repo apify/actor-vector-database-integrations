@@ -33,7 +33,7 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 
 To utilize this integration, ensure you have:
 
-- Created or existing `Milvus` database. You need to know `milvusUrl`, `milvusApiKey`, and `milvusCollectionName`.
+- Created or existing `Milvus` database. You need to know `milvusUri`, `milvusApiKey`, and `milvusCollectionName`.
 - If the collection does not exist, it will be created automatically.
 - An account to compute embeddings using one of the providers, e.g., [OpenAI](https://platform.openai.com/docs/guides/embeddings) or [Cohere](https://docs.cohere.com/docs/cohere-embed).
 
@@ -53,7 +53,7 @@ For detailed input information refer to the [Input page](https://apify.com/apify
 #### Database: Milvus
 ```json
 {
-  "milvusUrl": "YOUR-MILVUS-URL",
+  "milvusUri": "YOUR-MILVUS-URI",
   "milvusApiKey": "YOUR-MILVUS-API-KEY",
   "milvusCollectionName": "YOUR-MILVUS-COLLECTION-NAME"
 }
@@ -172,7 +172,7 @@ This integration will save the selected fields from your Actor to Milvus and sto
 
 ```json
 {
-  "milvusUrl": "YOUR-MILVUS-URL",
+  "milvusUri": "YOUR-MILVUS-URI",
   "milvusApiKey": "YOUR-MILVUS-API-KEY",
   "milvusCollectionName": "YOUR-MILVUS-COLLECTION-NAME",
   "embeddingsApiKey": "YOUR-OPENAI-API-KEY",
@@ -195,7 +195,7 @@ This integration will save the selected fields from your Actor to Milvus and sto
 #### Milvus
 ```json
 {
-  "milvusUrl": "YOUR-MILVUS-URL",
+  "milvusUri": "YOUR-MILVUS-URI",
   "milvusApiKey": "YOUR-MILVUS-API-KEY",
   "milvusCollectionName": "YOUR-MILVUS-COLLECTION-NAME"
 }
@@ -204,7 +204,7 @@ This integration will save the selected fields from your Actor to Milvus and sto
 #### Managed Milvus service at [Zilliz](https://zilliz.com/)
 ```json
 {
-  "milvusUrl": "https://in03-***********.api.gcp-us-west1.zillizcloud.com",
+  "milvusUri": "https://in03-***********.api.gcp-us-west1.zillizcloud.com",
   "milvusApiKey": "d46**********b4b",
   "milvusCollectionName": "YOUR-MILVUS-COLLECTION-NAME"
 }
