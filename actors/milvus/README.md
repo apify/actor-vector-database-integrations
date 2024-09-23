@@ -58,6 +58,8 @@ For detailed input information refer to the [Input page](https://apify.com/apify
   "milvusCollectionName": "YOUR-MILVUS-COLLECTION-NAME"
 }
 ```
+If you're using a username and password for authentication, you can include them in the `milvusUri` as follows:
+`"milvusUri": "https://username:password@YOUR-MILVUS-URI"`.``
 
 #### Embeddings provider: OpenAI
 ```json 
