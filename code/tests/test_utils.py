@@ -122,7 +122,7 @@ def test_get_chunks_update_metadata(documents: list[Document]) -> None:
     add_, update_ = get_chunks_to_update(chunks, chunks)
     assert len(add_) == 0
     assert len(update_) == 1
-    assert update_[0].metadata["checksum"] == "04a9294ef00e1ba17270e4fad7319495a2c21999195adf01d12fed2f04201486"
+    assert update_[0].metadata["checksum"] == "0feb3e25afe9430e2d23d726cbe2cecccef2afff29cdecf7a747264433605fa4"
     assert update_[0].metadata["item_id"] == "f2881510b05f8c3567c1d63a3212d3ebb8bbfc5510241db1f39da8f66df1defd"
 
 

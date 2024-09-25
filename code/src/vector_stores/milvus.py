@@ -20,11 +20,7 @@ class MilvusDatabase(Milvus, VectorDbBase):
     def __init__(self, actor_input: MilvusIntegration, embeddings: Embeddings) -> None:
         self.collection_name = actor_input.milvusCollectionName
 
-        connection_args = {"uri": actor_input.milvusUrl, "token": actor_input.milvusApiKey}
-
-        if actor_input.milvusUser and actor_input.milvusPassword:
-            connection_args |= {"user": actor_input.milvusUser, "password": actor_input.milvusPassword}
-
+        connection_args = {"uri": actor_input.milvusUri, "token": actor_input.milvusApiKey}
         super().__init__(connection_args=connection_args, embedding_function=embeddings, collection_name=self.collection_name)
         self.client = MilvusClient(**connection_args)
         self._dummy_vector: list[float] = []
@@ -32,8 +28,8 @@ class MilvusDatabase(Milvus, VectorDbBase):
     @property
     def dummy_vector(self) -> list[float]:
         if not self._dummy_vector and self.embeddings:
-            self._dummy_vector = self.embeddings.embed_query("dummy")
-        return self._dummy_vector
+            self._dummy_vector = self.embeddings.embed_query("dummy")  # type: ignore
+        return self._dummy_vector  # type: ignore
 
     async def is_connected(self) -> bool:
         raise NotImplementedError
