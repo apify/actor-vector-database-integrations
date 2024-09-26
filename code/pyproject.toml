@@ -4,7 +4,7 @@ authors = ["jiri.spilka@apify.com"]
 description = ""
 name = "store-vector-db"
 readme = "README.md"
-version = "0.0.1"
+version = "0.1.4"
 package-mode = false
 
 [tool.poetry.dependencies]
