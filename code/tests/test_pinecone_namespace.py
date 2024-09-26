@@ -63,6 +63,7 @@ def db_pinecone_ns() -> PineconeDatabase:  # type: ignore
 
 @pytest.mark.integration()
 @pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
+@pytest.mark.skipif("db_pinecone" not in DATABASE_FIXTURES, reason="pinecone database is not enabled")
 def test_namespace(db_pinecone_ns: PineconeDatabase) -> None:
     """Test namespace functionality
 
