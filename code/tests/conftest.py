@@ -105,8 +105,8 @@ def db_chroma(crawl_1: list[Document]) -> ChromaDatabase:
 def db_milvus(crawl_1: list[Document]) -> MilvusDatabase:
     db = MilvusDatabase(
         actor_input=MilvusIntegration(
-            milvusUrl=os.getenv("MILVUS_URL"),
-            milvusApiKey=os.getenv("MILVUS_API_KEY"),
+            milvusUri=os.getenv("MILVUS_URI"),
+            milvusToken=os.getenv("MILVUS_TOKEN"),
             milvusCollectionName=INDEX_NAME,
             embeddingsProvider=EmbeddingsProvider.OpenAI.value,
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),

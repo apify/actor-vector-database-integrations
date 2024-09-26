@@ -141,7 +141,7 @@ def add_item_checksum(items: list[Document], dataset_fields_to_item_id: list[str
 def add_chunk_id(chunks: list[Document]) -> list[Document]:
     """For every chunk (document stored in vector db) add chunk_id to metadata.
 
-    The chunk_id is a unique identifier for each chunk and is not required but it is better to keep it in metadata.
+    The chunk_id is a unique identifier for each chunk and is not required, but it is better to keep it in metadata.
     """
     for d in chunks:
         d.metadata["chunk_id"] = d.metadata.get("chunk_id", str(uuid4()))

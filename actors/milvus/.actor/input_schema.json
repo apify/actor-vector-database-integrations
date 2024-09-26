@@ -3,16 +3,17 @@
   "type": "object",
   "schemaVersion": 1,
   "properties": {
-    "milvusUrl": {
-      "title": "Milvus URL",
+    "milvusUri": {
+      "title": "Milvus URI",
       "type": "string",
-      "description": "REST URL of the Milvus instance to connect to",
+      "description": "The URI of the Milvus instance to connect to. You can include the username and password in the URI, for example: `https://username:password@****.serverless.gcp-us-west1.cloud.zilliz.com`.",
       "editor": "textfield",
-      "sectionCaption": "Milvus settings"
+      "sectionCaption": "Milvus settings",
+      "isSecret": true
     },
-    "milvusApiKey": {
-      "title": "Milvus API KEY",
-      "description": "Milvus API KEY",
+    "milvusToken": {
+      "title": "Milvus Token",
+      "description": "Milvus Token",
       "type": "string",
       "editor": "textfield",
       "isSecret": true
@@ -22,19 +23,6 @@
       "type": "string",
       "description": "Name of the Milvus collection where the data will be stored",
       "editor": "textfield"
-    },
-    "milvusUser": {
-      "title": "Milvus user name",
-      "type": "string",
-      "description": "User name for the Milvus cluster",
-      "editor": "textfield"
-    },
-    "milvusPassword": {
-      "title": "Milvus user password",
-      "type": "string",
-      "description": "Password for the Milvus cluster user",
-      "editor": "textfield",
-      "isSecret": true
     },
     "embeddingsProvider": {
       "title": "Embeddings provider (as defined in the langchain API)",
@@ -152,8 +140,8 @@
     }
   },
   "required": [
-    "milvusUrl",
-    "milvusApiKey",
+    "milvusUri",
+    "milvusToken",
     "milvusCollectionName",
     "embeddingsProvider",
     "embeddingsApiKey",

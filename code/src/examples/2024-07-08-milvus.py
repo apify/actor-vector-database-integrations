@@ -35,8 +35,8 @@ DROP_AND_INSERT = True
 
 db = MilvusDatabase(
     actor_input=MilvusIntegration(
-        milvusUrl=os.getenv("MILVUS_URL"),
-        milvusApiKey=os.getenv("MILVUS_API_KEY"),
+        milvusUri=os.getenv("MILVUS_URI"),
+        milvusToken=os.getenv("MILVUS_TOKEN"),
         milvusCollectionName=MILVUS_COLLECTION_NAME,
         embeddingsProvider=EmbeddingsProvider.OpenAI.value,
         embeddingsApiKey=os.getenv("OPENAI_API_KEY"),

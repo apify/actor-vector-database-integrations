@@ -33,7 +33,7 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 
 To utilize this integration, ensure you have:
 
-- Created or existing `Milvus` database. You need to know `milvusUrl`, `milvusApiKey`, and `milvusCollectionName`.
+- Created or existing `Milvus` database. You need to know `milvusUri`, `milvusToken`, and `milvusCollectionName`.
 - If the collection does not exist, it will be created automatically.
 - An account to compute embeddings using one of the providers, e.g., [OpenAI](https://platform.openai.com/docs/guides/embeddings) or [Cohere](https://docs.cohere.com/docs/cohere-embed).
 
@@ -53,11 +53,13 @@ For detailed input information refer to the [Input page](https://apify.com/apify
 #### Database: Milvus
 ```json
 {
-  "milvusUrl": "YOUR-MILVUS-URL",
-  "milvusApiKey": "YOUR-MILVUS-API-KEY",
+  "milvusUri": "YOUR-MILVUS-URI",
+  "milvusToken": "YOUR-MILVUS-TOKEN",
   "milvusCollectionName": "YOUR-MILVUS-COLLECTION-NAME"
 }
 ```
+If you're using a username and password for authentication, you can include them in the `milvusUri` as follows:
+`"milvusUri": "https://username:password@YOUR-MILVUS-URI"`.``
 
 #### Embeddings provider: OpenAI
 ```json 
@@ -172,8 +174,8 @@ This integration will save the selected fields from your Actor to Milvus and sto
 
 ```json
 {
-  "milvusUrl": "YOUR-MILVUS-URL",
-  "milvusApiKey": "YOUR-MILVUS-API-KEY",
+  "milvusUri": "YOUR-MILVUS-URI",
+  "milvusToken": "YOUR-MILVUS-TOKEN",
   "milvusCollectionName": "YOUR-MILVUS-COLLECTION-NAME",
   "embeddingsApiKey": "YOUR-OPENAI-API-KEY",
   "embeddingsConfig": {
@@ -195,8 +197,8 @@ This integration will save the selected fields from your Actor to Milvus and sto
 #### Milvus
 ```json
 {
-  "milvusUrl": "YOUR-MILVUS-URL",
-  "milvusApiKey": "YOUR-MILVUS-API-KEY",
+  "milvusUri": "YOUR-MILVUS-URI",
+  "milvusToken": "YOUR-MILVUS-TOKEN",
   "milvusCollectionName": "YOUR-MILVUS-COLLECTION-NAME"
 }
 ```
@@ -204,8 +206,8 @@ This integration will save the selected fields from your Actor to Milvus and sto
 #### Managed Milvus service at [Zilliz](https://zilliz.com/)
 ```json
 {
-  "milvusUrl": "https://in03-***********.api.gcp-us-west1.zillizcloud.com",
-  "milvusApiKey": "d46**********b4b",
+  "milvusUri": "https://in03-***********.api.gcp-us-west1.zillizcloud.com",
+  "milvusToken": "d46**********b4b",
   "milvusCollectionName": "YOUR-MILVUS-COLLECTION-NAME"
 }
 ```
