@@ -31,7 +31,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or "YOUR-OPENAI-API-KEY"
 
 MILVUS_COLLECTION_NAME = "apify"
 MILVUS_URI = os.getenv("MILVUS_URI") or "YOUR-MILVUS-URI"
-MILVUS_API_KEY = os.getenv("MILVUS_API_KEY") or "YOUR-MILVUS-API-KEY"
+MILVUS_TOKEN = os.getenv("MILVUS_TOKEN") or "YOUR-MILVUS-TOKEN"
 
 client = ApifyClient(APIFY_API_TOKEN)
 
@@ -49,7 +49,7 @@ print(actor_call)
 
 milvus_integration_inputs = {
     "milvusUri": MILVUS_URI,
-    "milvusApiKey": MILVUS_API_KEY,
+    "milvusToken": MILVUS_TOKEN,
     "milvusCollectionName": MILVUS_COLLECTION_NAME,
     "datasetFields": ["text"],
     "datasetId": actor_call["defaultDatasetId"],
@@ -66,7 +66,7 @@ print(actor_call)
 
 print("Question answering using Milvus/Zilliz database")
 vectorstore = Milvus(
-    connection_args={"uri": MILVUS_URI, "token": MILVUS_API_KEY},
+    connection_args={"uri": MILVUS_URI, "token": MILVUS_TOKEN},
     embedding_function=embeddings,
     collection_name=MILVUS_COLLECTION_NAME,
 )

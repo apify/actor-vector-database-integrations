@@ -106,7 +106,7 @@ def db_milvus(crawl_1: list[Document]) -> MilvusDatabase:
     db = MilvusDatabase(
         actor_input=MilvusIntegration(
             milvusUri=os.getenv("MILVUS_URI"),
-            milvusApiKey=os.getenv("MILVUS_API_KEY"),
+            milvusToken=os.getenv("MILVUS_API_KEY"),
             milvusCollectionName=INDEX_NAME,
             embeddingsProvider=EmbeddingsProvider.OpenAI.value,
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),

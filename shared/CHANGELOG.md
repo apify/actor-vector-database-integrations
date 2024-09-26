@@ -2,7 +2,7 @@
 
 ## 0.1.4 (2024-09-24)
 
-- Change `milvusUrl` to `milvusUri`. 
+- Change `milvusUrl` to `milvusUri` and `milvusApiKey` to `milvusToken`. 
 - Remove `milvusUsername` and `milvusPassword` as they were moved to the `milvusUri` as part of the URI.
 
 ## 0.1.3 (2024-09-11)

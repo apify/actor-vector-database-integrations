@@ -20,7 +20,7 @@ class MilvusDatabase(Milvus, VectorDbBase):
     def __init__(self, actor_input: MilvusIntegration, embeddings: Embeddings) -> None:
         self.collection_name = actor_input.milvusCollectionName
 
-        connection_args = {"uri": actor_input.milvusUri, "token": actor_input.milvusApiKey}
+        connection_args = {"uri": actor_input.milvusUri, "token": actor_input.milvusToken}
         super().__init__(connection_args=connection_args, embedding_function=embeddings, collection_name=self.collection_name)
         self.client = MilvusClient(**connection_args)
         self._dummy_vector: list[float] = []

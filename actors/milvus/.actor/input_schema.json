@@ -6,13 +6,13 @@
     "milvusUri": {
       "title": "Milvus URI",
       "type": "string",
-      "description": "URI of the Milvus instance to connect to",
+      "description": "The URI of the Milvus instance to connect to. You can include the username and password in the URI, for example: `https://username:password@****.serverless.gcp-us-west1.cloud.zilliz.com`.",
       "editor": "textfield",
       "sectionCaption": "Milvus settings"
     },
-    "milvusApiKey": {
-      "title": "Milvus API KEY",
-      "description": "Milvus API KEY",
+    "milvusToken": {
+      "title": "Milvus Token",
+      "description": "Milvus Token",
       "type": "string",
       "editor": "textfield",
       "isSecret": true
@@ -140,7 +140,7 @@
   },
   "required": [
     "milvusUri",
-    "milvusApiKey",
+    "milvusToken",
     "milvusCollectionName",
     "embeddingsProvider",
     "embeddingsApiKey",
