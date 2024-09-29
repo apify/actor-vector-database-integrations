@@ -96,7 +96,12 @@ def compare_crawled_data_with_db(vector_store: VectorDb, data: list[Document]) -
     ids_delete: set[str] = set()
     ids_update_last_seen: set[str] = set()
 
-    crawled_db = {item_id: vector_store.get_by_item_id(item_id) for item_id in {d.metadata["item_id"] for d in data}}
+    crawled_db = {}
+    items_ids = {d.metadata["item_id"] for d in data}
+    for (k, item_id) in enumerate(items_ids):
+        if  k % 100 == 0:
+            Actor.log.info("Processing item_id %s (%s/%s) to compare crawled data with the database", item_id, k, len(items_ids))
+        crawled_db[item_id] = vector_store.get_by_item_id(item_id)
 
     for d in data:
         if res := crawled_db.get(d.metadata["item_id"]):
