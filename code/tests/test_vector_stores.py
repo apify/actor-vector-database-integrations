@@ -18,7 +18,6 @@ if TYPE_CHECKING:
     from src._types import VectorDb
 
 
-
 def wait_for_db(sec: int = 3) -> None:
     # Wait for the database to update (Pinecone)
     # Data freshness - Pinecone is eventually consistent, so there can be a slight delay before new or changed records are visible to queries.

@@ -3,9 +3,11 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
+import backoff
 from langchain_core.documents import Document
 from langchain_pinecone import PineconeVectorStore
 from pinecone import Pinecone as PineconeClient  # type: ignore[import-untyped]
+from pinecone.exceptions import PineconeApiException  # type: ignore[import-untyped]
 
 from .base import VectorDbBase
 
@@ -35,6 +37,7 @@ class PineconeDatabase(PineconeVectorStore, VectorDbBase):
     async def is_connected(self) -> bool:
         raise NotImplementedError
 
+    @backoff.on_exception(backoff.expo, PineconeApiException, max_time=60)
     def get_by_item_id(self, item_id: str) -> list[Document]:
         """Get object by item_id.
 
