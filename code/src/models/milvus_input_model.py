@@ -18,7 +18,7 @@ class EmbeddingsProvider(Enum):
 class MilvusIntegration(BaseModel):
     milvusUri: str = Field(
         ...,
-        description='The URI of the Milvus instance to connect to. You can include the username and password in the URI, for example: `https://username:password@****.serverless.gcp-us-west1.cloud.zilliz.com`.',
+        description='The URI of the Milvus instance to connect to.',
         title='Milvus URI',
     )
     milvusToken: str = Field(..., description='Milvus Token', title='Milvus Token')
