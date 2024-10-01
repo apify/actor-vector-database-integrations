@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.1.5 (2024-09-30)
+
+- Add retry logic with exponential backoff for Pinecone database to handle rate limiting.
+
 ## 0.1.4 (2024-09-24)
 
 - Change `milvusUrl` to `milvusUri`. 

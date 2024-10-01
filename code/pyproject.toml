@@ -4,12 +4,13 @@ authors = ["jiri.spilka@apify.com"]
 description = ""
 name = "store-vector-db"
 readme = "README.md"
-version = "0.1.4"
+version = "0.1.5"
 package-mode = false
 
 [tool.poetry.dependencies]
 apify = "^1.7.0"
 apify-client = "^1.6.4"
+backoff = "^2.2.1"
 langchain-cohere = "^0.3.0"
 langchain-community = "^0.3.0"
 langchain-core = "0.3.5"

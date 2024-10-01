@@ -8,7 +8,7 @@
       "type": "string",
       "description": "The URL of the Amazon OpenSearch Service instance to connect to",
       "editor": "textfield",
-      "sectionCaption": "Amazon OpenSearch Service settings",
+      "sectionCaption": "Amazon OpenSearch Service settings"
     },
     "awsAccessKeyId": {
       "title": "AWS Access Key ID",
