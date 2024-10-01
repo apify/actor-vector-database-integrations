@@ -18,7 +18,6 @@ if TYPE_CHECKING:
     from src._types import VectorDb
 
 
-
 def wait_for_db(sec: int = 3) -> None:
     # Wait for the database to update (Pinecone)
     # Data freshness - Pinecone is eventually consistent, so there can be a slight delay before new or changed records are visible to queries.
@@ -96,7 +95,13 @@ def test_update_metadata_last_seen_at(input_db: str, crawl_2: list[Document], re
     _, ids_update_last_seen, _ = compare_crawled_data_with_db(db, crawl_2)
 
     assert len(ids_update_last_seen) == 1, "Expected 1 object to update"
-    assert ID3 in ids_update_last_seen, f"Expected {ID3} to be updated"
+
+    # OpenSearch serverless does not support to create a document with ID
+    # Therefore, we cannot check the ID directly and need to get the ID from the database
+    ids_orig = ids_update_last_seen
+    if hasattr(db, "get_by_id") and (v := db.get_by_id(ids_update_last_seen[0])):
+        ids_orig = v.metadata["chunk_id"]
+    assert ID3 in ids_orig, f"Expected {ID3} to be updated"
 
     res = db.search_by_vector(db.dummy_vector, k=10)
     assert next(r for r in res if r.metadata["chunk_id"] == ID3).metadata["last_seen_at"] == 1
@@ -121,10 +126,17 @@ def test_delete_updated_data(input_db: str, crawl_2: list[Document], request: Fi
 
     _, _, ids_del = compare_crawled_data_with_db(db, crawl_2)
 
+    # OpenSearch serverless does not support to create a document with ID, so we cannot check the ID directly
+    # Therefore, we need to get the ID from the database
+
+    ids_orig = ids_del
+    if hasattr(db, "get_by_id") and (data := [db.get_by_id(id_) for id_ in ids_del]):
+        ids_orig = [d.metadata["chunk_id"] for d in data if d]
+
     assert len(ids_del) == 3, "Expected 1 object to delete"
-    assert ID4A in ids_del, f"Expected {ID4A} to be deleted"
-    assert ID4B in ids_del, f"Expected {ID4B} to be deleted"
-    assert ID5A in ids_del, f"Expected {ID5A} to be deleted"
+    assert ID4A in ids_orig, f"Expected {ID4A} to be deleted"
+    assert ID4B in ids_orig, f"Expected {ID4B} to be deleted"
+    assert ID5A in ids_orig, f"Expected {ID5A} to be deleted"
 
     db.delete(ids=ids_del)
     wait_for_db(db.unit_test_wait_for_index)
@@ -164,6 +176,7 @@ def test_update_db_with_crawled_data_all(input_db: str, crawl_2: list[Document],
     assert len(res) == 6, "Expected 6 initial objects in the database"
 
     update_db_with_crawled_data(db, crawl_2)
+    wait_for_db(db.unit_test_wait_for_index)
     delete_expired_objects(db, 1)
     wait_for_db(db.unit_test_wait_for_index)
 

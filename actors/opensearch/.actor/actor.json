@@ -1,0 +1,15 @@
+{
+	"actorSpecification": 1,
+	"name": "opensearch-integration",
+	"title": "Amazon OpenSearch Integration",
+	"description": "Upload a dataset to Amazon OpenSearch Service",
+	"version": "0.0",
+	"input": "./input_schema.json",
+	"dockerfile": "../../../shared/Dockerfile",
+	"readme": "./README.md",
+	"changelog":"../../../shared/CHANGELOG.md",
+	"storages": {
+		"dataset": "../../../shared/dataset_schema.json"
+	},
+	"dockerContextDir": "../../.."
+}

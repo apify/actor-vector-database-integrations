@@ -4,7 +4,15 @@ from apify import Actor
 
 from .constants import SupportedVectorStores
 from .main import run_actor
-from .models import ChromaIntegration, MilvusIntegration, PgvectorIntegration, PineconeIntegration, QdrantIntegration, WeaviateIntegration
+from .models import (
+    ChromaIntegration,
+    MilvusIntegration,
+    OpensearchIntegration,
+    PgvectorIntegration,
+    PineconeIntegration,
+    QdrantIntegration,
+    WeaviateIntegration,
+)
 
 
 async def main() -> None:
@@ -32,8 +40,10 @@ async def main() -> None:
 
         if actor_type == SupportedVectorStores.chroma.value:
             await run_actor(ChromaIntegration(**actor_input), actor_input)
-        if actor_type == SupportedVectorStores.milvus.value:
+        elif actor_type == SupportedVectorStores.milvus.value:
             await run_actor(MilvusIntegration(**actor_input), actor_input)
+        elif actor_type == SupportedVectorStores.opensearch.value:
+            await run_actor(OpensearchIntegration(**actor_input), actor_input)
         elif actor_type == SupportedVectorStores.pgvector.value:
             await run_actor(PgvectorIntegration(**actor_input), actor_input)
         elif actor_type == SupportedVectorStores.pinecone.value:

@@ -10,6 +10,7 @@ from langchain_openai.embeddings import OpenAIEmbeddings
 from models import (  # type: ignore[import]
     ChromaIntegration,
     MilvusIntegration,
+    OpensearchIntegration,
     PgvectorIntegration,
     PineconeIntegration,
     QdrantIntegration,
@@ -19,6 +20,7 @@ from models.pinecone_input_model import EmbeddingsProvider  # type: ignore[impor
 from utils import add_item_checksum  # type: ignore[import]
 from vector_stores.chroma import ChromaDatabase  # type: ignore[import]
 from vector_stores.milvus import MilvusDatabase  # type: ignore[import]
+from vector_stores.opensearch import OpenSearchDatabase  # type: ignore[import]
 from vector_stores.pgvector import PGVectorDatabase  # type: ignore[import]
 from vector_stores.pinecone import PineconeDatabase  # type: ignore[import]
 from vector_stores.qdrant import QdrantDatabase  # type: ignore[import]
@@ -30,7 +32,7 @@ embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 INDEX_NAME = "apifyunittest"
 
 # Database fixtures to test. Fill here the name of the fixtures you want to test
-DATABASE_FIXTURES = ["db_chroma", "db_milvus", "db_pgvector", "db_pinecone", "db_qdrant", "db_weaviate"]
+DATABASE_FIXTURES = ["db_chroma", "db_milvus", "db_opensearch", "db_pgvector", "db_pinecone", "db_qdrant", "db_weaviate"]
 
 UUID = "00000000-0000-0000-0000-0000000000"
 ID1 = f"{UUID}10"
@@ -128,6 +130,39 @@ def db_milvus(crawl_1: list[Document]) -> MilvusDatabase:
 
 
 @pytest.fixture()
+def db_opensearch(crawl_1: list[Document]) -> OpenSearchDatabase:
+    use_aws4_auth = os.getenv("OPENSEARCH_URL", "").endswith("amazonaws.com")
+    db = OpenSearchDatabase(
+        actor_input=OpensearchIntegration(
+            useAWS4Auth=use_aws4_auth,
+            autoCreateIndex=True,
+            awsAccessKeyId=os.getenv("AWS_ACCESS_KEY_ID"),
+            awsSecretAccessKey=os.getenv("AWS_SECRET_ACCESS_KEY"),
+            openSearchIndexName=INDEX_NAME,
+            openSearchUrl=os.getenv("OPENSEARCH_URL"),
+            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+            embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
+            datasetFields=["text"],
+            useSsl=use_aws4_auth,
+            verifyCerts=use_aws4_auth,
+        ),
+        embeddings=embeddings,
+    )
+
+    # Opensearch takes long time to update the index
+    db.unit_test_wait_for_index = 80 if use_aws4_auth else 5
+
+    db.delete_all()
+    # Insert initially crawled objects
+    db.add_documents(documents=crawl_1, ids=[d.metadata["chunk_id"] for d in crawl_1])
+    time.sleep(db.unit_test_wait_for_index)
+
+    yield db
+
+    db.delete_all()
+
+
+@pytest.fixture()
 def db_pgvector(crawl_1: list[Document]) -> PGVectorDatabase:
     db = PGVectorDatabase(
         actor_input=PgvectorIntegration(
@@ -140,11 +175,12 @@ def db_pgvector(crawl_1: list[Document]) -> PGVectorDatabase:
         embeddings=embeddings,
     )
 
-    db.unit_test_wait_for_index = 0
+    db.unit_test_wait_for_index = 1
 
     db.delete_all()
     # Insert initially crawled objects
     db.add_documents(documents=crawl_1, ids=[d.metadata["chunk_id"] for d in crawl_1])
+    time.sleep(db.unit_test_wait_for_index)
 
     yield db
 

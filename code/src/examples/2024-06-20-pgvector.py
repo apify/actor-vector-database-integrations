@@ -123,8 +123,8 @@ assert len(res) == 6, "Expected 6 objects in the database after all updates"
 
 # compare results with expected results
 for r in expected_results:
-    d = db.get(r.metadata["chunk_id"])
-    assert d.cmetadata["item_id"] == r.metadata["item_id"], f"Expected item_id {r.metadata['item_id']}"
-    assert d.cmetadata["checksum"] == r.metadata["checksum"], f"Expected checksum {r.metadata['checksum']}"
+    d = db.get_by_id(r.metadata["chunk_id"])
+    assert d.metadata["item_id"] == r.metadata["item_id"], f"Expected item_id {r.metadata['item_id']}"
+    assert d.metadata["checksum"] == r.metadata["checksum"], f"Expected checksum {r.metadata['checksum']}"
 
 print("DONE")
