@@ -31,18 +31,28 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 
 ## ✅ Before you start
 
-To utilize this integration, ensure you have:
+To use this integration, ensure you have:
 
 - Created or existing `Milvus` database. You need to know `milvusUri`, `milvusToken`, and `milvusCollectionName`.
 - If the collection does not exist, it will be created automatically.
 - An account to compute embeddings using one of the providers, e.g., [OpenAI](https://platform.openai.com/docs/guides/embeddings) or [Cohere](https://docs.cohere.com/docs/cohere-embed).
 
-You can run Milvus using Docker or try the managed Milvus service at [Zilliz](https://zilliz.com/). 
+### Set up Milvus/Zilliz URI, token and collection name
+
+You can run Milvus using Docker or try the managed Milvus service at [Zilliz](https://zilliz.com/).
 For more details, please refer to the [Milvus documentation](https://milvus.io/docs).
+
+You need the URI and Token of your Milvus/Zilliz to setup the client.
+- If you have self-deployed Milvus server on [Docker or Kubernetes](https://milvus.io/docs/quickstart.md), use the server address and port as your uri, e.g.`http://localhost:19530`. If you enable the authentication feature on Milvus, use "<your_username>:<your_password>" as the token, otherwise leave the token as empty string.
+- If you use [Zilliz Cloud](https://zilliz.com/cloud), the fully managed cloud service for Milvus, adjust the `uri` and `token`, which correspond to the [Public Endpoint and API key](https://docs.zilliz.com/docs/on-zilliz-cloud-console#cluster-details) in Zilliz Cloud.
+
+Note that the collection does not need to exist beforehand. 
+It will be automatically created when data is uploaded to the database.
+
 
 ## 👉 Examples
 
-The configuration consists of three parts: Milvus, embeddings provider, and data.
+The configuration consists of three parts: Milvus, embeddings provider and data.
 
 Ensure that the vector size of your embeddings aligns with the configuration of your Milvus index. 
 For instance, if you're using the `text-embedding-3-small` model from `OpenAI`, it generates vectors of size `1536`. 
@@ -58,8 +68,8 @@ For detailed input information refer to the [Input page](https://apify.com/apify
   "milvusCollectionName": "YOUR-MILVUS-COLLECTION-NAME"
 }
 ```
-If you're using a username and password for authentication, you can include them in the `milvusUri` as follows:
-`"milvusUri": "https://username:password@YOUR-MILVUS-URI"`.``
+
+Please refer to the instructions above on how to set up the Milvus/Zilliz `URI`, `token`, and `collection name`.
 
 #### Embeddings provider: OpenAI
 ```json 
