@@ -78,7 +78,7 @@
       "title": "Dataset ID",
       "type": "string",
       "description": "Dataset ID (when running standalone without integration)",
-      "editor": "dataset"
+      "editor": "textfield"
     },
     "enableDeltaUpdates": {
       "title": "Enable incremental updates for objects based on deltas",
