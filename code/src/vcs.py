@@ -102,7 +102,7 @@ def get_items_ids_from_db(vector_store: VectorDb, data: list[Document]) -> dict[
 
         for k, future in enumerate(concurrent.futures.as_completed(future_to_item_id)):
             item_id = future_to_item_id[future]
-            if k % 100 == 0:
+            if k % 1000 == 0:
                 Actor.log.info("Processing item_id %s (%d/%d) to compare crawled data with the database", item_id, k, len(items_ids))
             try:
                 item_id, documents = future.result()

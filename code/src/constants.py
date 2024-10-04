@@ -3,6 +3,7 @@ import enum
 VCR_HEADERS_EXCLUDE = ["Authorization", "Api-Key"]
 
 DAY_IN_SECONDS = 24 * 3600
+BACKOFF_MAXTIME_SECONDS = 120
 
 
 class SupportedVectorStores(str, enum.Enum):

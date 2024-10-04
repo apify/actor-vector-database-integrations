@@ -9,6 +9,7 @@ from langchain_pinecone import PineconeVectorStore
 from pinecone import Pinecone as PineconeClient  # type: ignore[import-untyped]
 from pinecone.exceptions import PineconeApiException  # type: ignore[import-untyped]
 
+from ..constants import BACKOFF_MAXTIME_SECONDS
 from .base import VectorDbBase
 
 if TYPE_CHECKING:
@@ -41,7 +42,7 @@ class PineconeDatabase(PineconeVectorStore, VectorDbBase):
         result = self.index.describe_index_stats(namespace=self.namespace)
         return result["total_vector_count"]
 
-    @backoff.on_exception(backoff.expo, PineconeApiException, max_time=120)
+    @backoff.on_exception(backoff.expo, PineconeApiException, max_time=BACKOFF_MAXTIME_SECONDS)
     def get_by_item_id(self, item_id: str) -> list[Document]:
         """Get object by item_id.
 
@@ -52,6 +53,7 @@ class PineconeDatabase(PineconeVectorStore, VectorDbBase):
         )
         return [Document(page_content="", metadata=d["metadata"] | {"chunk_id": d["id"]}) for d in results["matches"]]
 
+    @backoff.on_exception(backoff.expo, PineconeApiException, max_time=BACKOFF_MAXTIME_SECONDS)
     def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:
         """Update last_seen_at field in the database."""
 
@@ -59,6 +61,7 @@ class PineconeDatabase(PineconeVectorStore, VectorDbBase):
         for _id in ids:
             self.index.update(id=_id, set_metadata={"last_seen_at": last_seen_at}, namespace=self.namespace)
 
+    @backoff.on_exception(backoff.expo, PineconeApiException, max_time=BACKOFF_MAXTIME_SECONDS)
     def delete_expired(self, expired_ts: int) -> None:
         """Delete objects from the index that are expired."""
 
