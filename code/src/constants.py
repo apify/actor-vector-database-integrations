@@ -17,3 +17,4 @@ class SupportedVectorStores(str, enum.Enum):
 class SupportedEmbeddings(str, enum.Enum):
     openai = "OpenAI"
     cohere = "Cohere"
+    fake = "Fake"

@@ -3,15 +3,18 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
+import backoff
 from langchain_core.documents import Document
 from langchain_qdrant import Qdrant
 from qdrant_client import QdrantClient
+from qdrant_client.http.exceptions import ResponseHandlingException
 from qdrant_client.models import FieldCondition, Filter, MatchValue, Range
 
 from .base import VectorDbBase
 
 if TYPE_CHECKING:
     from langchain_core.embeddings import Embeddings
+    from qdrant_client.http.models import CollectionInfo
 
     from ..models.qdrant_input_model import QdrantIntegration
 
@@ -50,6 +53,12 @@ class QdrantDatabase(Qdrant, VectorDbBase):
         else:
             return True
 
+    def count(self) -> int | None:
+        """Get the number of documents in the index."""
+        results: CollectionInfo = self.client.get_collection(self.collection_name)
+        return results.points_count
+
+    @backoff.on_exception(backoff.expo, ResponseHandlingException, max_time=120)
     def get_by_item_id(self, item_id: str) -> list[Document]:
         """Get all documents with the given item_id.
 

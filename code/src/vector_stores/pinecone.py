@@ -37,7 +37,11 @@ class PineconeDatabase(PineconeVectorStore, VectorDbBase):
     async def is_connected(self) -> bool:
         raise NotImplementedError
 
-    @backoff.on_exception(backoff.expo, PineconeApiException, max_time=60)
+    def count(self) -> None:
+        result = self.index.describe_index_stats(namespace=self.namespace)
+        return result["total_vector_count"]
+
+    @backoff.on_exception(backoff.expo, PineconeApiException, max_time=120)
     def get_by_item_id(self, item_id: str) -> list[Document]:
         """Get object by item_id.
 
