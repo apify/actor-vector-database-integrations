@@ -3,15 +3,19 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
+import backoff
 from langchain_core.documents import Document
 from langchain_qdrant import Qdrant
 from qdrant_client import QdrantClient
+from qdrant_client.http.exceptions import ResponseHandlingException
 from qdrant_client.models import FieldCondition, Filter, MatchValue, Range
 
+from ..constants import BACKOFF_MAX_TIME_DELETE_SECONDS, BACKOFF_MAX_TIME_SECONDS
 from .base import VectorDbBase
 
 if TYPE_CHECKING:
     from langchain_core.embeddings import Embeddings
+    from qdrant_client.http.models import CollectionInfo
 
     from ..models.qdrant_input_model import QdrantIntegration
 
@@ -50,6 +54,12 @@ class QdrantDatabase(Qdrant, VectorDbBase):
         else:
             return True
 
+    def count(self) -> int | None:
+        """Get the number of documents in the index."""
+        results: CollectionInfo = self.client.get_collection(self.collection_name)
+        return results.points_count
+
+    @backoff.on_exception(backoff.expo, ResponseHandlingException, max_time=BACKOFF_MAX_TIME_SECONDS)
     def get_by_item_id(self, item_id: str) -> list[Document]:
         """Get all documents with the given item_id.
 
@@ -64,6 +74,7 @@ class QdrantDatabase(Qdrant, VectorDbBase):
         )
         return [Document(page_content="", metadata=d.payload.get("metadata", {}) | {"chunk_id": d.id}) for d in results if d.payload]
 
+    @backoff.on_exception(backoff.expo, ResponseHandlingException, max_time=BACKOFF_MAX_TIME_SECONDS)
     def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:
         """Update last_seen_at field in the database.
 
@@ -75,6 +86,7 @@ class QdrantDatabase(Qdrant, VectorDbBase):
         last_seen_at = last_seen_at or int(datetime.now(timezone.utc).timestamp())
         self.client.set_payload(self.collection_name, {"last_seen_at": last_seen_at}, points=ids, key=self.metadata_payload_key)
 
+    @backoff.on_exception(backoff.expo, ResponseHandlingException, max_time=BACKOFF_MAX_TIME_DELETE_SECONDS)
     def delete_expired(self, expired_ts: int) -> None:
         """Delete objects from the index that are expired."""
         self.client.delete(

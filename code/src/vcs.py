@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import concurrent.futures
 import datetime
+from collections import defaultdict
 from typing import TYPE_CHECKING
 
 from apify import Actor
@@ -67,6 +69,7 @@ def update_db_with_crawled_data(vector_store: VectorDb, documents: list[Document
 
     # Add new data
     if data_add:
+        Actor.log.info("Adding %s new objects to the vector store", len(data_add))
         vector_store.add_documents(data_add, ids=[d.metadata["chunk_id"] for d in data_add])
         Actor.log.info("Added %s new objects to the vector store", len(data_add))
 
@@ -85,6 +88,31 @@ def delete_expired_objects(vector_store: VectorDb, timestamp_expired: int) -> No
         vector_store.delete_expired(timestamp_expired)
 
 
+def get_items_ids_from_db(vector_store: VectorDb, data: list[Document]) -> dict[str, list[Document]]:
+    """Get documents from the database by item_id."""
+
+    items_ids = {d.metadata["item_id"] for d in data}
+
+    def _get_item_id(item_id: str) -> tuple[str, list[Document]]:
+        return item_id, vector_store.get_by_item_id(item_id)
+
+    crawled_db = defaultdict(list)
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        future_to_item_id = {executor.submit(_get_item_id, item_id): item_id for item_id in items_ids}
+
+        for k, future in enumerate(concurrent.futures.as_completed(future_to_item_id)):
+            item_id = future_to_item_id[future]
+            if k % 1000 == 0:
+                Actor.log.info("Processing item_id %s (%d/%d) to compare crawled data with the database", item_id, k, len(items_ids))
+            try:
+                item_id, documents = future.result()
+                crawled_db[item_id].extend(documents)
+            except Exception as exc:
+                Actor.log.error("Item_id %s generated an exception: %s", item_id, exc)
+
+    return dict(crawled_db)
+
+
 def compare_crawled_data_with_db(vector_store: VectorDb, data: list[Document]) -> tuple[list[Document], list[str], list[str]]:
     """Compare current crawled data with the data in the database. Return data to add, delete and update.
 
@@ -96,12 +124,10 @@ def compare_crawled_data_with_db(vector_store: VectorDb, data: list[Document]) -
     ids_delete: set[str] = set()
     ids_update_last_seen: set[str] = set()
 
-    crawled_db = {}
-    items_ids = {d.metadata["item_id"] for d in data}
-    for k, item_id in enumerate(items_ids):
-        if k % 100 == 0:
-            Actor.log.info("Processing item_id %s (%s/%s) to compare crawled data with the database", item_id, k, len(items_ids))
-        crawled_db[item_id] = vector_store.get_by_item_id(item_id)
+    if hasattr(vector_store, "count") and vector_store.count() == 0:
+        return data, [], []
+
+    crawled_db = get_items_ids_from_db(vector_store, data)
 
     for d in data:
         if res := crawled_db.get(d.metadata["item_id"]):
