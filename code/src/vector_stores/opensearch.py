@@ -27,17 +27,19 @@ class OpenSearchDatabase(OpenSearchVectorSearch, VectorDbBase):
 
         if actor_input.useAWS4Auth:
             from apify import Actor
+            service_name = actor_input.awsServiceName or ""
+            service_name = service_name if isinstance(service_name, str) else service_name.value
 
             Actor.log.info("Using AWS4Auth")
             Actor.log.info(f"awsAccessKeyId: ****{actor_input.awsAccessKeyId[5:]}, {type(actor_input.awsAccessKeyId)}")
             Actor.log.info(f"awsSecretAccessKey: ****{actor_input.awsSecretAccessKey[-5:]}, {type(actor_input.awsSecretAccessKey)}")
             Actor.log.info(f"awsRegion: {actor_input.awsRegion}, {type(actor_input.awsRegion)}")
-            Actor.log.info(f"awsServiceName: {actor_input.awsServiceName}, {type(actor_input.awsServiceName)}")
+            Actor.log.info(f"awsServiceName: {service_name}, {service_name}")
             awsauth = AWS4Auth(
                 actor_input.awsAccessKeyId,
                 actor_input.awsSecretAccessKey,
                 actor_input.awsRegion,
-                actor_input.awsServiceName,
+                service_name,
             )
         else:
             awsauth = None
