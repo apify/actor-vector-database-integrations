@@ -10,6 +10,7 @@ BACKOFF_MAX_TIME_DELETE_SECONDS = 300  # 5 minutes (if many objects were added i
 class SupportedVectorStores(str, enum.Enum):
     chroma = "chroma"
     milvus = "milvus"
+    opensearch = "opensearch"
     pgvector = "pgvector"
     pinecone = "pinecone"
     qdrant = "qdrant"

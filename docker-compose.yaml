@@ -16,6 +16,17 @@ services:
       timeout: 20s
       retries: 3
 
+  opensearch:
+    image: opensearchproject/opensearch:latest
+    environment:
+      - discovery.type=single-node
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=dfkjds4Afjd4
+      - plugins.security.disabled=true
+      - plugins.security.ssl.http.enabled=false
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
   pgvector:
     image: pgvector/pgvector:pg16
     environment:

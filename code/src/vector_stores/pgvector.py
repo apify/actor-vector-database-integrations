@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from langchain_core.documents import Document
 from langchain_postgres import PGVector
@@ -32,7 +32,7 @@ class PGVectorDatabase(PGVector, VectorDbBase):
     async def is_connected(self) -> bool:
         raise NotImplementedError
 
-    def get(self, id_: str) -> Any:
+    def get_by_id(self, id_: str) -> Document:
         """Get a document by id from the database.
 
         Used only for testing purposes.
@@ -41,11 +41,12 @@ class PGVectorDatabase(PGVector, VectorDbBase):
             if not (collection := self.get_collection(session)):
                 raise ValueError("Collection not found")
 
+            store = self.EmbeddingStore
+            result = session.query(store).where(store.collection_id == collection.uuid).where(store.id == id_).first()
             return (
-                session.query(self.EmbeddingStore)
-                .where(self.EmbeddingStore.collection_id == collection.uuid)
-                .where(self.EmbeddingStore.id == id_)
-                .first()
+                Document(page_content=result.document, metadata=result.cmetadata | {"chunk_id": result.id})
+                if result
+                else Document(page_content="", metadata={})
             )
 
     def get_all_ids(self) -> list[str]:

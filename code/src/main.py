@@ -54,7 +54,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
     try:
         vcs_: VectorDb = await get_vector_database(actor_input, embeddings)
     except Exception as e:
-        Actor.log.error(e)
+        Actor.log.exception(e)
         await Actor.fail(
             status_message="Failed to connect/get database. Please ensure the following: "
             "1. Database credentials are correct and the database is configure properly. "
