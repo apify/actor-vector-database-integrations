@@ -23,23 +23,16 @@ MAX_SIZE = 10_000
 class OpenSearchDatabase(OpenSearchVectorSearch, VectorDbBase):
     def __init__(self, actor_input: OpensearchIntegration, embeddings: Embeddings) -> None:
         self.index_name = actor_input.openSearchIndexName
-        self.service_name = actor_input.awsServiceName
+        name = actor_input.awsServiceName or ""
+        name = name if isinstance(name, str) else name.value
+        self.service_name = name
 
         if actor_input.useAWS4Auth:
-            from apify import Actor
-            service_name = actor_input.awsServiceName or ""
-            service_name = service_name if isinstance(service_name, str) else service_name.value
-
-            Actor.log.info("Using AWS4Auth")
-            Actor.log.info(f"awsAccessKeyId: ****{actor_input.awsAccessKeyId[5:]}, {type(actor_input.awsAccessKeyId)}")
-            Actor.log.info(f"awsSecretAccessKey: ****{actor_input.awsSecretAccessKey[-5:]}, {type(actor_input.awsSecretAccessKey)}")
-            Actor.log.info(f"awsRegion: {actor_input.awsRegion}, {type(actor_input.awsRegion)}")
-            Actor.log.info(f"awsServiceName: {service_name}, {service_name}")
             awsauth = AWS4Auth(
                 actor_input.awsAccessKeyId,
                 actor_input.awsSecretAccessKey,
                 actor_input.awsRegion,
-                service_name,
+                self.service_name
             )
         else:
             awsauth = None

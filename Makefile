@@ -10,8 +10,6 @@ install-dev:
 	cd $(DIRS_WITH_CODE) && pip install --upgrade pip poetry && poetry install --with main,dev,chroma,milvus,opensearch,pgvector,pinecone,qdrant,weaviate && poetry run pre-commit install && cd ..
 
 lint:
-	echo "Running lint"
-	echo $(PWD)
 	poetry run -C $(DIRS_WITH_CODE) ruff check $(DIRS_WITH_CODE)
 
 type-check:
