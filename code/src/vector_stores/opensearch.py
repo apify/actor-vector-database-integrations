@@ -4,7 +4,6 @@ import time
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any
 
-import boto3  # type: ignore
 from langchain_community.vectorstores import OpenSearchVectorSearch
 from langchain_core.documents import Document
 from opensearchpy import OpenSearch, RequestsHttpConnection
@@ -28,22 +27,17 @@ class OpenSearchDatabase(OpenSearchVectorSearch, VectorDbBase):
 
         if actor_input.useAWS4Auth:
             from apify import Actor
-            Actor.log.info("Using AWS4Auth")
-            Actor.log.info(f"awsAccessKeyId: ****{actor_input.awsAccessKeyId[5:]}")
-            Actor.log.info(f"awsSecretAccessKey: ****{actor_input.awsSecretAccessKey[-5:]}")
-            Actor.log.info(f"awsRegion: {actor_input.awsRegion}")
-            Actor.log.info(f"awsServiceName: {actor_input.awsServiceName}")
 
-            credentials = boto3.Session(
-                aws_access_key_id=actor_input.awsAccessKeyId, aws_secret_access_key=actor_input.awsSecretAccessKey, region_name=actor_input.awsRegion
-            ).get_credentials()
-            Actor.log.info(f"credentials token {credentials.token}")
+            Actor.log.info("Using AWS4Auth")
+            Actor.log.info(f"awsAccessKeyId: ****{actor_input.awsAccessKeyId[5:]}, {type(actor_input.awsAccessKeyId)}")
+            Actor.log.info(f"awsSecretAccessKey: ****{actor_input.awsSecretAccessKey[-5:]}, {type(actor_input.awsSecretAccessKey)}")
+            Actor.log.info(f"awsRegion: {actor_input.awsRegion}, {type(actor_input.awsRegion)}")
+            Actor.log.info(f"awsServiceName: {actor_input.awsServiceName}, {type(actor_input.awsServiceName)}")
             awsauth = AWS4Auth(
                 actor_input.awsAccessKeyId,
                 actor_input.awsSecretAccessKey,
                 actor_input.awsRegion,
                 actor_input.awsServiceName,
-                session_token=credentials.token,
             )
         else:
             awsauth = None
