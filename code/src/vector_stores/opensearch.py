@@ -27,9 +27,17 @@ class OpenSearchDatabase(OpenSearchVectorSearch, VectorDbBase):
         self.service_name = actor_input.awsServiceName
 
         if actor_input.useAWS4Auth:
+            from apify import Actor
+            Actor.log.info("Using AWS4Auth")
+            Actor.log.info(f"awsAccessKeyId: ****{actor_input.awsAccessKeyId[5:]}")
+            Actor.log.info(f"awsSecretAccessKey: ****{actor_input.awsSecretAccessKey[-5:]}")
+            Actor.log.info(f"awsRegion: {actor_input.awsRegion}")
+            Actor.log.info(f"awsServiceName: {actor_input.awsServiceName}")
+
             credentials = boto3.Session(
                 aws_access_key_id=actor_input.awsAccessKeyId, aws_secret_access_key=actor_input.awsSecretAccessKey, region_name=actor_input.awsRegion
             ).get_credentials()
+            Actor.log.info(f"credentials token {credentials.token}")
             awsauth = AWS4Auth(
                 actor_input.awsAccessKeyId,
                 actor_input.awsSecretAccessKey,
