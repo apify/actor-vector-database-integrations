@@ -216,3 +216,16 @@ This integration will save the selected fields from your Actor to Qdrant.
   "embeddingsConfig": {"model":  "embed-multilingual-v3.0"}
 }
 ```
+
+### Fake Embeddings
+
+You can use the `Fake` embeddings for testing purposes.
+It will generate random embeddings of the specified size.
+
+```json
+{
+  "embeddingsApiKey": "RANDOM-STRING",
+  "embeddings": "Fake",
+  "embeddingsConfig": {"size":  1536}
+}
+```

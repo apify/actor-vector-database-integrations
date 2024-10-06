@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.1.6 (2024-10-04)
+
+- Add retry logic with exponential backoff for Qdrant errors.
+- Use Langchain Fake Embeddings for testing.
+- Parallelize comparison of crawled data with the database.
+- Implement a count() method for Pinecone and Qdrant.
+
 ## 0.1.5 (2024-09-30)
 
 - Add retry logic with exponential backoff for Pinecone database to handle rate limiting.

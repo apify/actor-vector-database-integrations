@@ -27,5 +27,11 @@ async def get_embedding_provider(embeddings_name: str, api_key: str | None = Non
         config["cohere_api_key"] = api_key
         return CohereEmbeddings(**config)
 
+    if embeddings_name == SupportedEmbeddings.fake:
+        from langchain_core.embeddings import FakeEmbeddings
+
+        config = config or {}
+        return FakeEmbeddings(**config)
+
     await Actor.fail(status_message=f"Failed to get embeddings for embeddings: {embeddings_name} and config: {config}")
     raise ValueError("Failed to get embeddings")
