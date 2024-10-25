@@ -1,17 +1,28 @@
-import requests
 import os
+
+from apify_client import ApifyClient
 from dotenv import load_dotenv
 
 load_dotenv()
 
-URL = "https://api.apify.com/v2/datasets"
+client = ApifyClient(token=os.getenv("APIFY_API_TOKEN"))
 
-APIFY_API_TOKEN = os.getenv("APIFY_API_TOKEN")
+actor_name = "apify/opensearch-integration"
 
-print(APIFY_API_TOKEN)
-r = requests.post(URL, json={"data": "my-data"}, params={"name": "my-dataset-name", "token": APIFY_API_TOKEN})
-print(r.json())
-print(r.url)
+run_input = {
+    "datasetId": "YOUR-DATASET-ID",
+    "datasetFields": ["text"],
+    "deltaUpdatesPrimaryDatasetFields": ["url"],
+    "openSearchIndexName": "apify-index",
+    "embeddingsApiKey": os.getenv("OPENAI_API_KEY"),
+    "embeddingsConfig": {"model": "text-embedding-3-small"},
+    "embeddingsProvider": "OpenAI",
+    "enableDeltaUpdates": True,
+    "openSearchUrl": os.getenv("OPENSEARCH_URL"),
+    "awsAccessKeyId": os.getenv("AWS_ACCESS_KEY_ID"),
+    "awsSecretAccessKey": os.getenv("AWS_SECRET_ACCESS_KEY"),
+    "awsRegion": "us-east-1",
+}
 
-
-# https://api.apify.com/v2/datasets?name=my-dataset-name&token=apify_api_IoPOM26vW1hV4tqum7jVYsoFvm0UZt4iEOPH
+result = client.actor(actor_name).call(run_input=run_input)
+print(result)
