@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.1.7 (2024-10-25)
+
+- Increase backoff time to 300 seconds (was 120)
+
 ## 0.1.6 (2024-10-04)
 
 - Add retry logic with exponential backoff for Qdrant errors.
