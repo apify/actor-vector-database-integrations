@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from src.constants import VCR_HEADERS_EXCLUDE
 from src.vcs import compare_crawled_data_with_db, delete_expired_objects, update_db_with_crawled_data
 
 from .conftest import DATABASE_FIXTURES, ID1, ID3, ID4A, ID4B, ID4C, ID5A, ID5B, ID5C, ID6, ITEM_ID1, ITEM_ID4
@@ -25,7 +24,6 @@ def wait_for_db(sec: int = 3) -> None:
 
 
 @pytest.mark.integration()
-@pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_add_newly_crawled_data(input_db: str, crawl_2: list[Document], request: FixtureRequest) -> None:
     db: VectorDb = request.getfixturevalue(input_db)
@@ -54,7 +52,6 @@ def test_add_newly_crawled_data(input_db: str, crawl_2: list[Document], request:
 
 
 @pytest.mark.integration()
-@pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_get_by_item_id(input_db: str, request: FixtureRequest) -> None:
     db: VectorDb = request.getfixturevalue(input_db)
@@ -81,7 +78,6 @@ def test_get_by_item_id(input_db: str, request: FixtureRequest) -> None:
 
 
 @pytest.mark.integration()
-@pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_update_metadata_last_seen_at(input_db: str, crawl_2: list[Document], request: FixtureRequest) -> None:
     # to test whether the object was updated
@@ -116,7 +112,6 @@ def test_update_metadata_last_seen_at(input_db: str, crawl_2: list[Document], re
 
 
 @pytest.mark.integration()
-@pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_delete_updated_data(input_db: str, crawl_2: list[Document], request: FixtureRequest) -> None:
     db: VectorDb = request.getfixturevalue(input_db)
@@ -150,7 +145,6 @@ def test_delete_updated_data(input_db: str, crawl_2: list[Document], request: Fi
 
 
 @pytest.mark.integration()
-@pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_deleted_expired_data(input_db: str, request: FixtureRequest) -> None:
     db: VectorDb = request.getfixturevalue(input_db)
@@ -167,7 +161,6 @@ def test_deleted_expired_data(input_db: str, request: FixtureRequest) -> None:
 
 
 @pytest.mark.integration()
-@pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_update_db_with_crawled_data_all(input_db: str, crawl_2: list[Document], expected_results: list[Document], request: FixtureRequest) -> None:
     db: VectorDb = request.getfixturevalue(input_db)
@@ -191,7 +184,6 @@ def test_update_db_with_crawled_data_all(input_db: str, crawl_2: list[Document],
 
 
 @pytest.mark.integration()
-@pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_get_delete_all(input_db: str, request: FixtureRequest) -> None:
     """Test that all items have benn deleted (delete_all is an internal function)."""

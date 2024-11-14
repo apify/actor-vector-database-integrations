@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.1.8 (2024-11-14)
+
+- Pinecone - do not create string from metadata fields
+
 ## 0.1.7 (2024-10-25)
 
 - Increase backoff time to 300 seconds (was 120)

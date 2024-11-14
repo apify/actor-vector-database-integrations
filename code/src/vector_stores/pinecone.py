@@ -9,8 +9,7 @@ from langchain_pinecone import PineconeVectorStore
 from pinecone import Pinecone as PineconeClient  # type: ignore[import-untyped]
 from pinecone.exceptions import PineconeApiException  # type: ignore[import-untyped]
 
-from ..constants import BACKOFF_MAX_TIME_DELETE_SECONDS, BACKOFF_MAX_TIME_SECONDS
-from .base import VectorDbBase
+from .base import BACKOFF_MAX_TIME_DELETE_SECONDS, BACKOFF_MAX_TIME_SECONDS, VectorDbBase
 
 if TYPE_CHECKING:
     from langchain_core.embeddings import Embeddings

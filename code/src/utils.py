@@ -4,6 +4,7 @@ import copy
 import hashlib
 from collections import defaultdict
 from datetime import datetime, timezone
+from typing import Any
 from uuid import uuid4
 
 from langchain_community.document_loaders import ApifyDatasetLoader
@@ -13,7 +14,7 @@ EXCLUDE_KEYS_FROM_CHECKSUM = {"metadata": {"chunk_id", "id", "checksum", "last_s
 DAY_IN_SECONDS = 24 * 3600
 
 
-def get_nested_value(d: dict, keys: str) -> str:
+def get_nested_value(d: dict, keys: str) -> Any:
     """
     Extract nested value from dict.
 
@@ -28,7 +29,7 @@ def get_nested_value(d: dict, keys: str) -> str:
             d = d[key]
         else:
             return ""
-    return str(d)
+    return d
 
 
 def stringify_dict(d: dict, keys: list[str]) -> str:
