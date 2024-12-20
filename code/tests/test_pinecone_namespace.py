@@ -7,7 +7,6 @@ from datetime import datetime, timezone
 import pytest
 from langchain_core.documents import Document
 
-from src.constants import VCR_HEADERS_EXCLUDE
 from src.models import EmbeddingsProvider, PineconeIntegration
 from src.vector_stores.pinecone import PineconeDatabase  # type: ignore[import]
 
@@ -52,17 +51,20 @@ def db_pinecone_ns() -> PineconeDatabase:  # type: ignore
 
     # delete_all is not deleting all namespaces
     db.delete_all()
+    delete_ns("default")
+    delete_ns(NAMESPACE1)
     delete_ns(NAMESPACE2)
     wait_for_db(db.unit_test_wait_for_index)
 
     yield db
 
     db.delete_all()
+    delete_ns("default")
+    delete_ns(NAMESPACE1)
     delete_ns(NAMESPACE2)
 
 
 @pytest.mark.integration()
-@pytest.mark.vcr(filter_headers=VCR_HEADERS_EXCLUDE)
 @pytest.mark.skipif("db_pinecone" not in DATABASE_FIXTURES, reason="pinecone database is not enabled")
 def test_namespace(db_pinecone_ns: PineconeDatabase) -> None:
     """Test namespace functionality

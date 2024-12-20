@@ -1,5 +1,7 @@
 # Chroma integration
 
+[![Chroma integration](https://apify.com/actor-badge?actor=apify/chroma-integration)](https://apify.com/apify/chroma-integration)
+
 The Apify Chroma integration transfers selected data from Apify Actors to a [Chroma](https://www.trychroma.com/) database. 
 It processes the data, optionally splits it into chunks, computes embeddings, and saves them to Chroma.
 

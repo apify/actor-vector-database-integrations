@@ -1,5 +1,17 @@
 # Apify Vector Database Integrations
 
+#### Vector database integrations (Actors)
+
+| Actor                       | Actor badge |
+|-----------------------------|---------------------|
+| [Chroma](https://apify.com/apify/chroma-integration) | [![Chroma integration](https://apify.com/actor-badge?actor=apify/chroma-integration)](https://apify.com/apify/chroma-integration) |
+| [Milvus](https://apify.com/apify/milvus-integration) | [![Milvus integration](https://apify.com/actor-badge?actor=apify/milvus-integration)](https://apify.com/apify/milvus-integration) |
+| [OpenSearch](https://apify.com/apify/opensearch-integration) | [![OpenSearch integration](https://apify.com/actor-badge?actor=apify/opensearch-integration)](https://apify.com/apify/opensearch-integration) |
+| [PGVector](https://apify.com/apify/pgvector-integration) | [![PGVector integration](https://apify.com/actor-badge?actor=apify/pgvector-integration)](https://apify.com/apify/pgvector-integration) |
+| [Pinecone](https://apify.com/apify/pinecone-integration) | [![Pinecone integration](https://apify.com/actor-badge?actor=apify/pinecone-integration)](https://apify.com/apify/pinecone-integration) |
+| [Qdrant](https://apify.com/apify/qdrant-integration) | [![Qdrant integration](https://apify.com/actor-badge?actor=apify/qdrant-integration)](https://apify.com/apify/adrant-integration) |
+| [Weaviate](https://apify.com/apify/weaviate-integration) | [![Weaviate integration](https://apify.com/actor-badge?actor=apify/weaviate-integration)](https://apify.com/apify/weaviate-integration) |
+
 The Apify Vector Database Integrations facilitate the transfer of data from Apify Actors to a vector database. 
 This process includes data processing, optional splitting into chunks, embedding computation, and data storage
 
@@ -15,15 +27,6 @@ This repository contains Actors for different vector databases.
 3. _[Optional]_ Update only changed data.
 4. Compute embeddings, e.g. using [OpenAI](https://platform.openai.com/docs/guides/embeddings) or [Cohere](https://cohere.com/embeddings).
 5. Save data into the database.
-
-## Vector database integrations (Actors)
-- [Chroma](https://apify.com/apify/chroma-integration)
-- [Milvus](https://apify.com/apify/milvus-integration)
-- [OpenSearch](https://apify.com/apify/opensearch-integration)
-- [PGVector](https://apify.com/apify/pgvector-integration)
-- [Pinecone](https://apify.com/apify/pinecone-integration)
-- [Qdrant](https://apify.com/apify/qdrant-integration)
-- [Weaviate](https://apify.com/apify/weaviate-integration)
 
 ## Supported Vector Embeddings
 - [OpenAI](https://platform.openai.com/docs/guides/embeddings)
@@ -136,7 +139,7 @@ services:
 
 1. Run tests
    ```bash  
-   make test
+   make pytest
    ```
 
 1. Run the actor locally

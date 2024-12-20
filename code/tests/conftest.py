@@ -135,6 +135,7 @@ def db_opensearch(crawl_1: list[Document]) -> OpenSearchDatabase:
     db = OpenSearchDatabase(
         actor_input=OpensearchIntegration(
             useAWS4Auth=use_aws4_auth,
+            awsServiceName=os.getenv("AWS_SERVICE_NAME"),
             autoCreateIndex=True,
             awsAccessKeyId=os.getenv("AWS_ACCESS_KEY_ID"),
             awsSecretAccessKey=os.getenv("AWS_SECRET_ACCESS_KEY"),
@@ -150,12 +151,16 @@ def db_opensearch(crawl_1: list[Document]) -> OpenSearchDatabase:
     )
 
     # Opensearch takes long time to update the index
-    db.unit_test_wait_for_index = 80 if use_aws4_auth else 5
+    db.unit_test_wait_for_index = 80 if use_aws4_auth else 60
 
     db.delete_all()
+    time.sleep(db.unit_test_wait_for_index)
     # Insert initially crawled objects
     db.add_documents(documents=crawl_1, ids=[d.metadata["chunk_id"] for d in crawl_1])
-    time.sleep(db.unit_test_wait_for_index)
+    for _ in range(5):
+        if len(db.search_by_vector(db.dummy_vector, k=10)) == 6:
+            break
+        time.sleep(db.unit_test_wait_for_index)
 
     yield db
 

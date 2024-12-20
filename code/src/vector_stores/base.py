@@ -6,6 +6,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from langchain_core.documents import Document
 
+BACKOFF_MAX_TIME_SECONDS = 900
+BACKOFF_MAX_TIME_DELETE_SECONDS = 900  # 15 minutes (if many objects were added it takes time to search in the database)
+
 
 class VectorDbBase(ABC):
     # only for testing purposes (to wait for the index to be updated, e.g. in Pinecone)

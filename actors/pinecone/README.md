@@ -1,5 +1,7 @@
 # Pinecone integration
 
+[![Pinecone integration](https://apify.com/actor-badge?actor=apify/pinecone-integration)](https://apify.com/apify/pinecone-integration)
+
 The Apify Pinecone integration transfers selected data from Apify Actors to a [Pinecone](https://www.pinecone.io) database. 
 It processes the data, optionally splits it into chunks, computes embeddings, and saves them to Pinecone.
 

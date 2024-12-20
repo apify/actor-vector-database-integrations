@@ -28,12 +28,7 @@ class OpenSearchDatabase(OpenSearchVectorSearch, VectorDbBase):
         self.service_name = name
 
         if actor_input.useAWS4Auth:
-            awsauth = AWS4Auth(
-                actor_input.awsAccessKeyId,
-                actor_input.awsSecretAccessKey,
-                actor_input.awsRegion,
-                self.service_name
-            )
+            awsauth = AWS4Auth(actor_input.awsAccessKeyId, actor_input.awsSecretAccessKey, actor_input.awsRegion, self.service_name)
         else:
             awsauth = None
 

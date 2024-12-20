@@ -10,8 +10,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.http.exceptions import ResponseHandlingException
 from qdrant_client.models import FieldCondition, Filter, MatchValue, Range
 
-from ..constants import BACKOFF_MAX_TIME_DELETE_SECONDS, BACKOFF_MAX_TIME_SECONDS
-from .base import VectorDbBase
+from .base import BACKOFF_MAX_TIME_DELETE_SECONDS, BACKOFF_MAX_TIME_SECONDS, VectorDbBase
 
 if TYPE_CHECKING:
     from langchain_core.embeddings import Embeddings
