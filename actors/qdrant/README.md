@@ -1,5 +1,7 @@
 # Qdrant integration
 
+[![Qdrant integration](https://apify.com/actor-badge?actor=apify/qdrant-integration)](https://apify.com/apify/adrant-integration)
+
 The Apify Qdrant integration transfers selected data from Apify Actors to a [Qdrant](https://qdrant.tech/) collection.
 It processes the data, optionally splits it into chunks, computes embeddings, and saves them to a Qdrant collection.
 

@@ -1,5 +1,7 @@
 # Milvus integration
 
+[![Milvus integration](https://apify.com/actor-badge?actor=apify/milvus-integration)](https://apify.com/apify/milvus-integration)
+
 The Apify Milvus integration transfers selected data from Apify Actors to a  [Milvus](https://milvus.io/)/[Zilliz](https://zilliz.com) database. 
 It processes the data, optionally splits it into chunks, computes embeddings, and saves them to Milvus.
 

@@ -1,5 +1,7 @@
 # PostgreSQL (with PGVector) integration
 
+[![PGVector integration](https://apify.com/actor-badge?actor=apify/pgvector-integration)](https://apify.com/apify/pgvector-integration)
+
 The Apify PGVector integration transfers selected data from Apify Actors to PostgreSQL (with PGVector extension). 
 It processes the data, optionally splits it into chunks, computes embeddings, and saves them to PostgreSQL.
 

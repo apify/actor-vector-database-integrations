@@ -1,8 +1,10 @@
 # Change Log
 
-## 0.1.8 (2024-11-14)
+## 0.1.8 (2024-12-20)
 
-- Pinecone - do not create string from metadata fields
+- Do not create string from metadata fields
+- Increase backoff time to 900 seconds (15 minutes) (was 300)
+- Add Apify's badge to the README
 
 ## 0.1.7 (2024-10-25)
 

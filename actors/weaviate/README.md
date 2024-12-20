@@ -1,5 +1,7 @@
 # Weaviate integration
 
+[![Weaviate integration](https://apify.com/actor-badge?actor=apify/weaviate-integration)](https://apify.com/apify/weaviate-integration)
+
 The Apify Weaviate integration transfers selected data from Apify Actors to a Weaviate database. 
 It processes the data, optionally splits it into chunks, computes embeddings, and saves them to Weaviate.
 

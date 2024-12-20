@@ -1,5 +1,7 @@
 # Amazon OpenSearch integration
 
+[![OpenSearch integration](https://apify.com/actor-badge?actor=apify/opensearch-integration)](https://apify.com/apify/opensearch-integration)
+
 The Apify Amazon Open Search integration transfers selected data from Apify Actors to a [OpenSearch](https://opensearch.org/) database. 
 This integration supports [Amazon OpenSearch Service](https://aws.amazon.com/opensearch-service/) (successor of Amazon Elasticsearch Service)
 and [Amazon OpenSearch Serverless](https://aws.amazon.com/opensearch-service/features/serverless/).
