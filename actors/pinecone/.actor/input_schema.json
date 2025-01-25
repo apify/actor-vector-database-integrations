@@ -30,8 +30,7 @@
       "editor": "select",
       "enum": [
         "OpenAI",
-        "Cohere",
-        "Fake"
+        "Cohere"
       ],
       "default": "OpenAI",
       "sectionCaption": "Embeddings settings"

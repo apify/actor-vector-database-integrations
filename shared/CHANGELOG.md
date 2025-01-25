@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.1.9 (2025-01-25)
+
+- Convert all fields used for delta updates to strings to avoid issues with different types of data.
+
 ## 0.1.8 (2024-12-20)
 
 - Do not create string from metadata fields

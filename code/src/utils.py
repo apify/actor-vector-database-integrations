@@ -134,7 +134,7 @@ def add_item_checksum(items: list[Document], dataset_fields_to_item_id: list[str
     """
     for item in items:
         item.metadata["checksum"] = compute_hash(item.json(exclude=EXCLUDE_KEYS_FROM_CHECKSUM))  # type: ignore[arg-type]
-        item.metadata["item_id"] = compute_hash("".join([item.metadata[key] for key in dataset_fields_to_item_id]))
+        item.metadata["item_id"] = compute_hash("".join([str(item.metadata[key]) for key in dataset_fields_to_item_id]))
 
     return add_item_last_seen_at(items)
 
