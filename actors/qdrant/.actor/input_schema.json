@@ -31,13 +31,12 @@
     },
     "embeddingsProvider": {
       "title": "Embeddings provider (as defined in the langchain API)",
-      "description": "Choose the embeddings provider to use for generating embeddings OpenAI, Cohere, or Fake",
+      "description": "Choose the embeddings provider to use for generating embeddings OpenAI, Cohere",
       "type": "string",
       "editor": "select",
       "enum": [
         "OpenAI",
-        "Cohere",
-        "Fake"
+        "Cohere"
       ],
       "default": "OpenAI",
       "sectionCaption": "Embeddings settings"
