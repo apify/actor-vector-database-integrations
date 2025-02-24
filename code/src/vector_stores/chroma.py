@@ -69,6 +69,9 @@ class ChromaDatabase(Chroma, VectorDbBase):
         """Delete expired objects."""
         self.index.delete(where={"last_seen_at": {"$lt": expired_ts}})  # type: ignore[dict-item]
 
+    def delete_by_item_id(self, item_id: str) -> None:
+        self.index.delete(where={"item_id": {"$eq": item_id}})  # type: ignore[dict-item]
+
     def delete_all(self) -> None:
         """Delete all objects."""
         r = self.index.get()

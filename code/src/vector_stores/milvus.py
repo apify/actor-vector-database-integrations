@@ -58,6 +58,10 @@ class MilvusDatabase(Milvus, VectorDbBase):
             d["last_seen_at"] = last_seen_at
         self.client.upsert(collection_name=self.collection_name, data=data)
 
+    def delete_by_item_id(self, item_id: str) -> None:
+        """Delete object by item_id."""
+        self.client.delete(collection_name=self.collection_name, filter=f"item_id == '{item_id}'")
+
     def delete_expired(self, expired_ts: int) -> None:
         """Delete objects from the index that are expired."""
         self.client.delete(collection_name=self.collection_name, filter=f"last_seen_at < {expired_ts}")

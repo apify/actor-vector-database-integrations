@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 import pytest
 from langchain_core.documents import Document
 
-from src.models import EmbeddingsProvider, PineconeIntegration
+from src.models import PineconeIntegration
 from src.vector_stores.pinecone import PineconeDatabase
 
 from .conftest import DATABASE_FIXTURES, INDEX_NAME, embeddings
@@ -36,7 +36,7 @@ def db_pinecone_ns() -> PineconeDatabase:  # type: ignore
             pineconeIndexName=INDEX_NAME,
             pineconeIndexNamespace=NAMESPACE1,
             pineconeApiKey=os.getenv("PINECONE_API_KEY") or "fake",
-            embeddingsProvider=EmbeddingsProvider.OpenAI.value,  # type: ignore
+            embeddingsProvider="OpenAI",
             embeddingsApiKey=os.getenv("OPENAI_API_KEY") or "fake",
             datasetFields=["text"],
         ),

@@ -17,7 +17,7 @@ from models import (  # type: ignore
     QdrantIntegration,
     WeaviateIntegration,
 )
-from models.pinecone_input_model import EmbeddingsProvider  #type: ignore[import-not-found]
+from models.chroma_input_model import EmbeddingsProvider  # type: ignore[import-not-found]
 from utils import add_item_checksum  # type: ignore[import-not-found]
 from vector_stores.chroma import ChromaDatabase  # type: ignore[import-not-found]
 from vector_stores.milvus import MilvusDatabase  # type: ignore[import-not-found]
@@ -33,7 +33,7 @@ embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 INDEX_NAME = "apifyunittest"
 
 # Database fixtures to test. Fill here the name of the fixtures you want to test
-DATABASE_FIXTURES = ["db_chroma", "db_milvus", "db_opensearch", "db_pgvector", "db_pinecone", "db_qdrant", "db_weaviate"]
+DATABASE_FIXTURES = ["db_chroma", "db_milvus", "db_opensearch", "db_pgvector", "db_pinecone", "db_pinecone_id_prefix", "db_qdrant", "db_weaviate"]
 
 UUID = "00000000-0000-0000-0000-0000000000"
 ID1 = f"{UUID}10"
@@ -77,7 +77,7 @@ def expected_results() -> list[Document]:
 @pytest.fixture()
 def documents() -> list[Document]:
     d = Document(page_content="Content", metadata={"url": "https://url1.com"})
-    return add_item_checksum([d], ["url"])  #type: ignore[no-any-return]
+    return add_item_checksum([d], ["url"])  # type: ignore[no-any-return]
 
 
 @pytest.fixture()
@@ -199,7 +199,7 @@ def db_pinecone(crawl_1: list[Document]) -> Generator[PineconeDatabase, Any, Non
         actor_input=PineconeIntegration(
             pineconeIndexName=INDEX_NAME,
             pineconeApiKey=os.getenv("PINECONE_API_KEY"),
-            embeddingsProvider=EmbeddingsProvider.OpenAI,
+            embeddingsProvider="OpenAI",
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],
         ),

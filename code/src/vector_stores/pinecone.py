@@ -85,7 +85,8 @@ class PineconeDatabase(PineconeVectorStore, VectorDbBase):
         """
         if self.use_id_prefix:
             ids_ = []
-            for _ids in self.index.list(prefix=f"{item_id}#", namespace=self.namespace):
+            prefix = f"{item_id}#" if "#" not in item_id else item_id
+            for _ids in self.index.list(prefix=prefix, namespace=self.namespace):
                 ids_.extend(_ids)
             if ids_:
                 results = self.index.fetch(ids=ids_, namespace=self.namespace)
@@ -104,6 +105,23 @@ class PineconeDatabase(PineconeVectorStore, VectorDbBase):
         last_seen_at = last_seen_at or int(datetime.now(timezone.utc).timestamp())
         for _id in ids:
             self.index.update(id=_id, set_metadata={"last_seen_at": last_seen_at}, namespace=self.namespace)
+
+    @backoff.on_exception(backoff.expo, PineconeApiException, max_time=BACKOFF_MAX_TIME_DELETE_SECONDS)
+    def delete_by_item_id(self, item_id: str) -> None:
+        """Delete objects by item_id."""
+        ids = []
+        if self.use_id_prefix:
+            prefix = f"{item_id}#" if "#" not in item_id else item_id
+            for ids in self.index.list(prefix=prefix, namespace=self.namespace):
+                ids.extend(ids)
+        else:
+            results = self.index.query(
+                vector=self.dummy_vector, top_k=10_000, filter={"item_id": item_id}, include_metadata=True, namespace=self.namespace
+            )
+            ids = [r.get("id") or r.get("chunk_id") for r in results["matches"]]
+
+        if ids:
+            self.delete(ids=ids, namespace=self.namespace)
 
     @backoff.on_exception(backoff.expo, PineconeApiException, max_time=BACKOFF_MAX_TIME_DELETE_SECONDS)
     def delete_expired(self, expired_ts: int) -> None:

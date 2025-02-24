@@ -38,6 +38,7 @@ async def main() -> None:
         actor_type = arg.split("/")[-1]
         Actor.log.info("Received start argument (vector database name): %s", actor_type)
 
+        actor_input_ensure_backward_compatibility(actor_input)
         if actor_type == SupportedVectorStores.chroma.value:
             await run_actor(ChromaIntegration(**actor_input), actor_input)
         elif actor_type == SupportedVectorStores.milvus.value:
@@ -58,3 +59,22 @@ async def main() -> None:
                 status_message=f"This Actor was built incorrectly; an unknown Actor was selected "
                 f"to start ({actor_type}). If you encounter this issue, please contact the Actor developer.",
             )
+
+
+def actor_input_ensure_backward_compatibility(actor_input: dict) -> None:
+    """Ensure backward compatibility for the actor input."""
+    if not actor_input.get("dataUpdatesStrategy"):
+        # legacy update mechanism
+        if actor_input.get("enableDeltaUpdates") is False:
+            actor_input["dataUpdatesStrategy"] = "add"
+        else:
+            actor_input["dataUpdatesStrategy"] = "deltaUpdates"
+    else:
+        # for integrations that do not have updateStrategy implemented
+        actor_input["enableDeltaUpdates"] = actor_input["dataUpdatesStrategy"] == "deltaUpdates"
+
+    if not actor_input.get("dataUpdatesPrimaryDatasetFields"):
+        actor_input["dataUpdatesPrimaryDatasetFields"] = actor_input.get("deltaUpdatesPrimaryDatasetFields", [])
+    else:
+        # for integrations that do not have updateStrategy implemented
+        actor_input["deltaUpdatesPrimaryDatasetFields"] = actor_input.get("dataUpdatesPrimaryDatasetFields")

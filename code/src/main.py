@@ -9,7 +9,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from .constants import DAY_IN_SECONDS
 from .emb import get_embedding_provider
 from .utils import add_chunk_id, add_item_checksum, get_dataset_loader
-from .vcs import delete_expired_objects, get_vector_database, update_db_with_crawled_data
+from .vcs import delete_expired_objects, get_vector_database, update_db_with_crawled_data, upsert_db_with_crawled_data
 
 if TYPE_CHECKING:
     from langchain_core.documents import Document
@@ -64,12 +64,20 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
         return
 
     try:
-        if actor_input.enableDeltaUpdates:
+        data_update_strategy = hasattr(actor_input, "dataUpdatesStrategy") and actor_input.dataUpdatesStrategy
+        if data_update_strategy == "deltaUpdates":
             Actor.log.info("Update database with crawled data. Delta updates enabled")
             update_db_with_crawled_data(vcs_, documents)
-        else:
+        elif data_update_strategy == "add":
             vcs_.add_documents(documents)
             Actor.log.info("Added %s new objects to the vector store", len(documents))
+        elif data_update_strategy == "upsert":
+            upsert_db_with_crawled_data(vcs_, documents)
+        else:
+            await Actor.fail(
+                status_message=f"Invalid dataUpdatesStrategy: {data_update_strategy}. "
+                f"Please ensure that the configuration in the Database Settings is correct."
+            )
 
         if actor_input.deleteExpiredObjects:
             expired_days = actor_input.expiredObjectDeletionPeriodDays or 0
@@ -96,9 +104,14 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
 
 async def get_embeddings(actor_input: ActorInputsDb) -> Embeddings:  # type: ignore[return]
     try:
-        Actor.log.info("Get embeddings class: %s", actor_input.embeddingsProvider.value)
+        if not isinstance(actor_input.embeddingsProvider, str):
+            embed_provider_name = str(actor_input.embeddingsProvider.value)
+        else:
+            embed_provider_name = str(actor_input.embeddingsProvider)
+
+        Actor.log.info("Get embeddings class: %s", embed_provider_name)
         embeddings = await get_embedding_provider(
-            str(actor_input.embeddingsProvider.value),
+            embed_provider_name,
             actor_input.embeddingsApiKey,
             actor_input.embeddingsConfig,
         )

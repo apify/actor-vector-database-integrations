@@ -215,3 +215,31 @@ def test_get_delete_all(input_db: str, request: FixtureRequest) -> None:
 
     res = db.search_by_vector(db.dummy_vector, k=10)
     assert not res
+
+
+@pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
+def test_delete_by_item_id(input_db: str, request: FixtureRequest) -> None:
+    db: VectorDb = request.getfixturevalue(input_db)
+
+    res = db.search_by_vector(db.dummy_vector, k=10)
+    assert len(res) == 6, "Expected 6 initial objects in the database"
+
+    id4a = get_expected_id(db, "id4", ID4A)
+    id4b = get_expected_id(db, "id4", ID4B)
+
+    res = db.get_by_item_id(ITEM_ID4)
+    assert len(res) == 2, "Expected 2 objects to be returned"
+
+    ids = [r.metadata["chunk_id"] for r in res]
+    assert id4a in ids, f"Expected {id4a} to be returned"
+    assert id4b in ids, f"Expected {id4b} to be returned"
+
+    db.delete_by_item_id(ITEM_ID4)
+    wait_for_db(db.unit_test_wait_for_index)
+    res = db.get_by_item_id(ITEM_ID4)
+    assert not res, "Expected None to be returned"
+
+    db.delete_by_item_id("idX")
+    wait_for_db(db.unit_test_wait_for_index)
+    res = db.get_by_item_id("idX")
+    assert not res, "Expected None to be returned"

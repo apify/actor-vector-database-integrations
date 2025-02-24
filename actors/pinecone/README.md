@@ -29,7 +29,7 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 1. Retrieve a dataset as output from an Actor
 2. _[Optional]_ Split text data into chunks using `langchain`'s `RecursiveCharacterTextSplitter`
 (enable/disable using `performChunking` and specify `chunkSize`, `chunkOverlap`)
-3. _[Optional]_ Update only changed data in Pinecone (enable/disable using `enableDeltaUpdates`)
+3. _[Optional]_ Update only changed data in Pinecone (select `dataUpdateStragegy`)
 4. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
 5. Save data into the database
 
@@ -109,38 +109,58 @@ The settings depend on your use case where a proper chunking helps optimize retr
   "chunkOverlap": 0
 }
 ```
+### Configure update strategy
+
+To control how the integration updates data in the database, use the `dataUpdatesStrategy` parameter. This parameter allows you to choose between different update strategies based on your use case, such as adding new data, upserting records, or incrementally updating records based on changes (deltas). Below are the available strategies and explanations for when to use each:
+- **Add data (`add`)**:
+    - Appends new data to the database without checking for duplicates or updating existing records.
+    - Suitable for cases where deduplication or updates are unnecessary, and the data simply needs to be added.
+    - For example, you might use this strategy to continually append data from independent crawls without regard for overlaps.
+
+- **Upsert data (`upsert`)**:
+    - Updates existing records in the database if they match a key or identifier and inserts new records if they don’t already exist.
+    - Ideal when you want to maintain accurate and up-to-date data while avoiding duplication.
+    - For instance, this is useful in cases where unique items (such as user profiles or documents) need to be managed, ensuring the database reflects the latest changes.
+    - Check the `dataUpdatePrimaryDatasetFields` parameter to specify which fields are used to uniquely identify each dataset item.
+
+- **Delta updates (`deltaUpdates`)**:
+    - Incrementally updates records by identifying differences (deltas) between the new dataset and the existing database records.
+    - Ensures only new or modified records are processed, leaving unchanged records untouched. This minimizes unnecessary database operations and improves efficiency.
+    - This is the most efficient strategy when integrating data that evolves over time, such as website content or recurring crawls.
+    - Check the `dataUpdatePrimaryDatasetFields` parameter to specify which fields are used to uniquely identify each dataset item.
+
+
 ### Incrementally update database from the Website Content Crawler
 
-To incrementally update data from the [Website Content Crawler](https://apify.com/apify/website-content-crawler) to Pinecone, configure the integration to update only the changed or new data. 
-This is controlled by the `enableDeltaUpdates` setting. 
+To incrementally update data from the [Website Content Crawler](https://apify.com/apify/website-content-crawler) to Pinecone, configure the integration to update only the changed or new data.
+This is controlled by the `dataUpdatesStrategy` setting.
 This way, the integration minimizes unnecessary updates and ensures that only new or modified data is processed.
 
-A checksum is computed for each dataset item (together with all metadata) and stored in the database alongside the vectors. 
-When the data is re-crawled, the checksum is recomputed and compared with the stored checksum. 
+A checksum is computed for each dataset item (together with all metadata) and stored in the database alongside the vectors.
+When the data is re-crawled, the checksum is recomputed and compared with the stored checksum.
 If the checksum is different, the old data (including vectors) is deleted and new data is saved.
 Otherwise, only the `last_seen_at` metadata field is updated to indicate when the data was last seen.
 
-
 #### Provide unique identifier for each dataset item
 
-To incrementally update the data, you need to be able to uniquely identify each dataset item. 
-The variable `deltaUpdatesPrimaryDatasetFields` specifies which fields are used to uniquely identify each dataset item and helps track content changes across different crawls. 
+To incrementally update the data, you need to be able to uniquely identify each dataset item.
+The variable `dataUpdatesPrimaryDatasetFields` specifies which fields are used to uniquely identify each dataset item and helps track content changes across different crawls.
 For instance, when working with the Website Content Crawler, you can use the URL as a unique identifier.
 
 ```json
 {
-  "enableDeltaUpdates": true,
-  "deltaUpdatesPrimaryDatasetFields": ["url"]
+  "dataUpdatesStrategy": true,
+  "dataUpdatePrimaryDatasetFields": ["url"]
 }
 ```
 
-Additionally, when `enableDeltaUpdates` is set to `true`, you can use the `usePineconeIdPrefix` parameter to optimize delta updates by creating a Pinecone-specific ID prefix in the database instead of storing metadata. 
+Additionally, you can use the `usePineconeIdPrefix` parameter to optimize delta updates by creating a Pinecone-specific ID prefix in the database instead of storing metadata.
 The prefix is auto generated using the format: `item_id#chunk_id`, which results in more efficient updates.
 
 ```json
 {
-  "enableDeltaUpdates": true,
-  "deltaUpdatesPrimaryDatasetFields": ["url"],
+  "dataUpdatesStrategy": "deltaUpdates",
+  "dataUpdatePrimaryDatasetFields": ["url"],
   "usePineconeIdPrefix": true
 }
 ```
@@ -196,8 +216,8 @@ This integration will save the selected fields from your Actor to Pinecone and s
   "datasetFields": [
     "text"
   ],
-  "enableDeltaUpdates": true,
-  "deltaUpdatesPrimaryDatasetFields": ["url"],
+  "dataUpdatesStrategy": "deltaUpdates",
+  "dataUpdatePrimaryDatasetFields": ["url"],
   "expiredObjectDeletionPeriodDays": 7,
   "performChunking": true,
   "chunkSize": 2000,

@@ -117,6 +117,18 @@ class OpenSearchDatabase(OpenSearchVectorSearch, VectorDbBase):
         # Execute the bulk update
         bulk(self.client, actions)
 
+    def delete_by_item_id(self, item_id: str) -> None:
+        """Delete object by item_id."""
+        res = self.client.search(
+            index=self.index_name,
+            body={"query": {"term": {"metadata.item_id": item_id}}, "size": MAX_SIZE},
+            params={"_source_excludes": "vector_field"},
+        )
+        if not (hits := res.get("hits", {}).get("hits")):
+            return
+
+        self.delete(ids=[doc["_id"] for doc in hits])
+
     def delete_expired(self, expired_ts: int) -> None:
         """Delete objects from the index that are expired.
 
