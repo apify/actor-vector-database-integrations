@@ -8,7 +8,7 @@ import pytest
 from langchain_core.documents import Document
 
 from src.models import EmbeddingsProvider, PineconeIntegration
-from src.vector_stores.pinecone import PineconeDatabase  # type: ignore[import]
+from src.vector_stores.pinecone import PineconeDatabase
 
 from .conftest import DATABASE_FIXTURES, INDEX_NAME, embeddings
 

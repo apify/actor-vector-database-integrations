@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.1.10 (2025-02-24)
+
+- `embeddingBatchSize`: Batch size for embedding texts. Default: `1000`, Minimum: `1`.
+- `usePineconeIdPrefix`: Optimizes delta updates with a Pinecone ID prefix (`item_id#chunk_id`) when `enableDeltaUpdates` is `true`. Works only when database is empty. 
+
 ## 0.1.9 (2025-01-25)
 
 - Convert all fields used for delta updates to strings to avoid issues with different types of data.

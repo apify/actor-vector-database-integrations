@@ -60,8 +60,8 @@ class OpenSearchDatabase(OpenSearchVectorSearch, VectorDbBase):
     @property
     def dummy_vector(self) -> list[float]:
         if not self._dummy_vector and self.embeddings:
-            self._dummy_vector = self.embeddings.embed_query("dummy")  # type: ignore
-        return self._dummy_vector  # type: ignore
+            self._dummy_vector = self.embeddings.embed_query("dummy")
+        return self._dummy_vector
 
     async def is_connected(self) -> bool:
         raise NotImplementedError

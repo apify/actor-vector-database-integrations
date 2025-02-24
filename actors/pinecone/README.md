@@ -134,6 +134,19 @@ For instance, when working with the Website Content Crawler, you can use the URL
 }
 ```
 
+Additionally, when `enableDeltaUpdates` is set to `true`, you can use the `usePineconeIdPrefix` parameter to optimize delta updates by creating a Pinecone-specific ID prefix in the database instead of storing metadata. 
+The prefix is auto generated using the format: `item_id#chunk_id`, which results in more efficient updates.
+
+```json
+{
+  "enableDeltaUpdates": true,
+  "deltaUpdatesPrimaryDatasetFields": ["url"],
+  "usePineconeIdPrefix": true
+}
+```
+To fully maximize the potential of incremental data updates, it is recommended to start with an empty database. 
+While it is possible to use this feature with an existing database, records that were not originally saved using a prefix or metadata will not be updated.
+
 ### Delete outdated (expired) data
 
 The integration can delete data from the database that hasn't been crawled for a specified period, which is useful when data becomes outdated, such as when a page is removed from a website.

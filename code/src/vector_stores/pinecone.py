@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import copy
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import backoff
 from langchain_core.documents import Document
@@ -25,6 +26,8 @@ class PineconeDatabase(PineconeVectorStore, VectorDbBase):
         self.client = PineconeClient(api_key=actor_input.pineconeApiKey, source_tag=PINECONE_SOURCE_TAG)
         self.index = self.client.Index(actor_input.pineconeIndexName)
         self.namespace = actor_input.pineconeIndexNamespace or None
+        self.use_id_prefix = actor_input.usePineconeIdPrefix
+        self.embedding_batch_size = actor_input.embeddingBatchSize
         super().__init__(index=self.index, embedding=embeddings, namespace=self.namespace)
         self._dummy_vector: list[float] = []
 
@@ -37,9 +40,42 @@ class PineconeDatabase(PineconeVectorStore, VectorDbBase):
     async def is_connected(self) -> bool:
         raise NotImplementedError
 
-    def count(self) -> None:
+    def get_by_id(self, id_: str) -> Document:
+        """Get a document by id from the database.
+
+        Used only for testing purposes.
+        """
+        if result := self.index.fetch(ids=[id_], namespace=self.namespace):
+            r = result["vectors"][id_]
+            return Document(page_content="", metadata=r["metadata"])
+        return Document(page_content="", metadata={})
+
+    def create_prefix_id_from_item_id_chunk_id(self, doc_: Document) -> str:
+        if self.use_id_prefix and "#" not in doc_.metadata["chunk_id"]:
+            return f"{doc_.metadata['item_id']}#{doc_.metadata['chunk_id']}"
+
+        return doc_.metadata["chunk_id"] or ""
+
+    def add_documents(self, documents: list[Document], **kwargs: Any) -> list[str]:
+        """Add documents to the index.
+
+        Allows to use Pinecone id prefix and embedding chunk size.
+        """
+        if not kwargs.get("embedding_chunk_size"):
+            kwargs["embedding_chunk_size"] = self.embedding_batch_size
+
+        if (ids := kwargs.get("ids")) and self.use_id_prefix:
+            # do not change id of the original document
+            documents = copy.deepcopy(documents)
+            for doc in documents:
+                doc.metadata["chunk_id"] = self.create_prefix_id_from_item_id_chunk_id(doc)
+            kwargs["ids"] = [doc.metadata["chunk_id"] for doc, _id in zip(documents, ids)]
+
+        return super().add_documents(documents, **kwargs)
+
+    def count(self) -> int | None:
         result = self.index.describe_index_stats(namespace=self.namespace)
-        return result["total_vector_count"]
+        return result.get("total_vector_count", 0) or 0
 
     @backoff.on_exception(backoff.expo, PineconeApiException, max_time=BACKOFF_MAX_TIME_SECONDS)
     def get_by_item_id(self, item_id: str) -> list[Document]:
@@ -47,6 +83,15 @@ class PineconeDatabase(PineconeVectorStore, VectorDbBase):
 
         Pinecone does not support to get objects with filter on metadata. Hence, we need to do similarity search
         """
+        if self.use_id_prefix:
+            ids_ = []
+            for _ids in self.index.list(prefix=f"{item_id}#", namespace=self.namespace):
+                ids_.extend(_ids)
+            if ids_:
+                results = self.index.fetch(ids=ids_, namespace=self.namespace)
+                return [Document(page_content="", metadata=results["vectors"][_v]["metadata"]) for _v in results["vectors"]]
+            return []
+
         results = self.index.query(
             vector=self.dummy_vector, top_k=10_000, filter={"item_id": item_id}, include_metadata=True, namespace=self.namespace
         )
@@ -67,7 +112,7 @@ class PineconeDatabase(PineconeVectorStore, VectorDbBase):
         res = self.search_by_vector(self.dummy_vector, filter_={"last_seen_at": {"$lt": expired_ts}})
         ids = [d.metadata.get("id") or d.metadata.get("chunk_id", "") for d in res]
         ids = [_id for _id in ids if _id]
-        self.delete(ids=ids)
+        self.delete(ids=ids, namespace=self.namespace)
 
     def delete_all(self) -> None:
         """Delete all objects from the index in the namespace that the database was initialized.

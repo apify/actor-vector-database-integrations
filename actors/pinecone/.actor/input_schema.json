@@ -133,6 +133,19 @@
       "description": "Specifies the number of overlapping characters between consecutive text chunks. Adjusting this helps maintain context across chunks, which is crucial for accuracy in retrieval-augmented generation systems.",
       "default": 0,
       "minimum": 0
+    },
+    "usePineconeIdPrefix": {
+      "title": "Use Pinecone ID prefix",
+      "type": "boolean",
+      "description": "When set to true, this option will use Pinecone ID prefix instead of metadata for handling deltaUpdates. It will create a prefix in the database using the following format: `item_id#chunk_id`. This will results in more efficient updates",
+      "default": false
+    },
+    "embeddingBatchSize": {
+      "title": "Batch size to use when embedding the texts",
+      "type": "integer",
+      "description": "Specifies the number of texts to embed in a single batch. Adjusting this setting can help optimize the performance of the embeddings provider. If you encounter errors from the embeddings provider, consider reducing the batch size",
+      "default": 1000,
+      "minimum": 1
     }
   },
   "required": [
