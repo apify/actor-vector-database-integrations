@@ -77,7 +77,7 @@ class PineconeIntegration(BaseModel):
     deltaUpdatesPrimaryDatasetFields: Optional[List] = Field(
         ['url'],
         description='This array contains fields that are used to uniquely identify dataset items, which helps to handle content changes across different runs.\n\nFor instance, in a web content crawling scenario, the `url` field could serve as a unique identifier for each item.',
-        title='Dataset fields to uniquely identify dataset items (only relevant when `enableDeltaUpdates` is enabled) (depracated)',
+        title='Dataset fields to uniquely identify dataset items (only relevant when `enableDeltaUpdates` is enabled) (deprecated)',
     )
     deleteExpiredObjects: Optional[bool] = Field(
         True,

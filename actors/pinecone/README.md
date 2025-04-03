@@ -121,13 +121,13 @@ To control how the integration updates data in the database, use the `dataUpdate
     - Updates existing records in the database if they match a key or identifier and inserts new records if they don’t already exist.
     - Ideal when you want to maintain accurate and up-to-date data while avoiding duplication.
     - For instance, this is useful in cases where unique items (such as user profiles or documents) need to be managed, ensuring the database reflects the latest changes.
-    - Check the `dataUpdatePrimaryDatasetFields` parameter to specify which fields are used to uniquely identify each dataset item.
+    - Check the `dataUpdatesPrimaryDatasetFields` parameter to specify which fields are used to uniquely identify each dataset item.
 
 - **Delta updates (`deltaUpdates`)**:
     - Incrementally updates records by identifying differences (deltas) between the new dataset and the existing database records.
     - Ensures only new or modified records are processed, leaving unchanged records untouched. This minimizes unnecessary database operations and improves efficiency.
     - This is the most efficient strategy when integrating data that evolves over time, such as website content or recurring crawls.
-    - Check the `dataUpdatePrimaryDatasetFields` parameter to specify which fields are used to uniquely identify each dataset item.
+    - Check the `dataUpdatesPrimaryDatasetFields` parameter to specify which fields are used to uniquely identify each dataset item.
 
 
 ### Incrementally update database from the Website Content Crawler
