@@ -42,7 +42,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
 
     embeddings = await get_embeddings(actor_input)
     documents = await load_dataset(actor_input, dataset_id)
-    documents = add_item_checksum(documents, actor_input.deltaUpdatesPrimaryDatasetFields)  # type: ignore[arg-type]
+    documents = add_item_checksum(documents, actor_input.dataUpdatesPrimaryDatasetFields)  # type: ignore[arg-type]
 
     if actor_input.performChunking:
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=actor_input.chunkSize, chunk_overlap=actor_input.chunkOverlap)
@@ -104,11 +104,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
 
 async def get_embeddings(actor_input: ActorInputsDb) -> Embeddings:  # type: ignore[return]
     try:
-        if not isinstance(actor_input.embeddingsProvider, str):
-            embed_provider_name = str(actor_input.embeddingsProvider.value)
-        else:
-            embed_provider_name = str(actor_input.embeddingsProvider)
-
+        embed_provider_name = str(actor_input.embeddingsProvider)
         Actor.log.info("Get embeddings class: %s", embed_provider_name)
         embeddings = await get_embedding_provider(
             embed_provider_name,
@@ -132,7 +128,7 @@ async def load_dataset(actor_input: ActorInputsDb, dataset_id: str) -> list[Docu
     # Required for checksum calculation
     # Update metadata fields with datasetFieldsToItemId for dataset loading
     meta_fields = actor_input.metadataDatasetFields or {}
-    meta_fields.update({k: k for k in actor_input.deltaUpdatesPrimaryDatasetFields or []})
+    meta_fields.update({k: k for k in actor_input.dataUpdatesPrimaryDatasetFields or []})
     Actor.log.info("Load Dataset ID %s and extract fields %s", dataset_id, actor_input.datasetFields)
 
     try:

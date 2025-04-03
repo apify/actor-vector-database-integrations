@@ -19,7 +19,6 @@ from langchain_openai.embeddings import OpenAIEmbeddings
 
 from .data_examples_uuid import crawl_1
 from ..models.chroma_input_model import ChromaIntegration
-from ..models.pinecone_input_model import EmbeddingsProvider
 from ..vector_stores.chroma import ChromaDatabase
 
 load_dotenv()
@@ -33,7 +32,7 @@ db = ChromaDatabase(
     ChromaIntegration(
         chromaCollectionName=CHROMA_COLLECTION_NAME,
         chromaClientHost="localhost",
-        embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+        embeddingsProvider="OpenAI",
         embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
         datasetFields=["text"],
     ),

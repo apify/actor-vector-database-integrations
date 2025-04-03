@@ -17,7 +17,6 @@ from models import (  # type: ignore
     QdrantIntegration,
     WeaviateIntegration,
 )
-from models.chroma_input_model import EmbeddingsProvider  # type: ignore[import-not-found]
 from utils import add_item_checksum  # type: ignore[import-not-found]
 from vector_stores.chroma import ChromaDatabase  # type: ignore[import-not-found]
 from vector_stores.milvus import MilvusDatabase  # type: ignore[import-not-found]
@@ -85,7 +84,7 @@ def db_chroma(crawl_1: list[Document]) -> Generator[ChromaDatabase, Any, None]:
     db = ChromaDatabase(
         actor_input=ChromaIntegration(
             chromaClientHost=os.getenv("CHROMA_CLIENT_HOST"),
-            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+            embeddingsProvider="OpenAI",
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],
             chromaCollectionName=INDEX_NAME,
@@ -111,7 +110,7 @@ def db_milvus(crawl_1: list[Document]) -> Generator[MilvusDatabase, Any, None]:
             milvusUri=os.getenv("MILVUS_URI"),
             milvusToken=os.getenv("MILVUS_TOKEN"),
             milvusCollectionName=INDEX_NAME,
-            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+            embeddingsProvider="OpenAI",
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],
         ),
@@ -142,7 +141,7 @@ def db_opensearch(crawl_1: list[Document]) -> Generator[OpenSearchDatabase, Any,
             awsSecretAccessKey=os.getenv("AWS_SECRET_ACCESS_KEY"),
             openSearchIndexName=INDEX_NAME,
             openSearchUrl=os.getenv("OPENSEARCH_URL"),
-            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+            embeddingsProvider="OpenAI",
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],
             useSsl=use_aws4_auth,
@@ -174,7 +173,7 @@ def db_pgvector(crawl_1: list[Document]) -> Generator[PGVectorDatabase, Any, Non
         actor_input=PgvectorIntegration(
             postgresSqlConnectionStr=os.getenv("POSTGRESQL_CONNECTION_STR"),
             postgresCollectionName=INDEX_NAME,
-            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+            embeddingsProvider="OpenAI",
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],
         ),
@@ -225,7 +224,7 @@ def db_pinecone_id_prefix(crawl_1: list[Document]) -> Generator[PineconeDatabase
         actor_input=PineconeIntegration(
             pineconeIndexName=INDEX_NAME,
             pineconeApiKey=os.getenv("PINECONE_API_KEY"),
-            embeddingsProvider=EmbeddingsProvider.OpenAI,
+            embeddingsProvider="OpenAI",
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],
             usePineconeIdPrefix=True,
@@ -253,7 +252,7 @@ def db_qdrant(crawl_1: list[Document]) -> Generator[QdrantDatabase, Any, None]:
         actor_input=QdrantIntegration(
             qdrantUrl=os.getenv("QDRANT_URL"),
             qdrantCollectionName=INDEX_NAME,
-            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+            embeddingsProvider="OpenAI",
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],
         ),
@@ -278,7 +277,7 @@ def db_weaviate(crawl_1: list[Document]) -> Generator[WeaviateDatabase, Any, Non
             weaviateUrl=os.getenv("WEAVIATE_URL"),
             weaviateApiKey=os.getenv("WEAVIATE_API_KEY"),
             weaviateCollectionName=os.getenv("WEAVIATE_COLLECTION_NAME"),
-            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+            embeddingsProvider="OpenAI",
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],
         ),

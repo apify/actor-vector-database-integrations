@@ -24,7 +24,6 @@ class OpenSearchDatabase(OpenSearchVectorSearch, VectorDbBase):
     def __init__(self, actor_input: OpensearchIntegration, embeddings: Embeddings) -> None:
         self.index_name = actor_input.openSearchIndexName
         name = actor_input.awsServiceName or ""
-        name = name if isinstance(name, str) else name.value
         self.service_name = name
 
         if actor_input.useAWS4Auth:

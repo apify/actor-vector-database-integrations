@@ -29,8 +29,8 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 1. Retrieve a dataset as output from an Actor
 2. _[Optional]_ Split text data into chunks using `langchain`'s `RecursiveCharacterTextSplitter`
 (enable/disable using `performChunking` and specify `chunkSize`, `chunkOverlap`)
-3. _[Optional]_ Update only changed data in Pinecone (select `dataUpdateStragegy`)
-4. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
+3. _[Optional]_ Update only changed data (select `dataUpdatesStrategy`)
+4. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddingsProvider` and `embeddingsConfig`)
 5. Save data into the database
 
 ![Apify-pinecone-integration](https://raw.githubusercontent.com/apify/actor-vector-database-integrations/master/docs/Apify-pinecone-integration-readme.png)
@@ -63,9 +63,18 @@ For detailed input information refer to the [Input page](https://apify.com/apify
 #### Embeddings provider: OpenAI
 ```json 
 {
-  "embeddingsProvider": "OpenAIEmbeddings",
+  "embeddingsProvider": "OpenAI",
   "embeddingsApiKey": "YOUR-OPENAI-API-KEY",
   "embeddingsConfig": {"model":  "text-embedding-3-large"}
+}
+```
+
+#### Embeddings provider: Cohere
+```json 
+{
+  "embeddingsApiKey": "YOUR-COHERE-API-KEY",
+  "embeddingsProvider": "Cohere",
+  "embeddingsConfig": {"model":  "embed-multilingual-v3.0"}
 }
 ```
 
@@ -118,7 +127,7 @@ To control how the integration updates data in the database, use the `dataUpdate
     - For example, you might use this strategy to continually append data from independent crawls without regard for overlaps.
 
 - **Upsert data (`upsert`)**:
-    - Updates existing records in the database if they match a key or identifier and inserts new records if they don’t already exist.
+    - Delete existing records in the database if they match a key or identifier and inserts new records.
     - Ideal when you want to maintain accurate and up-to-date data while avoiding duplication.
     - For instance, this is useful in cases where unique items (such as user profiles or documents) need to be managed, ensuring the database reflects the latest changes.
     - Check the `dataUpdatesPrimaryDatasetFields` parameter to specify which fields are used to uniquely identify each dataset item.
@@ -132,7 +141,7 @@ To control how the integration updates data in the database, use the `dataUpdate
 
 ### Incrementally update database from the Website Content Crawler
 
-To incrementally update data from the [Website Content Crawler](https://apify.com/apify/website-content-crawler) to Pinecone, configure the integration to update only the changed or new data.
+To incrementally update data from the [Website Content Crawler](https://apify.com/apify/website-content-crawler) to database, configure the integration to update only the changed or new data.
 This is controlled by the `dataUpdatesStrategy` setting.
 This way, the integration minimizes unnecessary updates and ensures that only new or modified data is processed.
 
@@ -149,7 +158,7 @@ For instance, when working with the Website Content Crawler, you can use the URL
 
 ```json
 {
-  "dataUpdatesStrategy": true,
+  "dataUpdatesStrategy": "deltaUpdates",
   "dataUpdatePrimaryDatasetFields": ["url"]
 }
 ```
@@ -237,7 +246,7 @@ This integration will save the selected fields from your Actor to Pinecone and s
 ```json 
 {
   "embeddingsApiKey": "YOUR-OPENAI-API-KEY",
-  "embeddings": "OpenAI",
+  "embeddingsProvider": "OpenAI",
   "embeddingsConfig": {"model":  "text-embedding-3-large"}
 }
 ```
@@ -245,7 +254,7 @@ This integration will save the selected fields from your Actor to Pinecone and s
 ```json 
 {
   "embeddingsApiKey": "YOUR-COHERE-API-KEY",
-  "embeddings": "Cohere",
+  "embeddingsProvider": "Cohere",
   "embeddingsConfig": {"model":  "embed-multilingual-v3.0"}
 }
 ```

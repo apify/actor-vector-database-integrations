@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 from langchain_openai.embeddings import OpenAIEmbeddings
 
 from .data_examples_uuid import ITEM_ID1, crawl_1
-from ..models.pinecone_input_model import EmbeddingsProvider, PineconeIntegration
+from ..models.pinecone_input_model import PineconeIntegration
 from ..vector_stores.pinecone import PineconeDatabase
 
 load_dotenv()
@@ -34,7 +34,7 @@ db = PineconeDatabase(
         pineconeIndexName=PINECONE_INDEX_NAME,
         pineconeIndexNamespace=PINECONE_INDEX_NAMESPACE,
         pineconeApiKey=os.getenv("PINECONE_API_KEY"),
-        embeddingsProvider=EmbeddingsProvider.OpenAI,
+        embeddingsProvider="OpenAI",
         embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
         datasetFields=["text"],
     ),

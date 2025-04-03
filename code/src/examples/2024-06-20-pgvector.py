@@ -20,7 +20,6 @@ from langchain_openai.embeddings import OpenAIEmbeddings
 
 from models import PgvectorIntegration
 from .data_examples_uuid import ID3, ID4A, ID4B, ID4C, ID5A, ID5B, ID5C, ID6, crawl_1, crawl_2, expected_results
-from ..models.pinecone_input_model import EmbeddingsProvider
 from ..vcs import compare_crawled_data_with_db
 from ..vector_stores.pgvector import PGVectorDatabase
 
@@ -42,7 +41,7 @@ db = PGVectorDatabase(
     actor_input=PgvectorIntegration(
         postgresCollectionName=PGVECTOR_COLLECTION_NAME,
         postgresSqlConnectionStr=POSTGRESQL_CONNECTION_STR,
-        embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+        embeddingsProvider="OpenAI",
         embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
         datasetFields=["text"],
     ),

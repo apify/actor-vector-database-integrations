@@ -1,5 +1,5 @@
 # __init__.py
-from .chroma_input_model import EmbeddingsProvider, ChromaIntegration
+from .chroma_input_model import ChromaIntegration
 from .milvus_input_model import MilvusIntegration
 from .opensearch_input_model import OpensearchIntegration
 from .pgvector_input_model import PgvectorIntegration
