@@ -67,6 +67,11 @@ class WeaviateDatabase(WeaviateVectorStore, VectorDbBase):
         for _id in ids:
             collection.data.update(uuid=_id, properties={"last_seen_at": last_seen_at})
 
+    def delete_by_item_id(self, item_id: str) -> None:
+        """Delete object by item_id."""
+        collection = self.client.collections.get(name=self.collection_name)
+        collection.data.delete_many(Filter.by_property("item_id").equal(item_id), verbose=True)
+
     def delete_expired(self, expired_ts: int) -> None:
         """Delete objects from the index that are expired."""
 

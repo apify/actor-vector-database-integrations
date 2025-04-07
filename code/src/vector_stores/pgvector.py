@@ -94,6 +94,20 @@ class PGVectorDatabase(PGVector, VectorDbBase):
             session.execute(stmt)
             session.commit()
 
+    def delete_by_item_id(self, item_id: str) -> None:
+        """Delete object by item_id."""
+        with self._make_sync_session() as session:
+            if not (collection := self.get_collection(session)):
+                raise ValueError("Collection not found")
+
+        stmt = (
+            delete(self.EmbeddingStore)
+            .where(self.EmbeddingStore.collection_id == literal(str(collection.uuid)))
+            .where(text("(cmetadata ->> 'item_id') = :value").bindparams(value=item_id))
+        )
+        session.execute(stmt)
+        session.commit()
+
     def delete_expired(self, expired_ts: int) -> None:
         """Delete objects from the index that are expired."""
 

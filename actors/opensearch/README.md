@@ -29,8 +29,8 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 1. Retrieve a dataset as output from an Actor
 2. _[Optional]_ Split text data into chunks using `langchain`'s `RecursiveCharacterTextSplitter`
 (enable/disable using `performChunking` and specify `chunkSize`, `chunkOverlap`)
-3. _[Optional]_ Update only changed data in OpenSearch (enable/disable using `enableDeltaUpdates`)
-4. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
+3. _[Optional]_ Update only changed data (select `dataUpdatesStrategy`)
+4. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddingsProvider` and `embeddingsConfig`)
 5. Save data into the database
 
 ## ✅ Before you start
@@ -65,7 +65,7 @@ For detailed input information refer to the [Input page](https://apify.com/apify
 #### Embeddings provider: OpenAI
 ```json 
 {
-  "embeddingsProvider": "OpenAIEmbeddings",
+  "embeddingsProvider": "OpenAI",
   "embeddingsApiKey": "YOUR-OPENAI-API-KEY",
   "embeddingsConfig": {"model":  "text-embedding-3-large"}
 }
@@ -111,30 +111,53 @@ The settings depend on your use case where a proper chunking helps optimize retr
   "chunkOverlap": 0
 }
 ```
+### Configure update strategy
+
+To control how the integration updates data in the database, use the `dataUpdatesStrategy` parameter. This parameter allows you to choose between different update strategies based on your use case, such as adding new data, upserting records, or incrementally updating records based on changes (deltas). Below are the available strategies and explanations for when to use each:
+- **Add data (`add`)**:
+    - Appends new data to the database without checking for duplicates or updating existing records.
+    - Suitable for cases where deduplication or updates are unnecessary, and the data simply needs to be added.
+    - For example, you might use this strategy to continually append data from independent crawls without regard for overlaps.
+
+- **Upsert data (`upsert`)**:
+    - Delete existing records in the database if they match a key or identifier and inserts new records.
+    - Ideal when you want to maintain accurate and up-to-date data while avoiding duplication.
+    - For instance, this is useful in cases where unique items (such as user profiles or documents) need to be managed, ensuring the database reflects the latest changes.
+    - Check the `dataUpdatesPrimaryDatasetFields` parameter to specify which fields are used to uniquely identify each dataset item.
+
+- **Delta updates (`deltaUpdates`)**:
+    - Incrementally updates records by identifying differences (deltas) between the new dataset and the existing database records.
+    - Ensures only new or modified records are processed, leaving unchanged records untouched. This minimizes unnecessary database operations and improves efficiency.
+    - This is the most efficient strategy when integrating data that evolves over time, such as website content or recurring crawls.
+    - Check the `dataUpdatesPrimaryDatasetFields` parameter to specify which fields are used to uniquely identify each dataset item.
+
+
 ### Incrementally update database from the Website Content Crawler
 
-To incrementally update data from the [Website Content Crawler](https://apify.com/apify/website-content-crawler) to database, configure the integration to update only the changed or new data. 
-This is controlled by the `enableDeltaUpdates` setting. 
+To incrementally update data from the [Website Content Crawler](https://apify.com/apify/website-content-crawler) to database, configure the integration to update only the changed or new data.
+This is controlled by the `dataUpdatesStrategy` setting.
 This way, the integration minimizes unnecessary updates and ensures that only new or modified data is processed.
 
-A checksum is computed for each dataset item (together with all metadata) and stored in the database alongside the vectors. 
-When the data is re-crawled, the checksum is recomputed and compared with the stored checksum. 
+A checksum is computed for each dataset item (together with all metadata) and stored in the database alongside the vectors.
+When the data is re-crawled, the checksum is recomputed and compared with the stored checksum.
 If the checksum is different, the old data (including vectors) is deleted and new data is saved.
 Otherwise, only the `last_seen_at` metadata field is updated to indicate when the data was last seen.
 
-
 #### Provide unique identifier for each dataset item
 
-To incrementally update the data, you need to be able to uniquely identify each dataset item. 
-The variable `deltaUpdatesPrimaryDatasetFields` specifies which fields are used to uniquely identify each dataset item and helps track content changes across different crawls. 
+To incrementally update the data, you need to be able to uniquely identify each dataset item.
+The variable `dataUpdatesPrimaryDatasetFields` specifies which fields are used to uniquely identify each dataset item and helps track content changes across different crawls.
 For instance, when working with the Website Content Crawler, you can use the URL as a unique identifier.
 
 ```json
 {
-  "enableDeltaUpdates": true,
-  "deltaUpdatesPrimaryDatasetFields": ["url"]
+  "dataUpdatesStrategy": "deltaUpdates",
+  "dataUpdatePrimaryDatasetFields": ["url"]
 }
 ```
+
+To fully maximize the potential of incremental data updates, it is recommended to start with an empty database. 
+While it is possible to use this feature with an existing database, records that were not originally saved using a prefix or metadata will not be updated.
 
 ### Delete outdated (expired) data
 
@@ -187,8 +210,8 @@ This integration will save the selected fields from your Actor to database and s
   "datasetFields": [
     "text"
   ],
-  "enableDeltaUpdates": true,
-  "deltaUpdatesPrimaryDatasetFields": ["url"],
+  "dataUpdatesStrategy": "deltaUpdates",
+  "dataUpdatePrimaryDatasetFields": ["url"],
   "expiredObjectDeletionPeriodDays": 7,
   "performChunking": true,
   "chunkSize": 2000,
@@ -222,7 +245,7 @@ This integration will save the selected fields from your Actor to database and s
 ```json 
 {
   "embeddingsApiKey": "YOUR-OPENAI-API-KEY",
-  "embeddings": "OpenAI",
+  "embeddingsProvider": "OpenAI",
   "embeddingsConfig": {"model":  "text-embedding-3-large"}
 }
 ```
@@ -230,7 +253,7 @@ This integration will save the selected fields from your Actor to database and s
 ```json 
 {
   "embeddingsApiKey": "YOUR-COHERE-API-KEY",
-  "embeddings": "Cohere",
+  "embeddingsProvider": "Cohere",
   "embeddingsConfig": {"model":  "embed-multilingual-v3.0"}
 }
 ```

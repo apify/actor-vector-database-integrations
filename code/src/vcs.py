@@ -92,6 +92,19 @@ def update_db_with_crawled_data(vector_store: VectorDb, documents: list[Document
         Actor.log.info("Updated last_seen_at metadata for %s objects", len(ids_update_last_seen))
 
 
+def upsert_db_with_crawled_data(vector_store: VectorDb, documents: list[Document]) -> None:
+    """Upsert crawled data into the database by first deleting all documents and then adding all the documents."""
+    Actor.log.info("Upsert crawled data into database")
+    Actor.log.info("Delete documents by item_id. This might take a while as documents are deleted one by one.")
+    for d in documents:
+        vector_store.delete_by_item_id(d.metadata["item_id"])
+    Actor.log.info("Delete documents by item_id. Done")
+
+    Actor.log.info("Add documents")
+    vector_store.add_documents(documents, ids=[d.metadata["chunk_id"] for d in documents])
+    Actor.log.info("Added %s new objects to the vector store", len(documents))
+
+
 def delete_expired_objects(vector_store: VectorDb, timestamp_expired: int) -> None:
     """Delete expired objects from the database."""
 
@@ -120,8 +133,8 @@ def get_items_ids_from_db(vector_store: VectorDb, data: list[Document]) -> dict[
             try:
                 item_id, documents = future.result()
                 crawled_db[item_id].extend(documents)
-            except Exception as exc:
-                Actor.log.error("Item_id %s generated an exception: %s", item_id, exc)
+            except Exception:
+                Actor.log.exception("Item_id %s generated an exception", item_id)
 
     return dict(crawled_db)
 

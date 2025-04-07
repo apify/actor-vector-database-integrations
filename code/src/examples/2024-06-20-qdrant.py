@@ -18,7 +18,6 @@ from langchain_openai.embeddings import OpenAIEmbeddings
 
 from models.qdrant_input_model import QdrantIntegration
 from .data_examples_uuid import crawl_1
-from ..models.pinecone_input_model import EmbeddingsProvider
 from ..vector_stores.qdrant import QdrantDatabase
 
 load_dotenv()
@@ -33,7 +32,7 @@ db = QdrantDatabase(
         qdrantCollectionName=QDRANT_COLLECTION_NAME,
         qdrantUrl=os.getenv("QDRANT_URL"),
         qdrantApiKey=os.getenv("QDRANT_API_KEY"),
-        embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+        embeddingsProvider="OpenAI",
         embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
         datasetFields=["text"],
     ),

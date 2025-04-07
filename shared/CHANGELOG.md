@@ -1,5 +1,21 @@
 # Change Log
 
+## 0.1.10 (2025-02-24)
+
+- `embeddingBatchSize`: (only Pinecone) batch size for embedding texts. Default: `1000`, Minimum: `1`.
+- `usePineconeIdPrefix`: (only Pinecone) Optimizes delta updates with a Pinecone ID prefix (`item_id#chunk_id`) when `enableDeltaUpdates` is `true`. Works only when database is empty. 
+- **New parameter `dataUpdatesStrategy`:**
+    - Replaces `enableDeltaUpdates`.
+    - Automatically set to `deltaUpdates` if `enableDeltaUpdates = true`.
+    - Options: `deltaUpdates`, `add`, or `upsert`
+
+- **Renamed `deltaUpdatesPrimaryDatasetFields`:**
+    - Now `dataUpdatesPrimaryDatasetFields`.
+    - Automatically migrated if the old field is present.
+
+- **Backward Compatibility:**
+    - Legacy `enableDeltaUpdates` mappings and `deltaUpdatesPrimaryDatasetFields` are supported.
+
 ## 0.1.9 (2025-01-25)
 
 - Convert all fields used for delta updates to strings to avoid issues with different types of data.

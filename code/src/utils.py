@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import logging
 from collections import defaultdict
 from datetime import datetime, timezone
 from typing import Any
@@ -12,6 +13,8 @@ from langchain_core.documents import Document
 
 EXCLUDE_KEYS_FROM_CHECKSUM = {"metadata": {"chunk_id", "id", "checksum", "last_seen_at", "item_id"}}
 DAY_IN_SECONDS = 24 * 3600
+
+logger = logging.getLogger("apify")
 
 
 def get_nested_value(d: dict, keys: str) -> Any:
@@ -133,8 +136,15 @@ def add_item_checksum(items: list[Document], dataset_fields_to_item_id: list[str
     specified keys in the document's metadata and added to the metadata as well.
     """
     for item in items:
-        item.metadata["checksum"] = compute_hash(item.json(exclude=EXCLUDE_KEYS_FROM_CHECKSUM))  # type: ignore[arg-type]
-        item.metadata["item_id"] = compute_hash("".join([str(item.metadata[key]) for key in dataset_fields_to_item_id]))
+        item.metadata["checksum"] = compute_hash(item.json(exclude=EXCLUDE_KEYS_FROM_CHECKSUM))
+        hash_str = "".join([str(item.metadata[key]) for key in dataset_fields_to_item_id])
+        item.metadata["item_id"] = compute_hash(hash_str)
+        if not hash_str:
+            logger.warning(
+                "Item_id %s was generated with an empty hash. This typically means that `dataUpdatesPrimaryDatasetFields` "
+                "are empty or non-existent.",
+                item.metadata["item_id"],
+            )
 
     return add_item_last_seen_at(items)
 

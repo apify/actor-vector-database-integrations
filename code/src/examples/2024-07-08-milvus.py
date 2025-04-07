@@ -20,7 +20,6 @@ from langchain_openai.embeddings import OpenAIEmbeddings
 
 from models import MilvusIntegration
 from .data_examples_uuid import ID1, ID3, ID4A, ID4B, ID4C, ID5A, ID5B, ID5C, ID6, crawl_1, crawl_2, expected_results
-from ..models import EmbeddingsProvider
 from ..vcs import compare_crawled_data_with_db
 from ..vector_stores.milvus import MilvusDatabase
 
@@ -38,7 +37,7 @@ db = MilvusDatabase(
         milvusUri=os.getenv("MILVUS_URI"),
         milvusToken=os.getenv("MILVUS_TOKEN"),
         milvusCollectionName=MILVUS_COLLECTION_NAME,
-        embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+        embeddingsProvider="OpenAI",
         embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
         datasetFields=["text"],
     ),

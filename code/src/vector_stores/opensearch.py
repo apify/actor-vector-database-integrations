@@ -24,7 +24,6 @@ class OpenSearchDatabase(OpenSearchVectorSearch, VectorDbBase):
     def __init__(self, actor_input: OpensearchIntegration, embeddings: Embeddings) -> None:
         self.index_name = actor_input.openSearchIndexName
         name = actor_input.awsServiceName or ""
-        name = name if isinstance(name, str) else name.value
         self.service_name = name
 
         if actor_input.useAWS4Auth:
@@ -60,8 +59,8 @@ class OpenSearchDatabase(OpenSearchVectorSearch, VectorDbBase):
     @property
     def dummy_vector(self) -> list[float]:
         if not self._dummy_vector and self.embeddings:
-            self._dummy_vector = self.embeddings.embed_query("dummy")  # type: ignore
-        return self._dummy_vector  # type: ignore
+            self._dummy_vector = self.embeddings.embed_query("dummy")
+        return self._dummy_vector
 
     async def is_connected(self) -> bool:
         raise NotImplementedError
@@ -116,6 +115,18 @@ class OpenSearchDatabase(OpenSearchVectorSearch, VectorDbBase):
 
         # Execute the bulk update
         bulk(self.client, actions)
+
+    def delete_by_item_id(self, item_id: str) -> None:
+        """Delete object by item_id."""
+        res = self.client.search(
+            index=self.index_name,
+            body={"query": {"term": {"metadata.item_id": item_id}}, "size": MAX_SIZE},
+            params={"_source_excludes": "vector_field"},
+        )
+        if not (hits := res.get("hits", {}).get("hits")):
+            return
+
+        self.delete(ids=[doc["_id"] for doc in hits])
 
     def delete_expired(self, expired_ts: int) -> None:
         """Delete objects from the index that are expired.

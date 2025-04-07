@@ -85,6 +85,12 @@ class QdrantDatabase(Qdrant, VectorDbBase):
         last_seen_at = last_seen_at or int(datetime.now(timezone.utc).timestamp())
         self.client.set_payload(self.collection_name, {"last_seen_at": last_seen_at}, points=ids, key=self.metadata_payload_key)
 
+    def delete_by_item_id(self, item_id: str) -> None:
+        """Delete objects by item_id."""
+        self.client.delete(
+            self.collection_name, Filter(must=[FieldCondition(key=f"{self.metadata_payload_key}.item_id", match=MatchValue(value=item_id))])
+        )
+
     @backoff.on_exception(backoff.expo, ResponseHandlingException, max_time=BACKOFF_MAX_TIME_DELETE_SECONDS)
     def delete_expired(self, expired_ts: int) -> None:
         """Delete objects from the index that are expired."""

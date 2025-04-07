@@ -29,7 +29,7 @@ class MilvusDatabase(Milvus, VectorDbBase):
     def dummy_vector(self) -> list[float]:
         if not self._dummy_vector and self.embeddings:
             self._dummy_vector = self.embeddings.embed_query("dummy")  # type: ignore
-        return self._dummy_vector  # type: ignore
+        return self._dummy_vector
 
     async def is_connected(self) -> bool:
         raise NotImplementedError
@@ -57,6 +57,10 @@ class MilvusDatabase(Milvus, VectorDbBase):
         for d in data:
             d["last_seen_at"] = last_seen_at
         self.client.upsert(collection_name=self.collection_name, data=data)
+
+    def delete_by_item_id(self, item_id: str) -> None:
+        """Delete object by item_id."""
+        self.client.delete(collection_name=self.collection_name, filter=f"item_id == '{item_id}'")
 
     def delete_expired(self, expired_ts: int) -> None:
         """Delete objects from the index that are expired."""

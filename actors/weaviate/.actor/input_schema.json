@@ -28,16 +28,13 @@
       "description": "Choose the embeddings provider to use for generating embeddings",
       "type": "string",
       "editor": "select",
-      "enum": [
-        "OpenAI",
-        "Cohere"
-      ],
+      "enum": ["OpenAI", "Cohere"],
       "default": "OpenAI",
       "sectionCaption": "Embeddings settings"
     },
     "embeddingsConfig": {
       "title": "Configuration for embeddings provider",
-      "description": "Configure the parameters for the LangChain embedding class. Key points to consider:\n\n1. Typically, you only need to specify the model name. For example, for OpenAI, set the model name as {\"model\": \"text-embedding-3-small\"}.\n\n2. It's crucial to ensure that the vector size of your embeddings matches the size of embeddings in the database.\n\n3. Here are some examples of embedding models:\n   - [OpenAI](https://platform.openai.com/docs/guides/embeddings): `text-embedding-3-small`, `text-embedding-3-large`, etc.\n   - [Cohere](https://docs.cohere.com/docs/cohere-embed): `embed-english-v3.0`, `embed-multilingual-light-v3.0`, etc.\n\n4. For more details about other parameters, refer to the [LangChain documentation](https://python.langchain.com/v0.2/docs/integrations/text_embedding/).",
+      "description": "Configure the parameters for the LangChain embedding class. Key points to consider:\n\n1. Typically, you only need to specify the model name. For example, for OpenAI, set the model name as {\"model\": \"text-embedding-3-small\"}.\n\n2. It's required to ensure that the vector size of your embeddings matches the size of embeddings in the database.\n\n3. Here are examples of embedding models:\n   - [OpenAI](https://platform.openai.com/docs/guides/embeddings): `text-embedding-3-small`, `text-embedding-3-large`, etc.\n   - [Cohere](https://docs.cohere.com/docs/cohere-embed): `embed-english-v3.0`, `embed-multilingual-light-v3.0`, etc.\n\n4. For more details about other parameters, refer to the [LangChain documentation](https://python.langchain.com/docs/integrations/text_embedding/).",
       "type": "object",
       "editor": "json"
     },
@@ -52,12 +49,8 @@
       "title": "Dataset fields to select from the dataset results and store in the database",
       "type": "array",
       "description": "This array specifies the dataset fields to be selected and stored in the vector store. Only the fields listed here will be included in the vector store.\n\nFor instance, when using the Website Content Crawler, you might choose to include fields such as `text`, `url`, and `metadata.title` in the vector store.",
-      "default": [
-        "text"
-      ],
-      "prefill": [
-        "text"
-      ],
+      "default": ["text"],
+      "prefill": ["text"],
       "editor": "stringList",
       "sectionCaption": "Dataset settings"
     },
@@ -79,18 +72,40 @@
       "description": "Dataset ID (when running standalone without integration)",
       "editor": "textfield"
     },
-    "enableDeltaUpdates": {
-      "title": "Enable incremental updates for objects based on deltas",
-      "type": "boolean",
-      "description": "When set to true, this setting enables incremental updates for objects in the database by comparing the changes (deltas) between the crawled dataset items and the existing objects, uniquely identified by the `datasetKeysToItemId` field.\n\n The integration will only add new objects and update those that have changed, reducing unnecessary updates. The `datasetFields`, `metadataDatasetFields`, and `metadataObject` fields are used to determine the changes.",
-      "default": true,
-      "sectionCaption": "Data updates settings"
+    "dataUpdatesStrategy": {
+      "title": "Update strategy (add, upsert, deltaUpdates (default))",
+      "description": "Choose the update strategy for the integration. The update strategy determines how the integration updates the data in the database.\n\nThe available options are:\n\n- **Add data** (`add`):\n  - Always adds new records to the database.\n  - No checks for existing records or updates are performed.\n  - Useful when appending data without concern for duplicates.\n\n- **Upsert data** (`upsert`):\n  - Updates existing records if they match a key or identifier.\n  - Inserts new records into the database if they don't already exist.\n  - Ideal for ensuring the database contains the most up-to-date data, avoiding duplicates.\n\n- **Update changed data based on deltas** (`deltaUpdates`):\n  - Performs incremental updates by identifying differences (deltas) between the new dataset and the existing records.\n  - Only adds new records and updates those that have changed.\n  - Unchanged records are left untouched.\n  - Maximizes efficiency by reducing unnecessary updates.\n\nSelect the strategy that best fits your use case.",
+      "type": "string",
+      "editor": "select",
+      "enum": ["add", "upsert", "deltaUpdates"],
+      "default": "deltaUpdates",
+      "prefill": "deltaUpdates"
     },
-    "deltaUpdatesPrimaryDatasetFields": {
-      "title": "Dataset fields to uniquely identify dataset items (only relevant when `enableDeltaUpdates` is enabled)",
+    "dataUpdatesPrimaryDatasetFields": {
+      "title": "Dataset fields to uniquely identify dataset items (only relevant when dataUpdatesStrategy is `upsert` or `deltaUpdates`)",
       "type": "array",
       "description": "This array contains fields that are used to uniquely identify dataset items, which helps to handle content changes across different runs.\n\nFor instance, in a web content crawling scenario, the `url` field could serve as a unique identifier for each item.",
       "editor": "stringList",
+      "default": [
+        "url"
+      ],
+      "prefill": [
+        "url"
+      ]
+    },
+    "enableDeltaUpdates": {
+      "title": "Enable incremental updates for objects based on deltas (deprecated)",
+      "type": "boolean",
+      "description": "When set to true, this setting enables incremental updates for objects in the database by comparing the changes (deltas) between the crawled dataset items and the existing objects, uniquely identified by the `datasetKeysToItemId` field.\n\n The integration will only add new objects and update those that have changed, reducing unnecessary updates. The `datasetFields`, `metadataDatasetFields`, and `metadataObject` fields are used to determine the changes.",
+      "default": true,
+      "editor": "hidden",
+      "sectionCaption": "Data updates settings"
+    },
+    "deltaUpdatesPrimaryDatasetFields": {
+      "title": "Dataset fields to uniquely identify dataset items (only relevant when `enableDeltaUpdates` is enabled) (deprecated)",
+      "type": "array",
+      "description": "This array contains fields that are used to uniquely identify dataset items, which helps to handle content changes across different runs.\n\nFor instance, in a web content crawling scenario, the `url` field could serve as a unique identifier for each item.",
+      "editor": "hidden",
       "default": [
         "url"
       ],

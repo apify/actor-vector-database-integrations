@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import os
 import time
+from typing import Any, Generator
 
 import pytest
 from dotenv import load_dotenv
 from langchain_core.documents import Document
 from langchain_openai.embeddings import OpenAIEmbeddings
-from models import (  # type: ignore[import]
+from models import (  # type: ignore
     ChromaIntegration,
     MilvusIntegration,
     OpensearchIntegration,
@@ -16,15 +17,14 @@ from models import (  # type: ignore[import]
     QdrantIntegration,
     WeaviateIntegration,
 )
-from models.pinecone_input_model import EmbeddingsProvider  # type: ignore[import]
-from utils import add_item_checksum  # type: ignore[import]
-from vector_stores.chroma import ChromaDatabase  # type: ignore[import]
-from vector_stores.milvus import MilvusDatabase  # type: ignore[import]
-from vector_stores.opensearch import OpenSearchDatabase  # type: ignore[import]
-from vector_stores.pgvector import PGVectorDatabase  # type: ignore[import]
-from vector_stores.pinecone import PineconeDatabase  # type: ignore[import]
-from vector_stores.qdrant import QdrantDatabase  # type: ignore[import]
-from vector_stores.weaviate import WeaviateDatabase  # type: ignore[import]
+from utils import add_item_checksum  # type: ignore[import-not-found]
+from vector_stores.chroma import ChromaDatabase  # type: ignore[import-not-found]
+from vector_stores.milvus import MilvusDatabase  # type: ignore[import-not-found]
+from vector_stores.opensearch import OpenSearchDatabase  # type: ignore[import-not-found]
+from vector_stores.pgvector import PGVectorDatabase  # type: ignore[import-not-found]
+from vector_stores.pinecone import PineconeDatabase  # type: ignore[import-not-found]
+from vector_stores.qdrant import QdrantDatabase  # type: ignore[import-not-found]
+from vector_stores.weaviate import WeaviateDatabase  # type: ignore[import-not-found]
 
 load_dotenv()
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
@@ -32,7 +32,7 @@ embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 INDEX_NAME = "apifyunittest"
 
 # Database fixtures to test. Fill here the name of the fixtures you want to test
-DATABASE_FIXTURES = ["db_chroma", "db_milvus", "db_opensearch", "db_pgvector", "db_pinecone", "db_qdrant", "db_weaviate"]
+DATABASE_FIXTURES = ["db_chroma", "db_milvus", "db_opensearch", "db_pgvector", "db_pinecone", "db_pinecone_id_prefix", "db_qdrant", "db_weaviate"]
 
 UUID = "00000000-0000-0000-0000-0000000000"
 ID1 = f"{UUID}10"
@@ -76,15 +76,15 @@ def expected_results() -> list[Document]:
 @pytest.fixture()
 def documents() -> list[Document]:
     d = Document(page_content="Content", metadata={"url": "https://url1.com"})
-    return add_item_checksum([d], ["url"])
+    return add_item_checksum([d], ["url"])  # type: ignore[no-any-return]
 
 
 @pytest.fixture()
-def db_chroma(crawl_1: list[Document]) -> ChromaDatabase:
+def db_chroma(crawl_1: list[Document]) -> Generator[ChromaDatabase, Any, None]:
     db = ChromaDatabase(
         actor_input=ChromaIntegration(
             chromaClientHost=os.getenv("CHROMA_CLIENT_HOST"),
-            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+            embeddingsProvider="OpenAI",
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],
             chromaCollectionName=INDEX_NAME,
@@ -104,13 +104,13 @@ def db_chroma(crawl_1: list[Document]) -> ChromaDatabase:
 
 
 @pytest.fixture()
-def db_milvus(crawl_1: list[Document]) -> MilvusDatabase:
+def db_milvus(crawl_1: list[Document]) -> Generator[MilvusDatabase, Any, None]:
     db = MilvusDatabase(
         actor_input=MilvusIntegration(
             milvusUri=os.getenv("MILVUS_URI"),
             milvusToken=os.getenv("MILVUS_TOKEN"),
             milvusCollectionName=INDEX_NAME,
-            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+            embeddingsProvider="OpenAI",
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],
         ),
@@ -130,7 +130,7 @@ def db_milvus(crawl_1: list[Document]) -> MilvusDatabase:
 
 
 @pytest.fixture()
-def db_opensearch(crawl_1: list[Document]) -> OpenSearchDatabase:
+def db_opensearch(crawl_1: list[Document]) -> Generator[OpenSearchDatabase, Any, None]:
     use_aws4_auth = os.getenv("OPENSEARCH_URL", "").endswith("amazonaws.com")
     db = OpenSearchDatabase(
         actor_input=OpensearchIntegration(
@@ -141,7 +141,7 @@ def db_opensearch(crawl_1: list[Document]) -> OpenSearchDatabase:
             awsSecretAccessKey=os.getenv("AWS_SECRET_ACCESS_KEY"),
             openSearchIndexName=INDEX_NAME,
             openSearchUrl=os.getenv("OPENSEARCH_URL"),
-            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+            embeddingsProvider="OpenAI",
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],
             useSsl=use_aws4_auth,
@@ -168,12 +168,12 @@ def db_opensearch(crawl_1: list[Document]) -> OpenSearchDatabase:
 
 
 @pytest.fixture()
-def db_pgvector(crawl_1: list[Document]) -> PGVectorDatabase:
+def db_pgvector(crawl_1: list[Document]) -> Generator[PGVectorDatabase, Any, None]:
     db = PGVectorDatabase(
         actor_input=PgvectorIntegration(
             postgresSqlConnectionStr=os.getenv("POSTGRESQL_CONNECTION_STR"),
             postgresCollectionName=INDEX_NAME,
-            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+            embeddingsProvider="OpenAI",
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],
         ),
@@ -193,19 +193,19 @@ def db_pgvector(crawl_1: list[Document]) -> PGVectorDatabase:
 
 
 @pytest.fixture()
-def db_pinecone(crawl_1: list[Document]) -> PineconeDatabase:
+def db_pinecone(crawl_1: list[Document]) -> Generator[PineconeDatabase, Any, None]:
     db = PineconeDatabase(
         actor_input=PineconeIntegration(
             pineconeIndexName=INDEX_NAME,
             pineconeApiKey=os.getenv("PINECONE_API_KEY"),
-            embeddingsProvider=EmbeddingsProvider.OpenAI,
+            embeddingsProvider="OpenAI",
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],
         ),
         embeddings=embeddings,
     )
     # Data freshness - Pinecone is eventually consistent, so there can be a slight delay before new or changed records are visible to queries.
-    db.unit_test_wait_for_index = 10
+    db.unit_test_wait_for_index = 20
 
     db.delete_all()
     # Insert initially crawled objects
@@ -219,12 +219,40 @@ def db_pinecone(crawl_1: list[Document]) -> PineconeDatabase:
 
 
 @pytest.fixture()
-def db_qdrant(crawl_1: list[Document]) -> QdrantDatabase:
+def db_pinecone_id_prefix(crawl_1: list[Document]) -> Generator[PineconeDatabase, Any, None]:
+    db = PineconeDatabase(
+        actor_input=PineconeIntegration(
+            pineconeIndexName=INDEX_NAME,
+            pineconeApiKey=os.getenv("PINECONE_API_KEY"),
+            embeddingsProvider="OpenAI",
+            embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
+            datasetFields=["text"],
+            usePineconeIdPrefix=True,
+            embeddingBatchSize=1,
+        ),
+        embeddings=embeddings,
+    )
+    # Data freshness - Pinecone is eventually consistent, so there can be a slight delay before new or changed records are visible to queries.
+    db.unit_test_wait_for_index = 20
+
+    db.delete_all()
+    # Insert initially crawled objects
+    db.add_documents(documents=crawl_1, ids=[d.metadata["chunk_id"] for d in crawl_1])
+    time.sleep(db.unit_test_wait_for_index)
+
+    yield db
+
+    db.delete_all()
+    time.sleep(db.unit_test_wait_for_index)
+
+
+@pytest.fixture()
+def db_qdrant(crawl_1: list[Document]) -> Generator[QdrantDatabase, Any, None]:
     db = QdrantDatabase(
         actor_input=QdrantIntegration(
             qdrantUrl=os.getenv("QDRANT_URL"),
             qdrantCollectionName=INDEX_NAME,
-            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+            embeddingsProvider="OpenAI",
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],
         ),
@@ -243,13 +271,13 @@ def db_qdrant(crawl_1: list[Document]) -> QdrantDatabase:
 
 
 @pytest.fixture()
-def db_weaviate(crawl_1: list[Document]) -> WeaviateDatabase:
+def db_weaviate(crawl_1: list[Document]) -> Generator[WeaviateDatabase, Any, None]:
     db = WeaviateDatabase(
         actor_input=WeaviateIntegration(
             weaviateUrl=os.getenv("WEAVIATE_URL"),
             weaviateApiKey=os.getenv("WEAVIATE_API_KEY"),
             weaviateCollectionName=os.getenv("WEAVIATE_COLLECTION_NAME"),
-            embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+            embeddingsProvider="OpenAI",
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],
         ),

@@ -111,7 +111,7 @@ services:
               actor_input=PgvectorIntegration(
                   postgresSqlConnectionStr=os.getenv("POSTGRESQL_CONNECTION_STR"),
                   postgresCollectionName=INDEX_NAME,
-                  embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+                  embeddingsProvider="OpenAI",
                   embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
                   datasetFields=["text"],
               ),

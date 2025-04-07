@@ -20,7 +20,6 @@ from langchain_openai.embeddings import OpenAIEmbeddings
 
 from models import OpensearchIntegration
 from .data_examples_uuid import ID1, ID3, ID4A, ID4B, ID4C, ID5A, ID5B, ID5C, ID6, crawl_1, crawl_2, expected_results
-from ..models import EmbeddingsProvider
 from ..vcs import compare_crawled_data_with_db
 from ..vector_stores.opensearch import OpenSearchDatabase
 
@@ -47,7 +46,7 @@ db = OpenSearchDatabase(
         awsSecretAccessKey=os.getenv("AWS_SECRET_ACCESS_KEY"),
         openSearchIndexName=INDEX_NAME,
         openSearchUrl=os.getenv("OPENSEARCH_URL"),
-        embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+        embeddingsProvider="OpenAI",
         embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
         datasetFields=["text"],
         useSsl=useAws4Auth,

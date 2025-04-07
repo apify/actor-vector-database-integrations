@@ -23,6 +23,10 @@ class VectorDbBase(ABC):
         """Update last_seen_at field in the database."""
 
     @abstractmethod
+    def delete_by_item_id(self, item_id: str) -> None:
+        """Delete documents by item_id."""
+
+    @abstractmethod
     def delete_expired(self, expired_ts: int) -> None:
         """Delete documents that are older than the ts_expired timestamp."""
 

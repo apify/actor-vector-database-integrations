@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 from langchain_openai.embeddings import OpenAIEmbeddings
 
 from .data_examples_uuid import ID1, ID3, ID4A, ID4B, ID4C, ID5A, ID5B, ID5C, ID6, crawl_1, crawl_2, expected_results
-from ..models import EmbeddingsProvider, WeaviateIntegration
+from ..models import WeaviateIntegration
 from ..vcs import compare_crawled_data_with_db
 from ..vector_stores.weaviate import WeaviateDatabase
 
@@ -45,7 +45,7 @@ db = WeaviateDatabase(
         weaviateUrl=os.getenv("WEAVIATE_URL"),
         weaviateApiKey=os.getenv("WEAVIATE_API_KEY"),
         weaviateCollectionName=WEAVIATE_COLLECTION_NAME,
-        embeddingsProvider=EmbeddingsProvider.OpenAI.value,
+        embeddingsProvider="OpenAI",
         embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
         datasetFields=["text"],
     ),

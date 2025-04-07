@@ -9,7 +9,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from .constants import DAY_IN_SECONDS
 from .emb import get_embedding_provider
 from .utils import add_chunk_id, add_item_checksum, get_dataset_loader
-from .vcs import delete_expired_objects, get_vector_database, update_db_with_crawled_data
+from .vcs import delete_expired_objects, get_vector_database, update_db_with_crawled_data, upsert_db_with_crawled_data
 
 if TYPE_CHECKING:
     from langchain_core.documents import Document
@@ -42,7 +42,7 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
 
     embeddings = await get_embeddings(actor_input)
     documents = await load_dataset(actor_input, dataset_id)
-    documents = add_item_checksum(documents, actor_input.deltaUpdatesPrimaryDatasetFields)  # type: ignore[arg-type]
+    documents = add_item_checksum(documents, actor_input.dataUpdatesPrimaryDatasetFields)  # type: ignore[arg-type]
 
     if actor_input.performChunking:
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=actor_input.chunkSize, chunk_overlap=actor_input.chunkOverlap)
@@ -64,12 +64,20 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
         return
 
     try:
-        if actor_input.enableDeltaUpdates:
+        data_update_strategy = hasattr(actor_input, "dataUpdatesStrategy") and actor_input.dataUpdatesStrategy
+        if data_update_strategy == "deltaUpdates":
             Actor.log.info("Update database with crawled data. Delta updates enabled")
             update_db_with_crawled_data(vcs_, documents)
-        else:
+        elif data_update_strategy == "add":
             vcs_.add_documents(documents)
             Actor.log.info("Added %s new objects to the vector store", len(documents))
+        elif data_update_strategy == "upsert":
+            upsert_db_with_crawled_data(vcs_, documents)
+        else:
+            await Actor.fail(
+                status_message=f"Invalid dataUpdatesStrategy: {data_update_strategy}. "
+                f"Please ensure that the configuration in the Database Settings is correct."
+            )
 
         if actor_input.deleteExpiredObjects:
             expired_days = actor_input.expiredObjectDeletionPeriodDays or 0
@@ -96,9 +104,10 @@ async def run_actor(actor_input: ActorInputsDb, payload: dict) -> None:
 
 async def get_embeddings(actor_input: ActorInputsDb) -> Embeddings:  # type: ignore[return]
     try:
-        Actor.log.info("Get embeddings class: %s", actor_input.embeddingsProvider.value)  # type: ignore[union-attr]
+        embed_provider_name = str(actor_input.embeddingsProvider)
+        Actor.log.info("Get embeddings class: %s", embed_provider_name)
         embeddings = await get_embedding_provider(
-            actor_input.embeddingsProvider.value,  # type: ignore[union-attr]
+            embed_provider_name,
             actor_input.embeddingsApiKey,
             actor_input.embeddingsConfig,
         )
@@ -119,7 +128,7 @@ async def load_dataset(actor_input: ActorInputsDb, dataset_id: str) -> list[Docu
     # Required for checksum calculation
     # Update metadata fields with datasetFieldsToItemId for dataset loading
     meta_fields = actor_input.metadataDatasetFields or {}
-    meta_fields.update({k: k for k in actor_input.deltaUpdatesPrimaryDatasetFields or []})
+    meta_fields.update({k: k for k in actor_input.dataUpdatesPrimaryDatasetFields or []})
     Actor.log.info("Load Dataset ID %s and extract fields %s", dataset_id, actor_input.datasetFields)
 
     try:
