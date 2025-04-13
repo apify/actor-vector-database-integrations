@@ -70,12 +70,8 @@
       "title": "Dataset fields to select from the dataset results and store in the database",
       "type": "array",
       "description": "This array specifies the dataset fields to be selected and stored in the vector store. Only the fields listed here will be included in the vector store.\n\nFor instance, when using the Website Content Crawler, you might choose to include fields such as `text`, `url`, and `metadata.title` in the vector store.",
-      "default": [
-        "text"
-      ],
-      "prefill": [
-        "text"
-      ],
+      "default": ["text"],
+      "prefill": ["text"],
       "editor": "stringList",
       "sectionCaption": "Dataset settings"
     },
@@ -104,7 +100,8 @@
       "editor": "select",
       "enum": ["add", "upsert", "deltaUpdates"],
       "default": "deltaUpdates",
-      "prefill": "deltaUpdates"
+      "prefill": "deltaUpdates",
+      "sectionCaption": "Data updates settings"
     },
     "dataUpdatesPrimaryDatasetFields": {
       "title": "Dataset fields to uniquely identify dataset items (only relevant when dataUpdatesStrategy is `upsert` or `deltaUpdates`)",
@@ -123,8 +120,7 @@
       "type": "boolean",
       "description": "When set to true, this setting enables incremental updates for objects in the database by comparing the changes (deltas) between the crawled dataset items and the existing objects, uniquely identified by the `datasetKeysToItemId` field.\n\n The integration will only add new objects and update those that have changed, reducing unnecessary updates. The `datasetFields`, `metadataDatasetFields`, and `metadataObject` fields are used to determine the changes.",
       "default": true,
-      "editor": "hidden",
-      "sectionCaption": "Data updates settings"
+      "editor": "hidden"
     },
     "deltaUpdatesPrimaryDatasetFields": {
       "title": "Dataset fields to uniquely identify dataset items (only relevant when `enableDeltaUpdates` is enabled) (deprecated)",
