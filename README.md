@@ -59,12 +59,12 @@ services:
    optional = true
    ```
    
-1. Create a new actor in the `actors` directory, e.g. `actors/pgvector` and add the following files: 
-   - `README.md` - the actor documentation
-   - `.actor/actor.json` - the actor definition
-   - `.actor/input_schema.json` - the actor input schema
+1. Create a new Actor in the `actors` directory, e.g. `actors/pgvector` and add the following files: 
+   - `README.md` - the Actor documentation
+   - `.actor/actor.json` - the Actor definition
+   - `.actor/input_schema.json` - the Actor input schema
    - 
-1. Create a pydantic model for the actor input schema. Edit Makefile to generate the input schema from the model:
+1. Create a pydantic model for the Actor input schema. Edit Makefile to generate the input schema from the model:
    ```bash
     datamodel-codegen --input $(DIRS_WITH_ACTORS)/pgvector/.actor/input_schema.json --output $(DIRS_WITH_CODE)/src/models/pgvector_input_model.py  --input-file-type jsonschema  --field-constraints
    ```
@@ -142,7 +142,7 @@ services:
    make pytest
    ```
 
-1. Run the actor locally
+1. Run the Actor locally
    ```bash
    export ACTOR_PATH_IN_DOCKER_CONTEXT=actors/pgvector
    apify run -p
@@ -157,4 +157,4 @@ services:
    Folder: actors/pgvector
    ```
 
-1. Test the actor on the Apify platform
+1. Test the Actor on the Apify platform
