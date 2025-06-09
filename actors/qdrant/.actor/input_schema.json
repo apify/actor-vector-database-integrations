@@ -29,6 +29,12 @@
       "description": "When set to true, the integration will automatically create the collection in Qdrant if it does not exist with the appropriate vector dimensions.",
       "default": true
     },
+    "qdrantVectorName": {
+      "title": "Vector name for a separate named vector spaces (default: None)",
+      "type": "string",
+      "description": "Name of the vector to use in Qdrant, see https://qdrant.tech/documentation/concepts/vectors/#named-vectors",
+      "default": null
+    },
     "embeddingsProvider": {
       "title": "Embeddings provider (as defined in the langchain API)",
       "description": "Choose the embeddings provider to use for generating embeddings",

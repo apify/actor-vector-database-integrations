@@ -251,6 +251,7 @@ def db_qdrant(crawl_1: list[Document]) -> Generator[QdrantDatabase, Any, None]:
     db = QdrantDatabase(
         actor_input=QdrantIntegration(
             qdrantUrl=os.getenv("QDRANT_URL"),
+            qdrantApiKey=os.getenv("QDRANT_API_KEY"),
             qdrantCollectionName=INDEX_NAME,
             embeddingsProvider="OpenAI",
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
