@@ -32,7 +32,8 @@
     "qdrantVectorName": {
       "title": "Vector name for a separate named vector spaces (default: None)",
       "type": "string",
-      "description": "Name of the vector to use in Qdrant, see https://qdrant.tech/documentation/concepts/vectors/#named-vectors"
+      "description": "Name of the vector to use in Qdrant, see https://qdrant.tech/documentation/concepts/vectors/#named-vectors",
+      "editor": "textfield"
     },
     "embeddingsProvider": {
       "title": "Embeddings provider (as defined in the langchain API)",
