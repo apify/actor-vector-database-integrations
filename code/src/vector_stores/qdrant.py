@@ -31,10 +31,28 @@ class QdrantDatabase(Qdrant, VectorDbBase):
                 url=actor_input.qdrantUrl,
                 api_key=actor_input.qdrantApiKey,
                 collection_name=actor_input.qdrantCollectionName,
+                vector_name=actor_input.qdrantVectorName or None,
             )
 
         client = QdrantClient(url=actor_input.qdrantUrl, api_key=actor_input.qdrantApiKey)
-        super().__init__(client=client, collection_name=actor_input.qdrantCollectionName, embeddings=embeddings)
+        super().__init__(
+            client=client,
+            collection_name=actor_input.qdrantCollectionName,
+            embeddings=embeddings,
+            vector_name=actor_input.qdrantVectorName or None,
+        )
+        client.create_payload_index(
+            collection_name=actor_input.qdrantCollectionName,
+            field_name="metadata.item_id",
+            field_schema="keyword",
+        )
+
+        if actor_input.deleteExpiredObjects:
+            client.create_payload_index(
+                collection_name=actor_input.qdrantCollectionName,
+                field_name="metadata.last_seen_at",
+                field_schema="integer",
+            )
 
         self._dummy_vector: list[float] = []
 
