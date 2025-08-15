@@ -21,7 +21,7 @@
     "milvusCollectionName": {
       "title": "Milvus collection name",
       "type": "string",
-      "description": "Name of the Milvus collection where the data will be stored",
+      "description": "Name of the Milvus collection where the data will be stored, if the collection does not exist, it will be created automatically",
       "editor": "textfield"
     },
     "embeddingsProvider": {
