@@ -5,7 +5,7 @@ services:
       - "6333:6333"
 
   chromadb:
-    image: chromadb/chroma:0.5.1
+    image: chromadb/chroma:1.0.17
     ports:
       - "8000:8000"
     healthcheck:

@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
 import chromadb
+from chromadb.config import Settings
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
@@ -17,26 +18,25 @@ if TYPE_CHECKING:
 
 class ChromaDatabase(Chroma, VectorDbBase):
     def __init__(self, actor_input: ChromaIntegration, embeddings: Embeddings) -> None:
-        settings = None
-        if auth := actor_input.chromaServerAuthCredentials:
-            settings = chromadb.config.Settings(
-                chroma_client_auth_credentials=auth,
-                chroma_client_auth_provider=actor_input.chromaClientAuthProvider,
-            )
-        client = chromadb.HttpClient(
-            host=actor_input.chromaClientHost,
-            port=actor_input.chromaClientPort or 8000,
-            ssl=actor_input.chromaClientSsl or False,
-            settings=settings,
+
+        settings = Settings(
+            chroma_server_host=actor_input.chromaClientHost,
+            chroma_server_http_port=actor_input.chromaClientPort or 8000,
+            chroma_server_ssl_enabled=actor_input.chromaClientSsl or False,
+            chroma_server_headers={"x-chroma-token": actor_input.chromaApiToken} if actor_input.chromaApiToken else {},
         )
-        collection_name = actor_input.chromaCollectionName or "chroma"
+        client = chromadb.Client(settings=settings)
+
+        collection_name = actor_input.chromaCollectionName
         super().__init__(
             client=client,
+            tenant=actor_input.chromaTenant,
+            database=actor_input.chromaDatabase,
             collection_name=collection_name,
             embedding_function=embeddings,
         )
         self.client = client
-        self.index = self.client.get_collection(collection_name)
+        self.index = self.client.get_or_create_collection(collection_name)
         self._dummy_vector: list[float] = []
 
     @property

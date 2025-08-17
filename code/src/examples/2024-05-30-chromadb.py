@@ -22,7 +22,6 @@ from ..models.chroma_input_model import ChromaIntegration
 from ..vector_stores.chroma import ChromaDatabase
 
 load_dotenv()
-CHROMA_COLLECTION_NAME = "apify"
 
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
@@ -30,8 +29,12 @@ DROP_AND_INSERT = True
 
 db = ChromaDatabase(
     ChromaIntegration(
-        chromaCollectionName=CHROMA_COLLECTION_NAME,
-        chromaClientHost="localhost",
+        chromaCollectionName=os.getenv("CHROMA_COLLECTION_NAME"),
+        chromaClientHost=os.getenv("CHROMA_CLIENT_HOST"),
+        chromaClientPort=8000,
+        chromaApiToken=os.getenv("CHROMA_API_TOKEN"),
+        chromaTenant=os.getenv("CHROMA_TENANT"),
+        chromaDatabase=os.getenv("CHROMA_DATABASE"),
         embeddingsProvider="OpenAI",
         embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
         datasetFields=["text"],
