@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from typing import Any
 from uuid import uuid4
 
-from langchain_community.document_loaders import ApifyDatasetLoader
+from langchain_apify import ApifyDatasetLoader
 from langchain_core.documents import Document
 
 EXCLUDE_KEYS_FROM_CHECKSUM = {"metadata": {"chunk_id", "id", "checksum", "last_seen_at", "item_id"}}
