@@ -22,6 +22,10 @@ async def main() -> None:
         if not (actor_input := await Actor.get_input() or {}):
             await Actor.fail(status_message="No input provided", exit_code=1)
 
+        # Set the Apify API token if it is available in the environment variables.
+        if apify_api_token := os.getenv("APIFY_TOKEN"):
+            os.environ["APIFY_API_TOKEN"] = apify_api_token
+
         if not (arg := os.getenv("ACTOR_PATH_IN_DOCKER_CONTEXT")):
             if Actor.is_at_home():
                 await Actor.exit(
