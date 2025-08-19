@@ -40,4 +40,4 @@ jobs:
         run: make test-unit
         env:
           OPENAI_API_KEY: "dummy-key"
-          APIFY_TOKEN: "dummy-key"
+          APIFY_API_TOKEN: "dummy-key"
