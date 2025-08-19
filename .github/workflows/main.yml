@@ -5,9 +5,9 @@ name: Python Lint, Check, Test
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 jobs:
   build:
@@ -37,4 +37,7 @@ jobs:
         run: make type-check
 
       - name: Tests (unit)
-        run: make pytest
+        run: make test-unit
+        env:
+          OPENAI_API_KEY: "dummy-key"
+          APIFY_API_TOKEN: "dummy-key"

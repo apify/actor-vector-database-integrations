@@ -83,11 +83,16 @@ def documents() -> list[Document]:
 def db_chroma(crawl_1: list[Document]) -> Generator[ChromaDatabase, Any, None]:
     db = ChromaDatabase(
         actor_input=ChromaIntegration(
-            chromaClientHost=os.getenv("CHROMA_CLIENT_HOST"),
+            chromaCollectionName=INDEX_NAME,
+            chromaClientHost=os.getenv("CHROMA_CLIENT_HOST", "localhost"),
+            chromaClientPort=int(os.getenv("CHROMA_CLIENT_PORT", "8000")),
+            chromaClientSsl=os.getenv("CHROMA_CLIENT_SSL", "false"),
+            chromaApiToken=os.getenv("CHROMA_API_TOKEN"),
+            chromaTenant=os.getenv("CHROMA_TENANT"),
+            chromaDatabase=os.getenv("CHROMA_DATABASE"),
             embeddingsProvider="OpenAI",
             embeddingsApiKey=os.getenv("OPENAI_API_KEY"),
             datasetFields=["text"],
-            chromaCollectionName=INDEX_NAME,
         ),
         embeddings=embeddings,
     )

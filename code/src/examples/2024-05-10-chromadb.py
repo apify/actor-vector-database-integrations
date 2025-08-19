@@ -11,36 +11,34 @@ docker pull chromadb/chroma
 docker run -p 8000:8000 chromadb/chroma
 """
 
+import os
 import chromadb
 from apify_client import ApifyClient
-from chromadb.config import Settings
 from dotenv import load_dotenv
-from langchain_community.document_loaders import ApifyDatasetLoader
+from langchain_apify import ApifyDatasetLoader
 from langchain_community.vectorstores import Chroma
 from langchain_openai.embeddings import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from utils import get_dataset_loader
 
-COLLECTION_NAME = "chroma"
-DATASET_ID = "u3lJ4arH2sC28ch3i"
-
+COLLECTION_NAME = "apify"
+DATASET_ID = "uMZMKGf8lLA1u63FX"
 
 load_dotenv()
+
+# Load environment variables from .env file or specify them here
+CHROMA_HOST = os.getenv("CHROMA_CLIENT_HOST")
+CHROMA_TENANT = os.getenv("CHROMA_TENANT")
+CHROMA_DATABASE = os.getenv("CHROMA_DATABASE")
+CHROMA_API_TOKEN = os.getenv("CHROMA_API_TOKEN")
 
 embeddings = OpenAIEmbeddings()
 
 client = ApifyClient()
 
 chroma_client = chromadb.HttpClient(
-    host="localhost",
-    port=8000,
-    ssl=False,
-    settings=Settings(
-        chroma_client_auth_provider="chromadb.auth.token_authn.TokenAuthClientProvider",
-        chroma_client_auth_credentials="test-token",
-    ),
+    ssl=True, host=CHROMA_HOST, tenant=CHROMA_TENANT, database=CHROMA_DATABASE, headers={"x-chroma-token": CHROMA_API_TOKEN}
 )
-
 
 print(chroma_client.heartbeat())
 print(chroma_client.get_version())

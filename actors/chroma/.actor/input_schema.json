@@ -21,28 +21,31 @@
       "title": "Chroma port",
       "description": "Port argument for Chroma HTTP Client",
       "type": "integer",
-      "editor": "number",
-      "default": 8000
+      "editor": "number"
     },
     "chromaClientSsl": {
       "title": "Chroma SSL enabled",
       "description": "Enable/Disable SSL",
-      "type": "boolean",
-      "default": false
+      "type": "boolean"
     },
-    "chromaServerAuthCredentials": {
-      "title": "Chroma server Auth Static API token credentials",
-      "description": "Chroma server Auth Static API token.",
+    "chromaApiToken": {
+      "title": "Chroma API token",
+      "description": "Chroma API token for authentication",
       "type": "string",
       "editor": "textfield",
       "isSecret": true
     },
-    "chromaClientAuthProvider": {
-      "title": "Chroma client auth provider",
-      "description": "Chroma client auth provider",
+    "chromaTenant": {
+      "title": "Chroma tenant",
+      "description": "Chroma tenant ID",
       "type": "string",
-      "editor": "textfield",
-      "default": "chromadb.auth.token_authn.TokenAuthClientProvider"
+      "editor": "textfield"
+    },
+    "chromaDatabase": {
+      "title": "Chroma database",
+      "description": "Chroma database name",
+      "type": "string",
+      "editor": "textfield"
     },
     "embeddingsProvider": {
       "title": "Embeddings provider (as defined in the langchain API)",
@@ -172,6 +175,7 @@
     }
   },
   "required": [
+    "chromaCollectionName",
     "chromaClientHost",
     "embeddingsProvider",
     "embeddingsApiKey",

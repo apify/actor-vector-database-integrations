@@ -30,6 +30,7 @@ def get_expected_id(db: VectorDb, item_id: str, chunk_id: str) -> str:
     return chunk_id
 
 
+@pytest.mark.integration()
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_add_newly_crawled_data(input_db: str, crawl_2: list[Document], request: FixtureRequest) -> None:
     db: VectorDb = request.getfixturevalue(input_db)
@@ -61,6 +62,7 @@ def test_add_newly_crawled_data(input_db: str, crawl_2: list[Document], request:
     assert id5c in ids, f"Expected {id5c} to be added"
 
 
+@pytest.mark.integration()
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_get_by_item_id(input_db: str, request: FixtureRequest) -> None:
     db: VectorDb = request.getfixturevalue(input_db)
@@ -90,6 +92,7 @@ def test_get_by_item_id(input_db: str, request: FixtureRequest) -> None:
     assert not res, "Expected [] to be returned"
 
 
+@pytest.mark.integration()
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_update_metadata_last_seen_at(input_db: str, crawl_2: list[Document], request: FixtureRequest) -> None:
     # to test whether the object was updated
@@ -124,6 +127,7 @@ def test_update_metadata_last_seen_at(input_db: str, crawl_2: list[Document], re
     assert next(r for r in res if r.metadata["chunk_id"] == id3).metadata["last_seen_at"] >= ts_init, f"Expected {id3} to be updated"
 
 
+@pytest.mark.integration()
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_delete_updated_data(input_db: str, crawl_2: list[Document], request: FixtureRequest) -> None:
     db: VectorDb = request.getfixturevalue(input_db)
@@ -160,6 +164,7 @@ def test_delete_updated_data(input_db: str, crawl_2: list[Document], request: Fi
     assert id5a not in ids, f"Expected {id5a} to be deleted"
 
 
+@pytest.mark.integration()
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_deleted_expired_data(input_db: str, request: FixtureRequest) -> None:
     db: VectorDb = request.getfixturevalue(input_db)
@@ -178,6 +183,7 @@ def test_deleted_expired_data(input_db: str, request: FixtureRequest) -> None:
     assert id1 not in [r.metadata["chunk_id"] for r in res], f"Expected {id1} to be deleted"
 
 
+@pytest.mark.integration()
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_update_db_with_crawled_data_all(input_db: str, crawl_2: list[Document], expected_results: list[Document], request: FixtureRequest) -> None:
     db: VectorDb = request.getfixturevalue(input_db)
@@ -200,7 +206,7 @@ def test_update_db_with_crawled_data_all(input_db: str, crawl_2: list[Document],
         assert d.metadata["item_id"] == expected.metadata["item_id"], f"Expected item_id {expected.metadata['item_id']}"
         assert d.metadata["checksum"] == expected.metadata["checksum"], f"Expected checksum {expected.metadata['checksum']}"
 
-
+@pytest.mark.integration()
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_get_delete_all(input_db: str, request: FixtureRequest) -> None:
     """Test that all items have benn deleted (delete_all is an internal function)."""
@@ -216,7 +222,7 @@ def test_get_delete_all(input_db: str, request: FixtureRequest) -> None:
     res = db.search_by_vector(db.dummy_vector, k=10)
     assert not res
 
-
+@pytest.mark.integration()
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_delete_by_item_id(input_db: str, request: FixtureRequest) -> None:
     db: VectorDb = request.getfixturevalue(input_db)

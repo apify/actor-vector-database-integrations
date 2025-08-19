@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from functools import partial
 from typing import TYPE_CHECKING
 
 import chromadb
@@ -17,26 +18,30 @@ if TYPE_CHECKING:
 
 class ChromaDatabase(Chroma, VectorDbBase):
     def __init__(self, actor_input: ChromaIntegration, embeddings: Embeddings) -> None:
-        settings = None
-        if auth := actor_input.chromaServerAuthCredentials:
-            settings = chromadb.config.Settings(
-                chroma_client_auth_credentials=auth,
-                chroma_client_auth_provider=actor_input.chromaClientAuthProvider,
-            )
-        client = chromadb.HttpClient(
+
+        # Create HttpClient using partial to handle optional parameters
+        client_factory = partial(
+            chromadb.HttpClient,
             host=actor_input.chromaClientHost,
-            port=actor_input.chromaClientPort or 8000,
             ssl=actor_input.chromaClientSsl or False,
-            settings=settings,
         )
-        collection_name = actor_input.chromaCollectionName or "chroma"
+        if actor_input.chromaClientPort is not None:
+            client_factory = partial(client_factory, port=actor_input.chromaClientPort)
+        if actor_input.chromaTenant:
+            client_factory = partial(client_factory, tenant=actor_input.chromaTenant)
+        if actor_input.chromaDatabase:
+            client_factory = partial(client_factory, database=actor_input.chromaDatabase)
+        if actor_input.chromaApiToken:
+            client_factory = partial(client_factory, headers={"x-chroma-token": actor_input.chromaApiToken})
+        client = client_factory()
+        collection_name = actor_input.chromaCollectionName
         super().__init__(
             client=client,
             collection_name=collection_name,
             embedding_function=embeddings,
         )
         self.client = client
-        self.index = self.client.get_collection(collection_name)
+        self.index = self.client.get_or_create_collection(collection_name)
         self._dummy_vector: list[float] = []
 
     @property

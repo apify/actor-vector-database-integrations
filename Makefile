@@ -30,5 +30,14 @@ pydantic-model:
 	datamodel-codegen --input $(DIRS_WITH_ACTORS)/qdrant/.actor/input_schema.json --output $(DIRS_WITH_CODE)/src/models/qdrant_input_model.py  --input-file-type jsonschema  --field-constraints  --enum-field-as-literal all
 	datamodel-codegen --input $(DIRS_WITH_ACTORS)/weaviate/.actor/input_schema.json --output $(DIRS_WITH_CODE)/src/models/weaviate_input_model.py  --input-file-type jsonschema  --field-constraints  --enum-field-as-literal all
 
-pytest:
-	poetry run -C $(DIRS_WITH_CODE) pytest --with-integration --vcr-record=none
+
+# Integration tests are marked with @pytest.mark.integration_test
+# You will require all databased running to run these tests.
+# Check docker-compose.yml for the list of databases.
+test-integration:
+	poetry run -C $(DIRS_WITH_CODE) pytest --with-integration
+
+test-unit:
+	poetry run -C $(DIRS_WITH_CODE) pytest
+
+test: test-unit test-integration
