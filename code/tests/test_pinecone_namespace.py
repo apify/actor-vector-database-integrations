@@ -27,7 +27,7 @@ def wait_for_db(sec: int = 3) -> None:
     # Data freshness - Pinecone is eventually consistent, so there can be a slight delay before new or changed records are visible to queries.
     time.sleep(sec)
 
-
+@pytest.mark.integration()
 @pytest.mark.skipif("db_pinecone" not in DATABASE_FIXTURES, reason="pinecone database is not enabled")
 @pytest.fixture()
 def db_pinecone_ns() -> PineconeDatabase:  # type: ignore
@@ -62,7 +62,6 @@ def db_pinecone_ns() -> PineconeDatabase:  # type: ignore
     delete_ns("default")
     delete_ns(NAMESPACE1)
     delete_ns(NAMESPACE2)
-
 
 @pytest.mark.integration()
 @pytest.mark.skipif("db_pinecone" not in DATABASE_FIXTURES, reason="pinecone database is not enabled")
