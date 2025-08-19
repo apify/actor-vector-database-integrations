@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from functools import partial
 from typing import TYPE_CHECKING
 
 import chromadb
-from chromadb.config import Settings
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
@@ -19,19 +19,23 @@ if TYPE_CHECKING:
 class ChromaDatabase(Chroma, VectorDbBase):
     def __init__(self, actor_input: ChromaIntegration, embeddings: Embeddings) -> None:
 
-        settings = Settings(
-            chroma_server_host=actor_input.chromaClientHost,
-            chroma_server_http_port=actor_input.chromaClientPort or 8000,
-            chroma_server_ssl_enabled=actor_input.chromaClientSsl or False,
-            chroma_server_headers={"x-chroma-token": actor_input.chromaApiToken} if actor_input.chromaApiToken else {},
+        # Create HttpClient using partial to handle optional parameters
+        client_factory = partial(
+            chromadb.HttpClient,
+            host=actor_input.chromaClientHost,
+            ssl=actor_input.chromaClientSsl or False,
         )
-        client = chromadb.Client(settings=settings)
+        if actor_input.chromaTenant:
+            client_factory = partial(client_factory, tenant=actor_input.chromaTenant)
+        if actor_input.chromaDatabase:
+            client_factory = partial(client_factory, database=actor_input.chromaDatabase)
+        if actor_input.chromaApiToken:
+            client_factory = partial(client_factory, headers={"x-chroma-token": actor_input.chromaApiToken})
 
+        client = client_factory()
         collection_name = actor_input.chromaCollectionName
         super().__init__(
             client=client,
-            tenant=actor_input.chromaTenant,
-            database=actor_input.chromaDatabase,
             collection_name=collection_name,
             embedding_function=embeddings,
         )

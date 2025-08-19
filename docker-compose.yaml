@@ -15,7 +15,7 @@ services:
       retries: 3
 
   opensearch:
-    image: opensearchproject/opensearch:latest
+    image: opensearchproject/opensearch:2.19.3
     environment:
       - discovery.type=single-node
       - OPENSEARCH_INITIAL_ADMIN_PASSWORD=dfkjds4Afjd4
