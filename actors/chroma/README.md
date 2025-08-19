@@ -24,59 +24,15 @@ It uses [LangChain](https://www.langchain.com/) to compute embeddings and intera
 2. _[Optional]_ Split text data into chunks using `langchain`'s `RecursiveCharacterTextSplitter`
 (enable/disable using `performChunking` and specify `chunkSize`, `chunkOverlap`)
 3. _[Optional]_ Update only changed data (select `dataUpdatesStrategy`)
-4. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddings` and `embeddingsConfig`)
+4. Compute embeddings, e.g. using `OpenAI` or `Cohere` (specify `embeddingsProvider` and `embeddingsConfig`)
 5. Save data into the database
 
 ## ✅ Before you start
 
 To utilize this integration, ensure you have:
 
-- `Chroma` operational on a server or localhost.
+- `Chroma` operational on a remote server or cloud instance.
 - An account to compute embeddings using one of the providers, e.g., OpenAI or Cohere.
-
-For quick Chroma setup, refer to [Chroma deployment](https://docs.trychroma.com/deployment#docker).
-Chroma can be run in a Docker container with the following commands:
-
-### Docker
-
-```shell
-docker pull chromadb/chroma
-docker run -p 8000:8000 chromadb/chroma
-```
-
-### Authentication with Docker
-
-To enable static API Token authentication, create a .env file with:
-
-```dotenv
-CHROMA_SERVER_AUTHN_CREDENTIALS=test-token
-CHROMA_SERVER_AUTHN_PROVIDER=chromadb.auth.token_authn.TokenAuthenticationServerProvider
-```
-
-Then run Docker with:
-
-```shell
-docker run --env-file ./.env -p 8000:8000 chromadb/chroma
-```
-
-### If you are running Chroma locally, you can expose the localhost using Ngrok
-
-[Install ngrok](https://ngrok.com/download) (you can use it for free or create an account). Expose Chroma using
-
-```shell
-ngrok http http://localhost:8080
-```
-
-You'll see an output similar to:
-```text
-Session Status                online
-Account                       a@a.ai (Plan: Free)
-Forwarding                    https://fdfe-82-208-25-82.ngrok-free.app -> http://localhost:8000
-```
-
-The URL (`https://fdfe-82-208-25-82.ngrok-free.app`) can be used in the as an input variable for `chromaClientHost=https://fdfe-82-208-25-82.ngrok-free.app`.
-Note that your specific URL will vary.
-
 
 ## 👉 Examples
 
@@ -88,12 +44,23 @@ This means your Chroma index should also be configured to accommodate vectors of
 
 For detailed input information refer to the [Input page](https://apify.com/apify/chroma-integration/input-schema).
 
-#### Database: Chroma
+#### Database: Chroma (simple)
 ```json
 {
-  "chromaClientHost": "https://fdfe-82-208-25-82.ngrok-free.app",
   "chromaCollectionName": "chroma",
-  "chromaServerAuthCredentials": "test-token"
+  "chromaClientHost": "https://your-chroma-instance.com",
+  "chromaApiToken": "your-api-token"
+}
+```
+
+#### Database: Chroma with tenant and database (cloud/enterprise)
+```json
+{
+  "chromaCollectionName": "chroma",
+  "chromaClientHost": "https://your-chroma-instance.chroma.cloud",
+  "chromaApiToken": "your-api-token",
+  "chromaTenant": "your-tenant-id",
+  "chromaDatabase": "your-database-name"
 }
 ```
 
@@ -169,7 +136,7 @@ To control how the integration updates data in the database, use the `dataUpdate
     - For instance, this is useful in cases where unique items (such as user profiles or documents) need to be managed, ensuring the database reflects the latest changes.
     - Check the `dataUpdatesPrimaryDatasetFields` parameter to specify which fields are used to uniquely identify each dataset item.
 
-- **Delta updates (`deltaUpdates`)**:
+- **Update changed data based on deltas (`deltaUpdates`)**:
     - Incrementally updates records by identifying differences (deltas) between the new dataset and the existing database records.
     - Ensures only new or modified records are processed, leaving unchanged records untouched. This minimizes unnecessary database operations and improves efficiency.
     - This is the most efficient strategy when integrating data that evolves over time, such as website content or recurring crawls.
@@ -196,7 +163,7 @@ For instance, when working with the Website Content Crawler, you can use the URL
 ```json
 {
   "dataUpdatesStrategy": "deltaUpdates",
-  "dataUpdatePrimaryDatasetFields": ["url"]
+  "dataUpdatesPrimaryDatasetFields": ["url"]
 }
 ```
 
@@ -241,19 +208,20 @@ This integration will save the selected fields from your Actor to Chroma.
 
 ```json
 {
-  "chromaClientHost": "https://fdfe-82-208-25-82.ngrok-free.app",
-  "chromaClientSsl": false,
   "chromaCollectionName": "chroma",
+  "chromaClientHost": "https://your-chroma-instance.com",
+  "chromaClientSsl": true,
+  "embeddingsProvider": "OpenAI",
   "embeddingsApiKey": "YOUR-OPENAI-API-KEY",
   "embeddingsConfig": {
     "model": "text-embedding-3-small"
   },
-  "embeddingsProvider": "OpenAI",
   "datasetFields": [
     "text"
   ],
   "dataUpdatesStrategy": "deltaUpdates",
-  "dataUpdatePrimaryDatasetFields": ["url"],
+  "dataUpdatesPrimaryDatasetFields": ["url"],
+  "deleteExpiredObjects": true,
   "expiredObjectDeletionPeriodDays": 7,
   "performChunking": true,
   "chunkSize": 2000,
@@ -261,12 +229,23 @@ This integration will save the selected fields from your Actor to Chroma.
 }
 ```
 
-#### Chroma
+#### Chroma (simple)
 ```json
 {
-  "chromaClientHost": "https://fdfe-82-208-25-82.ngrok-free.app",
   "chromaCollectionName": "chroma",
-  "chromaServerAuthCredentials": "test-token"
+  "chromaClientHost": "https://your-chroma-instance.com",
+  "chromaApiToken": "your-api-token"
+}
+```
+
+#### Chroma (cloud/enterprise with tenant and database)
+```json
+{
+  "chromaCollectionName": "chroma",
+  "chromaClientHost": "https://your-chroma-instance.chroma.cloud",
+  "chromaApiToken": "your-api-token",
+  "chromaTenant": "your-tenant-id",
+  "chromaDatabase": "your-database-name"
 }
 ```
 
