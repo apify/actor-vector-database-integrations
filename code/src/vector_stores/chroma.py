@@ -25,12 +25,6 @@ class ChromaDatabase(Chroma, VectorDbBase):
             host=actor_input.chromaClientHost,
             ssl=actor_input.chromaClientSsl or False,
         )
-        if actor_input.chromaTenant:
-            client_factory = partial(client_factory, tenant=actor_input.chromaTenant)
-        if actor_input.chromaDatabase:
-            client_factory = partial(client_factory, database=actor_input.chromaDatabase)
-        if actor_input.chromaApiToken:
-            client_factory = partial(client_factory, headers={"x-chroma-token": actor_input.chromaApiToken})
         if actor_input.chromaClientPort is not None:
             client_factory = partial(client_factory, port=actor_input.chromaClientPort)
         if actor_input.chromaTenant:
