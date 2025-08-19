@@ -27,8 +27,6 @@ from vector_stores.qdrant import QdrantDatabase  # type: ignore[import-not-found
 from vector_stores.weaviate import WeaviateDatabase  # type: ignore[import-not-found]
 
 load_dotenv()
-# Provide a default OpenAI API key for testing purposes or fake for testing at GitHub
-os.environ.setdefault("OPENAI_API_KEY", "fake")
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
 INDEX_NAME = "apifyunittest"

@@ -38,3 +38,6 @@ jobs:
 
       - name: Tests (unit)
         run: make test-unit
+        env:
+          OPENAI_API_KEY: "dummy-key"
+          APIFY_TOKEN: "dummy-key"
