@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from functools import partial
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Iterator
 
 import chromadb
 from langchain_chroma import Chroma
@@ -15,10 +15,18 @@ if TYPE_CHECKING:
 
     from ..models import ChromaIntegration
 
+BATCH_SIZE = 300  # Chroma's default (max) size, number of documents to insert in a single request.
+
+
+def batch(seq: list[Document], size: int) -> Iterator[list[Document]]:
+    if size <= 0:
+        raise ValueError("size must be > 0")
+    for i in range(0, len(seq), size):
+        yield seq[i : i + size]
+
 
 class ChromaDatabase(Chroma, VectorDbBase):
     def __init__(self, actor_input: ChromaIntegration, embeddings: Embeddings) -> None:
-
         # Create HttpClient using partial to handle optional parameters
         client_factory = partial(
             chromadb.HttpClient,
@@ -62,6 +70,21 @@ class ChromaDatabase(Chroma, VectorDbBase):
         if (ids := results.get("ids")) and (metadata := results.get("metadatas")):
             return [Document(page_content="", metadata={**m, "chunk_id": _id}) for _id, m in zip(ids, metadata)]
         return []
+
+    def add_documents(self, documents: list[Document], **kwargs: Any) -> list[str]:
+        """Add documents to the index.
+
+        We need to batch documents to avoid exceeding the maximum request size.
+        Chroma limits the number of records we can insert in a single request to keep the payload small.
+        """
+        inserted_ids: list[str] = []
+        batch_size = kwargs.pop("batch_size", BATCH_SIZE)
+
+        for docs_batch in batch(documents, batch_size):
+            ids = [str(doc.metadata["chunk_id"]) for doc in docs_batch]
+            batch_kwargs = {**kwargs, "ids": ids}
+            inserted_ids.extend(super().add_documents(docs_batch, **batch_kwargs))
+        return inserted_ids
 
     def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:
         """Update last_seen_at field in the database."""
