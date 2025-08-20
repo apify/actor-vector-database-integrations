@@ -47,6 +47,14 @@
       "type": "string",
       "editor": "textfield"
     },
+    "chromaBatchSize": {
+      "title": "Chroma batch size",
+      "description": "Number of documents to insert in a single request to Chroma. Default is 300. Lower if you experience timeouts or want finer control.",
+      "type": "integer",
+      "default": 300,
+      "minimum": 1,
+      "sectionCaption": "Chroma settings"
+    },
     "embeddingsProvider": {
       "title": "Embeddings provider (as defined in the langchain API)",
       "description": "Choose the embeddings provider to use for generating embeddings",

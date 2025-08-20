@@ -198,6 +198,11 @@ To disable this feature, set `deleteExpiredObjects` to `false`.
 Otherwise, data crawled by one Actor might expire due to inconsistent crawling schedules.
 
 
+## Batch size configuration
+
+You can control the number of documents sent to Chroma in a single request using the `chromaBatchSize` parameter. The default is 300. Lower this value if you experience timeouts or want finer control over insert operations.
+
+
 ## 💾 Outputs
 
 This integration will save the selected fields from your Actor to Chroma.

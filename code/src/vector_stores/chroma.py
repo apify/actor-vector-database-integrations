@@ -51,6 +51,7 @@ class ChromaDatabase(Chroma, VectorDbBase):
         self.client = client
         self.index = self.client.get_or_create_collection(collection_name)
         self._dummy_vector: list[float] = []
+        self.batch_size = actor_input.chromaBatchSize or BATCH_SIZE
 
     @property
     def dummy_vector(self) -> list[float]:
@@ -78,7 +79,7 @@ class ChromaDatabase(Chroma, VectorDbBase):
         Chroma limits the number of records we can insert in a single request to keep the payload small.
         """
         inserted_ids: list[str] = []
-        batch_size = kwargs.pop("batch_size", BATCH_SIZE)
+        batch_size = kwargs.pop("batch_size", self.batch_size)
 
         for docs_batch in batch(documents, batch_size):
             ids = [str(doc.metadata["chunk_id"]) for doc in docs_batch]
