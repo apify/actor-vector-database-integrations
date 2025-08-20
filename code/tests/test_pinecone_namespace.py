@@ -64,7 +64,6 @@ def db_pinecone_ns() -> PineconeDatabase:  # type: ignore
     delete_ns(NAMESPACE1)
     delete_ns(NAMESPACE2)
 
-
 @pytest.mark.integration()
 @pytest.mark.skipif("db_pinecone" not in DATABASE_FIXTURES, reason="pinecone database is not enabled")
 def test_namespace(db_pinecone_ns: PineconeDatabase) -> None:
