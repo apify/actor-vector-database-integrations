@@ -206,6 +206,7 @@ def test_update_db_with_crawled_data_all(input_db: str, crawl_2: list[Document],
         assert d.metadata["item_id"] == expected.metadata["item_id"], f"Expected item_id {expected.metadata['item_id']}"
         assert d.metadata["checksum"] == expected.metadata["checksum"], f"Expected checksum {expected.metadata['checksum']}"
 
+
 @pytest.mark.integration()
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_get_delete_all(input_db: str, request: FixtureRequest) -> None:
@@ -221,6 +222,7 @@ def test_get_delete_all(input_db: str, request: FixtureRequest) -> None:
 
     res = db.search_by_vector(db.dummy_vector, k=10)
     assert not res
+
 
 @pytest.mark.integration()
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
