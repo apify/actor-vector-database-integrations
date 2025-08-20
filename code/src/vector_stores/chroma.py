@@ -141,7 +141,6 @@ class ChromaDatabase(Chroma, VectorDbBase):
             return
 
         for ids_batch in batch(ids, self.batch_size):
-            self.index.delete(ids=ids_batch)
             super().delete(ids=ids_batch, **kwargs)
 
     def delete_all(self) -> None:
