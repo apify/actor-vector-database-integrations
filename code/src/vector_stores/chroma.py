@@ -115,10 +115,14 @@ class ChromaDatabase(Chroma, VectorDbBase):
         self.index.delete(where={"item_id": {"$eq": item_id}})  # type: ignore[dict-item]
 
     def delete_all(self) -> None:
-        """Delete all objects."""
+        """Delete all objects.
+
+        Delete the object in batches to avoid exceeding the maximum request size.
+        """
         r = self.index.get()
         if r["ids"]:
-            self.delete(ids=r["ids"])
+            for ids_batch in batch(r["ids"], self.batch_size):
+                self.index.delete(ids=ids_batch)
 
     def search_by_vector(self, vector: list[float], k: int = 1_000_000, filter_: dict | None = None) -> list[Document]:
         """Search by vector."""
