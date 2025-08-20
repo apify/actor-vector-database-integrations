@@ -133,8 +133,8 @@ def get_items_ids_from_db(vector_store: VectorDb, data: list[Document]) -> dict[
             try:
                 item_id, documents = future.result()
                 crawled_db[item_id].extend(documents)
-            except Exception:
-                Actor.log.exception("Item_id %s generated an exception", item_id)
+            except Exception as e:
+                Actor.log.error("Item_id %s generated an error", item_id, e)
 
     return dict(crawled_db)
 

@@ -2,13 +2,15 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from functools import partial
-from typing import TYPE_CHECKING, Any, Iterator
+from typing import TYPE_CHECKING, Any, Iterator, TypeVar
 
+import backoff
 import chromadb
+from chromadb.errors import ChromaError
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
-from .base import VectorDbBase
+from .base import BACKOFF_MAX_TIME_DELETE_SECONDS, BACKOFF_MAX_TIME_SECONDS, VectorDbBase
 
 if TYPE_CHECKING:
     from langchain_core.embeddings import Embeddings
@@ -17,8 +19,10 @@ if TYPE_CHECKING:
 
 BATCH_SIZE = 300  # Chroma's default (max) size, number of documents to insert in a single request.
 
+T = TypeVar("T")
 
-def batch(seq: list[Document], size: int) -> Iterator[list[Document]]:
+
+def batch(seq: list[T], size: int) -> Iterator[list[T]]:
     if size <= 0:
         raise ValueError("size must be > 0")
     for i in range(0, len(seq), size):
@@ -64,6 +68,7 @@ class ChromaDatabase(Chroma, VectorDbBase):
             return False
         return True
 
+    @backoff.on_exception(backoff.expo, ChromaError, max_time=BACKOFF_MAX_TIME_SECONDS)
     def get_by_item_id(self, item_id: str) -> list[Document]:
         """Get documents by item_id."""
 
@@ -87,13 +92,21 @@ class ChromaDatabase(Chroma, VectorDbBase):
             inserted_ids.extend(super().add_documents(docs_batch, **batch_kwargs))
         return inserted_ids
 
+    @backoff.on_exception(backoff.expo, ChromaError, max_time=BACKOFF_MAX_TIME_SECONDS)
     def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:
-        """Update last_seen_at field in the database."""
+        """Update last_seen_at field in the database.
+
+        Large updates are split into batches (self.batch_size) to avoid oversized requests.
+        """
+        if not ids:
+            return
 
         last_seen_at = last_seen_at or int(datetime.now(timezone.utc).timestamp())
-        for _id in ids:
-            self.index.update(ids=_id, metadatas=[{"last_seen_at": last_seen_at}])
+        batch_size = self.batch_size
+        for ids_batch in batch(ids, batch_size):
+            self.index.update(ids=ids_batch, metadatas=[{"last_seen_at": last_seen_at} for _ in ids_batch])
 
+    @backoff.on_exception(backoff.expo, ChromaError, max_time=BACKOFF_MAX_TIME_DELETE_SECONDS)
     def delete_expired(self, expired_ts: int) -> None:
         """Delete expired objects."""
         self.index.delete(where={"last_seen_at": {"$lt": expired_ts}})  # type: ignore[dict-item]
