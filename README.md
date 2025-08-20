@@ -139,7 +139,7 @@ services:
 
 1. Run tests
    ```bash  
-   make pytest
+   make test
    ```
 
 1. Run the Actor locally
