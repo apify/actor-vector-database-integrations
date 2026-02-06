@@ -7,9 +7,9 @@ from langchain_core.documents import Document
 from src.utils import (
     add_item_checksum,
     compute_hash,
+    create_dataset_mapping_function,
     get_chunks_to_delete,
     get_chunks_to_update,
-    get_dataset_loader,
     get_nested_value,
     stringify_dict,
 )
@@ -56,16 +56,18 @@ def test_stringify_dict_with_empty_dict() -> None:
     assert stringify_dict({}, ["a"]) == ""
 
 
-def test_load_page_content() -> None:
+def test_create_mapping_function_basic() -> None:
+    """Test that create_dataset_mapping_function creates a proper mapping function."""
     dataset_items = [{"text": "This is a test"}]
 
-    loader = get_dataset_loader("1234", ["text"], {}, {})
-    result = list(map(loader.dataset_mapping_function, dataset_items))
+    mapping_function = create_dataset_mapping_function(fields=["text"], meta_object={}, meta_fields={})
+    result = list(map(mapping_function, dataset_items))
 
     assert result == [Document(page_content="text: This is a test")]
 
 
-def test_load_page_content_with_metadata() -> None:
+def test_create_mapping_function_with_metadata() -> None:
+    """Test mapping function with metadata fields."""
     dataset_items = [
         {"text": "This is a test", "url": "https://example.com", "metadata": {"title": "Test Title"}},
         {"text": "Another test", "url": "https://example2.com", "metadata": {"title": "Test Title 2"}},
@@ -74,8 +76,8 @@ def test_load_page_content_with_metadata() -> None:
     meta_values = {"source": "test source"}
     meta_fields = {"page_url": "url", "page_title": "metadata.title"}
 
-    loader = get_dataset_loader("1234", ["text", "url"], meta_values, meta_fields)
-    result = list(map(loader.dataset_mapping_function, dataset_items))
+    mapping_function = create_dataset_mapping_function(fields=["text", "url"], meta_object=meta_values, meta_fields=meta_fields)
+    result = list(map(mapping_function, dataset_items))
 
     expected_result = [
         Document(

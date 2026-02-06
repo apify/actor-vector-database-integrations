@@ -82,7 +82,9 @@
       "title": "Dataset ID",
       "type": "string",
       "description": "Dataset ID (when running standalone without integration)",
-      "editor": "textfield"
+      "editor": "textfield",
+      "resourceType": "dataset",
+      "resourcePermissions": ["READ"]
     },
     "dataUpdatesStrategy": {
       "title": "Update strategy (add, upsert, deltaUpdates (default))",

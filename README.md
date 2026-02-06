@@ -15,26 +15,56 @@
 The Apify Vector Database Integrations facilitate the transfer of data from Apify Actors to a vector database. 
 This process includes data processing, optional splitting into chunks, embedding computation, and data storage
 
-These integrations support incremental updates, ensuring that only changed data is updated. 
-This reduces unnecessary embedding computation and storage operations, making it ideal for search and retrieval augmented generation (RAG) use cases.
+These integrations support incremental updates, ensuring that only changed data is updated.
+This reduces unnecessary embedding computation and storage operations, making it ideal for search and retrieval-augmented generation (RAG) use cases.
 
 This repository contains Actors for different vector databases. 
 
 ## How does it work?
 
 1. Retrieve a dataset as output from an Actor.
-2. _[Optional]_ Split text data into chunks using [langchain](https://python.langchain.com).
+2. _[Optional]_ Split text data into chunks using [LangChain](https://python.langchain.com).
 3. _[Optional]_ Update only changed data.
 4. Compute embeddings, e.g. using [OpenAI](https://platform.openai.com/docs/guides/embeddings) or [Cohere](https://cohere.com/embeddings).
 5. Save data into the database.
 
-## Supported Vector Embeddings
+## Security: LIMITED_PERMISSIONS support
+
+All vector database Actors in this repository run with **LIMITED_PERMISSIONS** for enhanced security:
+
+- **Principle of Least Privilege**: Actors only request READ access to the specific datasets they need
+- **Scoped Tokens**: When used in integrations, Actors receive scoped tokens with minimal permissions
+- **Actor SDK Implementation**: Uses `Actor.open_dataset()` directly instead of external packages
+- **No langchain_apify Dependency**: Actors no longer depend on `langchain-apify` package, implementing dataset loading natively
+
+This ensures that the Actors follow security best practices and can only access resources explicitly granted to them.
+
+### Technical implementation
+
+The Actors declare required permissions in their configuration:
+
+```json
+{
+  "permissionLevel": "LIMITED_PERMISSIONS"
+}
+```
+
+And specify dataset resource requirements in the input schema:
+
+```json
+"datasetId": {
+  "resourceType": "dataset",
+  "resourcePermissions": ["READ"]
+}
+```
+
+## Supported vector embeddings
 - [OpenAI](https://platform.openai.com/docs/guides/embeddings)
 - [Cohere](https://cohere.com/embeddings)
 
 ## How to add a new integration (an example for PG-Vector)?
 
-1. Add database to [docker-compose.yml](docker-compose.yaml) for local testing (if the database is available in docker).
+1. Add database to [docker-compose.yaml](docker-compose.yaml) for local testing (if the database is available in docker).
 
 ```
 version: '3.8'
@@ -59,11 +89,16 @@ services:
    optional = true
    ```
    
-1. Create a new Actor in the `actors` directory, e.g. `actors/pgvector` and add the following files: 
+1. Create a new Actor in the `actors` directory, e.g. `actors/pgvector` and add the following files:
    - `README.md` - the Actor documentation
-   - `.actor/actor.json` - the Actor definition
-   - `.actor/input_schema.json` - the Actor input schema
-   - 
+   - `.actor/actor.json` - the Actor definition with `"permissionLevel": "LIMITED_PERMISSIONS"`
+   - `.actor/input_schema.json` - the Actor input schema with dataset resource declarations:
+     ```json
+     "datasetId": {
+       "resourceType": "dataset",
+       "resourcePermissions": ["READ"]
+     }
+     ``` 
 1. Create a pydantic model for the Actor input schema. Edit Makefile to generate the input schema from the model:
    ```bash
     datamodel-codegen --input $(DIRS_WITH_ACTORS)/pgvector/.actor/input_schema.json --output $(DIRS_WITH_CODE)/src/models/pgvector_input_model.py  --input-file-type jsonschema  --field-constraints
@@ -75,7 +110,7 @@ services:
 1. Import the created model in `src/models/__init__.py`:
    ```python
    from .pgvector_input_model import PgvectorIntegration
-   ``
+   ```
 1. Create a new module (`pgvector.py`) in the `vector_stores` directory, e.g. `vector_stores/pgvector` and implement all class `PGVectorDatabase` and all required methods.
 1. Add PGVector into `SupportedVectorStores` in the `constants.py` 
    ```python
@@ -148,13 +183,13 @@ services:
    apify run -p
    ````
 
-1. Setup Actor on Apify platform at `https://console.apify.com`
+1. Setup Actor on the Apify platform at `https://console.apify.com`
 
    Build configuration
    ```
-   Git URL: https://github.com/apify/store-vector-db
-   Branch: master
-   Folder: actors/pgvector
+   **Git URL**: https://github.com/apify/store-vector-db
+   **Branch**: master
+   **Folder**: actors/pgvector
    ```
 
 1. Test the Actor on the Apify platform

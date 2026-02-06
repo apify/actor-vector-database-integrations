@@ -5,11 +5,13 @@ import hashlib
 import logging
 from collections import defaultdict
 from datetime import datetime, timezone
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
-from langchain_apify import ApifyDatasetLoader
 from langchain_core.documents import Document
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 EXCLUDE_KEYS_FROM_CHECKSUM = {"metadata": {"chunk_id", "id", "checksum", "last_seen_at", "item_id"}}
 DAY_IN_SECONDS = 24 * 3600
@@ -46,23 +48,29 @@ def stringify_dict(d: dict, keys: list[str]) -> str:
     return "\n".join([f"{key}: {value}" for key in keys if (value := get_nested_value(d, key))])
 
 
-def get_dataset_loader(dataset_id: str, fields: list[str], meta_object: dict, meta_fields: dict) -> ApifyDatasetLoader:
-    """Load dataset by dataset_id using ApifyDatasetLoader.
+def create_dataset_mapping_function(fields: list[str], meta_object: dict, meta_fields: dict) -> Callable[[dict], Document]:
+    """Create a mapping function that transforms dataset items to Document objects.
 
-    The dataset_mapping_function is used to map the dataset item to a Document object.
-    Stringify dict using the fields.
+    This function returns a callable that can be used to transform raw dataset items
+    into langchain Document objects with proper page_content and metadata.
+
+    Args:
+        fields: List of dataset field paths to include in page_content
+        meta_object: Static metadata dictionary to add to every document
+        meta_fields: Mapping of metadata keys to dataset field paths
+
+    Returns:
+        A function that takes a dataset_item dict and returns a Document object
     """
-
-    return ApifyDatasetLoader(
-        dataset_id,
-        dataset_mapping_function=lambda dataset_item: Document(
+    def mapping_function(dataset_item: dict) -> Document:
+        return Document(
             page_content=stringify_dict(dataset_item, fields) or "",
             metadata={
                 **meta_object,
                 **{key: get_nested_value(dataset_item, value) for key, value in meta_fields.items()},
             },
-        ),
-    )
+        )
+    return mapping_function
 
 
 def compute_hash(text: str) -> str:

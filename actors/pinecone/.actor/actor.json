@@ -11,5 +11,6 @@
 	"storages": {
 		"dataset": "../../../shared/dataset_schema.json"
 	},
-	"dockerContextDir": "../../.."
+	"dockerContextDir": "../../..",
+	"permissionLevel": "LIMITED_PERMISSIONS"
 }

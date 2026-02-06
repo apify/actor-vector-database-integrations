@@ -8,7 +8,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from .constants import DAY_IN_SECONDS
 from .emb import get_embedding_provider
-from .utils import add_chunk_id, add_item_checksum, get_dataset_loader
+from .utils import add_chunk_id, add_item_checksum, create_dataset_mapping_function
 from .vcs import delete_expired_objects, get_vector_database, update_db_with_crawled_data, upsert_db_with_crawled_data
 
 if TYPE_CHECKING:
@@ -119,27 +119,42 @@ async def get_embeddings(actor_input: ActorInputsDb) -> Embeddings:  # type: ign
 
 
 async def load_dataset(actor_input: ActorInputsDb, dataset_id: str) -> list[Document]:  # type: ignore[return]
-    """Load dataset from the datasetId and extract fields from the dataset."""
+    """Load dataset from the datasetId and extract fields from the dataset.
 
-    # Add parameters related to chunking to every dataset item to be able to update DB when chunkSize, chunkOverlap or performChunking changes
+    Uses Actor.open_dataset() to respect limited permissions and scoped tokens.
+    """
+    # Add parameters related to chunking to every dataset item
     meta_object = actor_input.metadataObject or {}
-    meta_object.update({"chunkSize": actor_input.chunkSize, "chunkOverlap": actor_input.chunkOverlap, "performChunking": actor_input.performChunking})
+    meta_object.update({
+        "chunkSize": actor_input.chunkSize,
+        "chunkOverlap": actor_input.chunkOverlap,
+        "performChunking": actor_input.performChunking
+    })
 
     # Required for checksum calculation
-    # Update metadata fields with datasetFieldsToItemId for dataset loading
     meta_fields = actor_input.metadataDatasetFields or {}
     meta_fields.update({k: k for k in actor_input.dataUpdatesPrimaryDatasetFields or []})
     Actor.log.info("Load Dataset ID %s and extract fields %s", dataset_id, actor_input.datasetFields)
 
     try:
-        dataset_loader = get_dataset_loader(
-            str(dataset_id),
+        # Create the mapping function to transform dataset items to Documents
+        mapping_function = create_dataset_mapping_function(
             fields=actor_input.datasetFields,
             meta_object=meta_object,
             meta_fields=meta_fields,
         )
-        documents = dataset_loader.load()
-        documents = [doc for doc in documents if doc.page_content]
+
+        # Use Actor SDK method which respects the scoped token with granted permissions
+        dataset = await Actor.open_dataset(name=dataset_id)
+
+        # Load all items and transform them to Documents
+        documents = []
+        async for item in dataset.iterate_items():
+            doc = mapping_function(item)
+            # Only include documents with content
+            if doc.page_content:
+                documents.append(doc)
+
         Actor.log.info("Dataset loaded, number of documents: %s", len(documents))
 
     except Exception as e:
