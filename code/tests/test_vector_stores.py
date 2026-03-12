@@ -210,7 +210,7 @@ def test_update_db_with_crawled_data_all(input_db: str, crawl_2: list[Document],
 @pytest.mark.integration()
 @pytest.mark.parametrize("input_db", DATABASE_FIXTURES)
 def test_get_delete_all(input_db: str, request: FixtureRequest) -> None:
-    """Test that all items have benn deleted (delete_all is an internal function)."""
+    """Test that all items have been deleted (delete_all is an internal function)."""
 
     db: VectorDb = request.getfixturevalue(input_db)
 

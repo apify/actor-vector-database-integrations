@@ -93,8 +93,9 @@ class OpenSearchDatabase(OpenSearchVectorSearch, VectorDbBase):
         if not (res := res.get("hits", {}).get("hits")):
             return []
 
-        # OpenSearch creates a custom _id for each document, we need to return this _id in the metadata
-        return [Document(page_content="", metadata={"id": o["_id"], **o["_source"]["metadata"]}) for o in res]
+        # OpenSearch creates a custom _id for each document; store it in both "id" and "chunk_id" so
+        # that compare_crawled_data_with_db (which keys on chunk_id) picks up the correct internal ID.
+        return [Document(page_content="", metadata={"id": o["_id"], **o["_source"]["metadata"], "chunk_id": o["_id"]}) for o in res]
 
     def update_last_seen_at(self, ids: list[str], last_seen_at: int | None = None) -> None:
         """Update last_seen_at field in the database.

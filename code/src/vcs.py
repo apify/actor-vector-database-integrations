@@ -158,10 +158,13 @@ def compare_crawled_data_with_db(vector_store: VectorDb, data: list[Document]) -
     for d in data:
         if res := crawled_db.get(d.metadata["item_id"]):
             if d.metadata["checksum"] in {r.metadata["checksum"] for r in res}:
-                # Because of weaviate database, we need to use chunk_id instead of id
-                ids_update_last_seen.update({r.metadata.get("id") or r.metadata.get("chunk_id", ""): r for r in res})
+                # Use chunk_id as the primary key (the actual vector store ID).
+                # Fallback to id for databases that store their internal ID there (e.g. OpenSearch).
+                # Do NOT use id first: if the dataset contains an "id" field it will be stored in
+                # metadata and would shadow the real vector store ID, causing silent delete/update failures.
+                ids_update_last_seen.update({r.metadata.get("chunk_id") or r.metadata.get("id", ""): r for r in res})
             else:
-                ids_delete.update({r.metadata.get("id") or r.metadata.get("chunk_id", ""): r for r in res})
+                ids_delete.update({r.metadata.get("chunk_id") or r.metadata.get("id", ""): r for r in res})
                 data_add.append(d)
         else:
             data_add.append(d)
