@@ -72,11 +72,12 @@ class WeaviateDatabase(WeaviateVectorStore, VectorDbBase):
         collection = self.client.collections.get(name=self.collection_name)
         collection.data.delete_many(Filter.by_property("item_id").equal(item_id), verbose=True)
 
-    def delete_expired(self, expired_ts: int) -> None:
+    def delete_expired(self, expired_ts: int) -> int | None:
         """Delete objects from the index that are expired."""
 
         collection = self.client.collections.get(name=self.collection_name)
         collection.data.delete_many(Filter.by_property("last_seen_at").less_than(expired_ts), verbose=True)
+        return None
 
     def get(self, id_: str) -> Any:
         """Get a document by id from the database.

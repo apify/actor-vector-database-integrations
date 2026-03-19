@@ -111,7 +111,9 @@ def delete_expired_objects(vector_store: VectorDb, timestamp_expired: int) -> No
     if timestamp_expired:
         dt = datetime.datetime.fromtimestamp(timestamp_expired, tz=datetime.timezone.utc)
         Actor.log.info("About to delete objects from the database that were not seen since %s (timestamp: %s)", dt, timestamp_expired)
-        vector_store.delete_expired(timestamp_expired)
+        deleted_count = vector_store.delete_expired(timestamp_expired)
+        if deleted_count is not None:
+            Actor.log.info("Deleted %s expired objects from the vector store", deleted_count)
 
 
 def get_items_ids_from_db(vector_store: VectorDb, data: list[Document]) -> dict[str, list[Document]]:

@@ -27,8 +27,11 @@ class VectorDbBase(ABC):
         """Delete documents by item_id."""
 
     @abstractmethod
-    def delete_expired(self, expired_ts: int) -> None:
-        """Delete documents that are older than the ts_expired timestamp."""
+    def delete_expired(self, expired_ts: int) -> int | None:
+        """Delete documents that are older than the ts_expired timestamp.
+
+        Returns the number of deleted documents if known, otherwise None.
+        """
 
     @abstractmethod
     def delete_all(self) -> None:

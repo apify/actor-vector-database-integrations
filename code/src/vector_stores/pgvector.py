@@ -108,7 +108,7 @@ class PGVectorDatabase(PGVector, VectorDbBase):
         session.execute(stmt)
         session.commit()
 
-    def delete_expired(self, expired_ts: int) -> None:
+    def delete_expired(self, expired_ts: int) -> int | None:
         """Delete objects from the index that are expired."""
 
         with self._make_sync_session() as session:
@@ -122,6 +122,7 @@ class PGVectorDatabase(PGVector, VectorDbBase):
             )
             session.execute(stmt)
             session.commit()
+        return None
 
     def delete_all(self) -> None:
         """Delete all documents from the database.
