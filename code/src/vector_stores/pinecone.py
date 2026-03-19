@@ -124,13 +124,14 @@ class PineconeDatabase(PineconeVectorStore, VectorDbBase):
             self.delete(ids=ids, namespace=self.namespace)
 
     @backoff.on_exception(backoff.expo, PineconeApiException, max_time=BACKOFF_MAX_TIME_DELETE_SECONDS)
-    def delete_expired(self, expired_ts: int) -> None:
+    def delete_expired(self, expired_ts: int) -> int | None:
         """Delete objects from the index that are expired."""
 
         res = self.search_by_vector(self.dummy_vector, filter_={"last_seen_at": {"$lt": expired_ts}})
         ids = [d.metadata.get("id") or d.metadata.get("chunk_id", "") for d in res]
         ids = [_id for _id in ids if _id]
         self.delete(ids=ids, namespace=self.namespace)
+        return len(ids)
 
     def delete_all(self) -> None:
         """Delete all objects from the index in the namespace that the database was initialized.

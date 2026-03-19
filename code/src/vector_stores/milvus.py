@@ -62,9 +62,10 @@ class MilvusDatabase(Milvus, VectorDbBase):
         """Delete object by item_id."""
         self.client.delete(collection_name=self.collection_name, filter=f"item_id == '{item_id}'")
 
-    def delete_expired(self, expired_ts: int) -> None:
+    def delete_expired(self, expired_ts: int) -> int | None:
         """Delete objects from the index that are expired."""
         self.client.delete(collection_name=self.collection_name, filter=f"last_seen_at < {expired_ts}")
+        return None
 
     def get(self, id_: str) -> Any:
         """Get a document by id from the database.

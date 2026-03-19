@@ -107,7 +107,7 @@ class ChromaDatabase(Chroma, VectorDbBase):
             self.index.update(ids=ids_batch, metadatas=[{"last_seen_at": last_seen_at} for _ in ids_batch])
 
     @backoff.on_exception(backoff.expo, ChromaError, max_time=BACKOFF_MAX_TIME_DELETE_SECONDS)
-    def delete_expired(self, expired_ts: int) -> None:
+    def delete_expired(self, expired_ts: int) -> int | None:
         """Delete expired objects.
 
         Fetch all expired IDs first, then delete them in batches using the configured batch_size.
@@ -115,9 +115,10 @@ class ChromaDatabase(Chroma, VectorDbBase):
         r = self.index.get(where={"last_seen_at": {"$lt": expired_ts}}, include=[])  # type: ignore
         ids: list[str] = r.get("ids") or []
         if not ids:
-            return
+            return 0
         for ids_batch in batch(ids, self.batch_size):
             self.index.delete(ids=ids_batch)
+        return len(ids)
 
     def delete_by_item_id(self, item_id: str) -> None:
         """Delete documents by item_id.

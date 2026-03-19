@@ -110,11 +110,12 @@ class QdrantDatabase(Qdrant, VectorDbBase):
         )
 
     @backoff.on_exception(backoff.expo, ResponseHandlingException, max_time=BACKOFF_MAX_TIME_DELETE_SECONDS)
-    def delete_expired(self, expired_ts: int) -> None:
+    def delete_expired(self, expired_ts: int) -> int | None:
         """Delete objects from the index that are expired."""
         self.client.delete(
             self.collection_name, Filter(must=[FieldCondition(key=f"{self.metadata_payload_key}.last_seen_at", range=Range(lt=expired_ts))])
         )
+        return None
 
     def delete_all(self) -> None:
         """Delete all objects from the index."""

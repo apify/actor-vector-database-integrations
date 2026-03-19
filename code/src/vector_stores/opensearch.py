@@ -129,7 +129,7 @@ class OpenSearchDatabase(OpenSearchVectorSearch, VectorDbBase):
 
         self.delete(ids=[doc["_id"] for doc in hits])
 
-    def delete_expired(self, expired_ts: int) -> None:
+    def delete_expired(self, expired_ts: int) -> int | None:
         """Delete objects from the index that are expired.
 
         Note that delete_by_query is not working for Opensearch serverless.
@@ -137,10 +137,11 @@ class OpenSearchDatabase(OpenSearchVectorSearch, VectorDbBase):
         """
         res = self.client.search(index=self.index_name, body={"query": {"range": {"metadata.last_seen_at": {"lt": expired_ts}}}, "size": MAX_SIZE})
         if not (hits := res.get("hits", {}).get("hits")):
-            return
+            return 0
 
         # delete the expired documents
         self.delete(ids=[doc["_id"] for doc in hits])
+        return len(hits)
 
     def get_all_ids(self) -> list[str]:
         """Get all document ids from the database.
